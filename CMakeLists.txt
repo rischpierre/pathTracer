@@ -22,18 +22,18 @@ find_library(USD_VT usd_vt HINTS ${USD_LIBRARY_DIRECTORY})
 find_package(PythonLibs REQUIRED)
 
 # 4. Include/Link Everything
-add_executable(run_it
+add_executable(pathTracer
         main.cpp
         )
 
-target_include_directories(run_it
+target_include_directories(pathTracer
         PUBLIC
         ${PYTHON_INCLUDE_PATH}
         ${USD_INCLUDE_DIRECTORY}
         )
 
 target_link_libraries(
-        run_it
+        pathTracer
         ${PYTHON_LIBRARY}
         ${USD_BOOST_PYTHON}
         ${USD_SDF}

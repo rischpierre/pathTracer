@@ -7,16 +7,17 @@ RUN apt-get -y install wget git
 RUN apt-get -y install python3 python3-pip
 RUN apt-get -y install gdb
 
-# todo build and install cmake from source instead
-RUN apt-get -y install cmake
-# install precompiled cmake to have a newer version (needed for USD compilation)
-# ARG cmakeVersion=3.23.2
-# RUN wget -nv https://github.com/Kitware/CMake/releases/download/v$cmakeVersion/cmake-$cmakeVersion-linux-x86_64.tar.gz
-# RUN tar -xzvf cmake-$cmakeVersion-linux-x86_64.tar.gz
-
-# todo copy cmake to /usr/bin
-# ENV PATH="/tmp/cmake-$cmakeVersion-linux-x86_64/bin:${PATH}"
-
+# Cmake custom install because the ppa repo is not up to date for USD
+WORKDIR /tmp
+RUN apt-get install -y libssl-dev   # required for cmake
+ARG CMAKE_VERSION_FULL=3.23.2
+ARG CMAKE_VERSION_MINOR=3.23
+RUN wget https://cmake.org/files/v${CMAKE_VERSION_MINOR}/cmake-${CMAKE_VERSION_FULL}.tar.gz
+RUN tar xzf cmake-${CMAKE_VERSION_FULL}.tar.gz
+WORKDIR /tmp/cmake-${CMAKE_VERSION_FULL}
+RUN ./configure
+RUN make
+RUN make install
 WORKDIR /home
 
 # Install USD

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 2.8...3.22)
 project(pathTracer)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -7,12 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(USD_LIBRARY_DIRECTORY $ENV{USD_INSTALL_ROOT}/lib)
 set(USD_INCLUDE_DIRECTORY $ENV{USD_INSTALL_ROOT}/include)
 
-find_library(USD_BOOST_PYTHON boost_python38 HINTS ${USD_LIBRARY_DIRECTORY})
-find_library(USD_SDF usd_sdf HINTS /opt/USD/lib)
-find_library(USD_TF usd_tf HINTS ${USD_LIBRARY_DIRECTORY})
-find_library(USD_USD usd_usd HINTS ${USD_LIBRARY_DIRECTORY})
-find_library(USD_USDGEOM usd_usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
-find_library(USD_VT usd_vt HINTS ${USD_LIBRARY_DIRECTORY})
+#find_library(USD_BOOST_PYTHON boost_python38 HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_SDF sdf HINTS /opt/USD/lib)
+find_library(USD_TF tf HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 #find_package(PythonLibs REQUIRED)
 
 add_executable(pathTracer
@@ -28,7 +28,7 @@ target_include_directories(pathTracer
 target_link_libraries(
         pathTracer
 #        ${PYTHON_LIBRARY}
-        ${USD_BOOST_PYTHON}
+#        ${USD_BOOST_PYTHON}
         ${USD_SDF}
         ${USD_TF}
         ${USD_USDGEOM}

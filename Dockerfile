@@ -42,3 +42,6 @@ RUN python /tmp/USD/build_scripts/build_usd.py  \
     ${USD_INSTALL_ROOT}
 
 RUN rm -rf /tmp/USD
+
+# todo set var directly above
+ENV USD_INSTALL_ROOT=$USD_INSTALL_ROOT

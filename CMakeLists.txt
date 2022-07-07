@@ -13,7 +13,7 @@ find_library(USD_TF usd_tf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USD usd_usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usd_usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT usd_vt HINTS ${USD_LIBRARY_DIRECTORY})
-find_package(PythonLibs REQUIRED)
+#find_package(PythonLibs REQUIRED)
 
 add_executable(pathTracer
         main.cpp
@@ -21,13 +21,13 @@ add_executable(pathTracer
 
 target_include_directories(pathTracer
         PUBLIC
-        ${PYTHON_INCLUDE_PATH}
+#        ${PYTHON_INCLUDE_PATH}
         ${USD_INCLUDE_DIRECTORY}
         )
 
 target_link_libraries(
         pathTracer
-        ${PYTHON_LIBRARY}
+#        ${PYTHON_LIBRARY}
         ${USD_BOOST_PYTHON}
         ${USD_SDF}
         ${USD_TF}

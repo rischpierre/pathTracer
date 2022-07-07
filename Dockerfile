@@ -9,8 +9,8 @@ RUN apt-get -y install gdb
 WORKDIR /tmp
 
 RUN apt-get install -y libssl-dev   # required for cmake
-ARG CMAKE_VERSION_FULL=3.23.2
-ARG CMAKE_VERSION_MINOR=3.23
+ARG CMAKE_VERSION_FULL=3.22.5
+ARG CMAKE_VERSION_MINOR=3.22
 RUN wget -q https://cmake.org/files/v${CMAKE_VERSION_MINOR}/cmake-${CMAKE_VERSION_FULL}.tar.gz
 RUN tar xzf cmake-${CMAKE_VERSION_FULL}.tar.gz
 WORKDIR /tmp/cmake-${CMAKE_VERSION_FULL}
@@ -19,7 +19,7 @@ RUN make
 RUN make install
 RUN make clean
 RUN rm -rf /tmp/cmake-${CMAKE_VERSION_FULL}
-RUN rm cmake-${CMAKE_VERSION_FULL}.tar.gz
+RUN rm /tmp/cmake-${CMAKE_VERSION_FULL}.tar.gz
 
 # Install USD
 WORKDIR /tmp
@@ -27,7 +27,6 @@ ARG USD_VERSION=19.11
 ARG USD_ROOT=/opt/USD
 
 RUN git clone -b v${USD_VERSION} https://github.com/PixarAnimationStudios/USD
-# RUN python /tmp/USD/build_scripts/build_usd.py --help
 RUN python /tmp/USD/build_scripts/build_usd.py  \
     --no-embree \
     --no-maya \

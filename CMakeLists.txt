@@ -7,28 +7,28 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(USD_LIBRARY_DIRECTORY $ENV{USD_INSTALL_ROOT}/lib)
 set(USD_INCLUDE_DIRECTORY $ENV{USD_INSTALL_ROOT}/include)
 
-#find_library(USD_BOOST_PYTHON boost_python38 HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_SDF sdf HINTS /opt/USD/lib)
 find_library(USD_TF tf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
-#find_package(PythonLibs REQUIRED)
 
-add_executable(pathTracer
+add_executable(
+        pathTracer
         main.cpp
+        scene.cpp
+        scene.h
         )
 
-target_include_directories(pathTracer
+target_include_directories(
+        pathTracer
+        SYSTEM
         PUBLIC
-#        ${PYTHON_INCLUDE_PATH}
         ${USD_INCLUDE_DIRECTORY}
         )
 
 target_link_libraries(
         pathTracer
-#        ${PYTHON_LIBRARY}
-#        ${USD_BOOST_PYTHON}
         ${USD_SDF}
         ${USD_TF}
         ${USD_USDGEOM}

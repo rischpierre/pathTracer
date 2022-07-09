@@ -44,19 +44,6 @@ void writeToFile(const std::string &path, int width, int height, const Vector3f 
     }
     std::cout << "Wrote file " << path << std::endl;
 
-    // test to see if the file is correct
-//    int width = 2;
-//    int height = 2;
-//
-//    auto *pixels = new Vector3f[width * height];
-//    pixels[0] = Vector3f(1, 0, 0);
-//    pixels[1] = Vector3f(1, 0, 0);
-//    pixels[2] = Vector3f(0, 1, 0);
-//    pixels[3] = Vector3f(0, 1, 0);
-//
-//    writeToFile("test.ppm", width, height, pixels);
-//
-//    delete[] pixels;
 }
 
 int main(int argc, char *argv[]){
@@ -76,16 +63,21 @@ int main(int argc, char *argv[]){
 
     Scene scene = Scene(path);
 
-    // todo main loop here
+    // todo continue main loop here
+
+    auto *pixels = new Vector3f[RESOLUTION_W * RESOLUTION_H];
     auto camOrig = Vector3f(0, 10 ,0);
     auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
     auto ray = Ray(camOrig, camDir);
 
     for (int y = 0; y < RESOLUTION_H; y++) {
         for (int x = 0; x < RESOLUTION_W; x++) {
-            std::cout << x << y << std::endl;
-            }
+            pixels[y * RESOLUTION_W + x] = Vector3f(0, 0, 1);
         }
+    }
+
+    writeToFile("test.ppm", RESOLUTION_W, RESOLUTION_H, pixels);
+    delete[] pixels;
 
     return 0;
 }

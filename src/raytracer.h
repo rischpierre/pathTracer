@@ -28,10 +28,28 @@
  *
  */
 
-//#ifndef RAYTRACEREXPERIMENT_RAYTRACER_H
-//#define RAYTRACEREXPERIMENT_RAYTRACER_H
-//
-//bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance);
-//
-//
-//#endif //RAYTRACEREXPERIMENT_RAYTRACER_H
+#ifndef RAYTRACEREXPERIMENT_RAYTRACER_H
+#define RAYTRACEREXPERIMENT_RAYTRACER_H
+
+#include <Eigen>
+
+#define RAY_TRACING_THRESHOLD 0.000001
+
+using namespace Eigen;
+
+class Triangle {
+public:
+    Triangle(Vector3f &v0, Vector3f &v1, Vector3f &v2) : v0(v0), v1(v1), v2(v2) {}
+    Vector3f v0, v1, v2;
+};
+
+class Ray {
+public:
+    Ray(Vector3f &o, Vector3f &d) : o(o), d(d){}
+    Vector3f o, d;
+};
+
+bool isRayIntersectsTriangle(const Ray *ray, const Triangle *tri, float *distance);
+
+
+#endif //RAYTRACEREXPERIMENT_RAYTRACER_H

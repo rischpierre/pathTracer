@@ -43,4 +43,6 @@ RUN rm -rf /tmp/USD
 
 # Install eigen3 (header lib only)
 RUN cd /opt && git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git
-ENV EIGEN3_INCLUDE_DIR=/opt/eigen/Eigen
+RUN cp -r /opt/eigen/Eigen /opt/Eigen
+RUN rm -rf /opt/eigen
+ENV EIGEN3_INCLUDE_DIR=/opt/Eigen

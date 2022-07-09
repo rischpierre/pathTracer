@@ -25,6 +25,7 @@ target_include_directories(
         SYSTEM
         PUBLIC
         ${USD_INCLUDE_DIRECTORY}
+        $ENV{EIGEN3_INCLUDE_DIR}
         )
 
 target_link_libraries(

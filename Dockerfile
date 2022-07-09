@@ -24,8 +24,7 @@ RUN rm /tmp/cmake-${CMAKE_VERSION_FULL}.tar.gz
 # Install USD
 WORKDIR /tmp
 ARG USD_VERSION=19.11
-ARG USD_INSTALL_ROOT=/opt/USD
-
+ENV USD_INSTALL_ROOT=/opt/USD
 RUN git clone -b v${USD_VERSION} https://github.com/PixarAnimationStudios/USD
 RUN python /tmp/USD/build_scripts/build_usd.py  \
     --no-embree \
@@ -40,8 +39,8 @@ RUN python /tmp/USD/build_scripts/build_usd.py  \
     --no-tests \
     --no-draco \
     ${USD_INSTALL_ROOT}
-
 RUN rm -rf /tmp/USD
 
-# todo set var directly above
-ENV USD_INSTALL_ROOT=$USD_INSTALL_ROOT
+# Install eigen3 (header lib only)
+RUN cd /opt && git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git
+ENV EIGEN3_INCLUDE_DIR=/opt/eigen/Eigen

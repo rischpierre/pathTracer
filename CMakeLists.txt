@@ -13,10 +13,10 @@ find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 
-file(GLOB_RECURSE SOURCES src/*.cpp)
-file(GLOB_RECURSE HEADERS src/*.h)
+file(GLOB_RECURSE SRCS src/*.cpp)
+file(GLOB_RECURSE HDRS src/*.h)
 
-add_executable(pathTracer ${SOURCES} ${HEADERS})
+add_executable(pathTracer ${SRCS} ${HDRS})
 
 target_include_directories(
         pathTracer

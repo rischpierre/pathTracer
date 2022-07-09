@@ -8,6 +8,23 @@
 using namespace Eigen;
 
 
+#define BG_COLOR_R 0.1f
+#define BG_COLOR_G 0.1f
+#define BG_COLOR_B 0.11f
+
+#define MAIN_RESOLUTION_W 1280
+#define MAIN_RESOLUTION_H 720
+#define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
+
+#define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
+#define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
+
+#define CAM_FILM_SIZE_W 3.6f   // 24 36 film back size
+#define CAM_FILM_SIZE_H 2.25f  // !6:9 ratio
+#define CAM_FOCAL_LENGTH 4  // in mmm
+#define WORLD_MAX_DISTANCE 9999999.f
+#define RAY_TRACING_THRESHOLD 0.000001
+
 // todo put that somewhere else
 void writeToFile(const std::string &path, int width, int height, const Vector3f *pixels) {
 
@@ -58,6 +75,17 @@ int main(int argc, char *argv[]){
     }
 
     Scene scene = Scene(path);
+
+    // todo main loop here
+    auto camOrig = Vector3f(0, 10 ,0);
+    auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
+    auto ray = Ray(camOrig, camDir);
+
+    for (int y = 0; y < RESOLUTION_H; y++) {
+        for (int x = 0; x < RESOLUTION_W; x++) {
+            std::cout << x << y << std::endl;
+            }
+        }
 
     return 0;
 }

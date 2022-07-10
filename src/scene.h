@@ -7,18 +7,37 @@
 #include <pxr/usd/usd/attribute.h>
 
 #include <Eigen>
+
+using namespace std;
+using namespace Eigen;
+
+class Mesh {
+    public:
+        explicit Mesh(vector<Vector3f> *vertices);
+        vector<Vector3f> *vertices;
+
+        int getFaceNb();
+
+    private:
+        int faceNb;
+};
+
+class Camera {
+
+public:
+    explicit Camera() {};
+};
+
 class Scene {
 
 public:
     explicit Scene(const std::string &path);
-    pxr::VtVec3fArray* getPoints();
+    vector<Mesh> getMeshes();
     ~Scene();
 
 private:
-    std::vector<pxr::UsdPrim> primitives;
-    pxr::VtVec3fArray *points;
+    Mesh testMesh;
+    vector<Mesh> meshes;
 };
-
-
 
 #endif //PATHTRACER_SCENEPARSER_H

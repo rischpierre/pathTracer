@@ -1,6 +1,5 @@
 #include "scene.h"
 
-//using namespace std;
 
 Scene::Scene(const std::string &path){
 
@@ -10,35 +9,17 @@ Scene::Scene(const std::string &path){
 //    auto attribute = primitive.GetAttribute(pxr::TfToken {"points"});
 //    Scene::points = new pxr::VtVec3fArray();
 //    attribute.Get(Scene::points, 0);
+    Vector3f v1(1, 2, -2);
+    Vector3f v2(1, 2, 1);
+    Vector3f v3(-2, 2, 1);
 
-    Vector3f t1(1, 2, -2);
-    Vector3f t2(1, 2, 1);
-    Vector3f t3(-2, 2, 1);
+    Face tri(v1, v2, v3);
 
-    vector<Vector3f> vertices[3];
-    vertices->push_back(t1);
-    vertices->push_back(t2);
-    vertices->push_back(t3);
+    vector<Face> triangles;
+    triangles.push_back(tri);
 
-    Mesh mesh(vertices);
-    this->testMesh = mesh;
-    this->meshes.push_back(this->testMesh);
+    Mesh testMesh(triangles);
+    this->meshes.push_back(testMesh);
 }
 
-vector<Mesh> Scene::getMeshes(){
-    return Scene::meshes;
-}
 
-Scene::~Scene() {
-    delete this->testMesh;
-    delete[] this->meshes;
-}
-
-int Mesh::getFaceNb(){
-    return this->faceNb;
-}
-
-Mesh::Mesh(vector<Vector3f> *vertices){
-    this->vertices = vertices;
-    this->faceNb = vertices->size();
-}

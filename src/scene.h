@@ -5,21 +5,21 @@
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usd/attribute.h>
-
 #include <Eigen>
+
+#include "raytracer.h"
 
 using namespace std;
 using namespace Eigen;
 
 class Mesh {
-    public:
-        explicit Mesh(vector<Vector3f> *vertices);
-        vector<Vector3f> *vertices;
+public:
+    Mesh(vector<Face> &faces) {this->faces = faces;}
 
-        int getFaceNb();
+    vector<Face> getFaces() {return this->faces;}
 
-    private:
-        int faceNb;
+private:
+    vector<Face> faces;
 };
 
 class Camera {
@@ -29,14 +29,12 @@ public:
 };
 
 class Scene {
-
 public:
-    explicit Scene(const std::string &path);
-    vector<Mesh> getMeshes();
-    ~Scene();
+    Scene(const std::string &path);
+
+    vector<Mesh> getMeshes() {return this->meshes;}
 
 private:
-    Mesh testMesh;
     vector<Mesh> meshes;
 };
 

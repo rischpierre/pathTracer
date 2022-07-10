@@ -46,14 +46,14 @@
  * intersection between the ray and the face.
  * return: true if the ray intersect the face.
  */
-bool isRayIntersectsTriangle(const Ray *ray, const Triangle *tri, float *distance) {
+bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance) {
 
     Vector3f edge1, edge2, p, q, t;
     float det, u, v, invertedDet;
 
     // find the two edges around V0
-    edge1 = tri->v1 - tri->v0;
-    edge2 = tri->v2 - tri->v0;
+    edge1 = face->v1 - face->v0;
+    edge2 = face->v2 - face->v0;
 
     //  get p
     p = ray->d.cross(edge2);
@@ -67,7 +67,7 @@ bool isRayIntersectsTriangle(const Ray *ray, const Triangle *tri, float *distanc
     invertedDet = 1.f / det;
 
     // distance from V to ray origin
-    t = ray->o - tri->v0;
+    t = ray->o - face->v0;
 
     // calculate u param
     u = t.dot(p) * invertedDet;

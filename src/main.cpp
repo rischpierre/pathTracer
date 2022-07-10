@@ -86,19 +86,18 @@ int main(int argc, char *argv[]){
             float maxDistance = WORLD_MAX_DISTANCE;
             Face *nearestFace = nullptr;
 
+            // todo this is a test with a single test mesh
             Mesh currentMesh = scene.getMeshes()[0];
-            for (int i = 0; i < currentMesh.getFaceNb(); i++) {
+            for (auto  &face: currentMesh.getFaces()) {
 
-                Face *currentFace = currentMesh.faces[i];
-
-                bool intersected = isRayIntersectsTriangle(&ray, currentFace, &distance);
+                bool intersected = isRayIntersectsTriangle(&ray, &face, &distance);
                 if (!intersected) {
                     continue;
                 }
 
                 if (distance < maxDistance) {
                     maxDistance = distance;
-                    nearestFace = currentFace;
+                    nearestFace = &face;
                 }
             }
             auto color = Vector3f(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B);

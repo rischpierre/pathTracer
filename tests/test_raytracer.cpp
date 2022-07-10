@@ -43,7 +43,7 @@ TEST(raytracer, test_ray_inside_triangle) {
     Vector3f t1(1, 2, -2);
     Vector3f t2(1, 2, 1);
     Vector3f t3(-2, 2, 1);
-    Triangle t(t1, t2, t3);
+    Face t(t1, t2, t3);
 
     float d;
     ASSERT_TRUE(isRayIntersectsTriangle(&ray, &t, &d));
@@ -58,7 +58,7 @@ TEST(raytracer, test_ray_outside_triangle) {
     Vector3f t1(-1, 2, -2);
     Vector3f t2(-1, 2, 1);
     Vector3f t3(-4, 2, 1);
-    Triangle t(t1, t2, t3);
+    Face t(t1, t2, t3);
 
     float d;
     ASSERT_FALSE(isRayIntersectsTriangle(&ray, &t, &d));
@@ -74,7 +74,7 @@ TEST(raytracer, test_ray_inside_tilted_triangle) {
     Vector3f t1(1, 1.412, -1.34);
     Vector3f t2(1, 2.95, 1.22);
     Vector3f t3(-2, 2.95, 1.22);
-    Triangle t(t1, t2, t3);
+    Face t(t1, t2, t3);
 
     float d;
     ASSERT_TRUE(isRayIntersectsTriangle(&ray, &t, &d));
@@ -90,7 +90,7 @@ TEST(raytracer, test_ray_outside_tilted_triangle) {
     Vector3f t1(1, 1.412, -1.34);
     Vector3f t2(1, 2.95, 1.22);
     Vector3f t3(-2, 2.95, 1.22);
-    Triangle t(t1, t2, t3);
+    Face t(t1, t2, t3);
 
     float d;
     ASSERT_FALSE(isRayIntersectsTriangle(&ray, &t, &d));

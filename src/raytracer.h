@@ -37,9 +37,9 @@
 
 using namespace Eigen;
 
-class Triangle {
+class Face {
 public:
-    Triangle(Vector3f &v0, Vector3f &v1, Vector3f &v2) : v0(v0), v1(v1), v2(v2) {}
+    Face(Vector3f &v0, Vector3f &v1, Vector3f &v2) : v0(v0), v1(v1), v2(v2) {}
     Vector3f v0, v1, v2;
 };
 
@@ -49,7 +49,7 @@ public:
     Vector3f o, d;
 };
 
-bool isRayIntersectsTriangle(const Ray *ray, const Triangle *tri, float *distance);
+bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance);
 
 
 #endif //RAYTRACEREXPERIMENT_RAYTRACER_H

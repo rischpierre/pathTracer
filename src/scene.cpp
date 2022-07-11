@@ -9,9 +9,9 @@ Scene::Scene(const std::string &path){
 //    auto attribute = primitive.GetAttribute(pxr::TfToken {"points"});
 //    Scene::points = new pxr::VtVec3fArray();
 //    attribute.Get(Scene::points, 0);
-    Vector3f v1(1, 2, -2);
-    Vector3f v2(1, 2, 1);
-    Vector3f v3(-2, 2, 1);
+    Vector3f v1(1, 10, -2);
+    Vector3f v2(1, 10, 1);
+    Vector3f v3(-2, 10, 1);
 
     Face tri(v1, v2, v3);
 

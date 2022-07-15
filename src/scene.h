@@ -1,6 +1,7 @@
 #ifndef PATHTRACER_SCENEPARSER_H
 #define PATHTRACER_SCENEPARSER_H
 
+#include <iostream>
 
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
@@ -32,7 +33,7 @@ class Scene {
 public:
     Scene(const std::string &path);
 
-    vector<Mesh> getMeshes() {return this->meshes;}
+    void parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, vector<pxr::UsdPrim> &rPrims);
 
 private:
     vector<Mesh> meshes;

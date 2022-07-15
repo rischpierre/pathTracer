@@ -1,26 +1,31 @@
 #include "scene.h"
 
 
-#include <pxr/usd/usdGeom/xform.h>
-#include <pxr/usd/usdGeom/mesh.h>
-
 Scene::Scene(const std::string &path){
 
-    auto stage = pxr::UsdStage::Open(path);
+    const auto stage = pxr::UsdStage::Open(path);
 
     // todo traverse tree instead to get all geom mesh primitives in the scene
-    auto primitive = stage->GetPrimAtPath(pxr::SdfPath {"/Cube/Cube"});
+    pxr::UsdPrim root = stage->GetPrimAtPath(pxr::SdfPath {"/"});
 
-    auto mesh = pxr::UsdGeomMesh(primitive);
+    vector<pxr::UsdPrim> prims;
+    parseUSDMeshes(root, *stage, prims);
+    std::cout << prims.empty() << endl;
 
-    // todo lets get the prim vars like this:
-    auto *faceVertexIndices = new pxr::VtIntArray;
-    auto faceVAttr = mesh.GetFaceVertexIndicesAttr();
-    faceVAttr.Get(faceVertexIndices);
-
-    for (auto &p: *faceVertexIndices){
-        cout << p << endl;
+    for (auto &p: prims) {
+        std::cout << p.GetPath().GetString() << endl;
     }
+
+//    auto mesh = pxr::UsdGeomMesh(primitive);
+//
+//    // todo lets get the prim vars like this:
+//    auto *faceVertexIndices = new pxr::VtIntArray;
+//    auto faceVAttr = mesh.GetFaceVertexIndicesAttr();
+//    faceVAttr.Get(faceVertexIndices);
+//
+//    for (auto &p: *faceVertexIndices){
+//        cout << p << endl;
+//    }
 
 
 //    mesh.GetNormalsAttr();
@@ -64,3 +69,12 @@ Scene::Scene(const std::string &path){
 }
 
 
+void Scene::parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, vector<pxr::UsdPrim> &rPrims) {
+    // todo
+    for (pxr::UsdPrim childPrim: prim.GetChildren()) {
+        if (childPrim.GetTypeName() == pxr::TfToken("Mesh")) {
+            rPrims.push_back(childPrim);
+            parseUSDMeshes(prim, stage, rPrims);
+        }
+    }
+}

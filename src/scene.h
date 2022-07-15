@@ -5,38 +5,32 @@
 
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
+#include <pxr/usd/usdGeom/mesh.h>
 #include <pxr/usd/usd/attribute.h>
 #include <Eigen>
 
-#include "raytracer.h"
 
-using namespace std;
-using namespace Eigen;
-
-class Mesh {
-public:
-    Mesh(vector<Face> &faces) {this->faces = faces;}
-
-    vector<Face> getFaces() {return this->faces;}
-
-private:
-    vector<Face> faces;
+struct Face {
+    Face(Eigen::Vector3f &v0, Eigen::Vector3f &v1, Eigen::Vector3f &v2) : v0(v0), v1(v1), v2(v2) {}
+    Eigen::Vector3f v0, v1, v2;
 };
 
-class Camera {
+struct Mesh {
+    Mesh(std::vector<Face> &faces) {this->faces = faces;}
+    std::vector<Face> getFaces() {return this->faces;}
+    std::vector<Face> faces;
+};
 
-public:
-    explicit Camera() {};
+struct Camera {
 };
 
 class Scene {
 public:
     Scene(const std::string &path);
 
-    void parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, vector<pxr::UsdPrim> &rPrims);
+    void parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims);
 
-private:
-    vector<Mesh> meshes;
+    std::vector<Mesh> meshes;
 };
 
 #endif //PATHTRACER_SCENEPARSER_H

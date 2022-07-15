@@ -6,7 +6,7 @@
 #include "scene.h"
 #include "raytracer.h"
 #include "math.h"
-
+#include <ctime>
 
 using namespace Eigen;
 
@@ -64,52 +64,60 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
+    clock_t t1 = clock();
     Scene scene = Scene(path);
+    clock_t t2 = clock();
+    std::cout << "Parsed scene in " << (t2 - t1) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
 
     // todo continue main loop here
+
+    t1 = clock();
 
     auto *pixels = new Vector3f[RESOLUTION_W * RESOLUTION_H];
     auto camOrig = Vector3f(0, 0,0);
     auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
     auto ray = Ray(camOrig, camDir);
 
-//    for (int y = 0; y < RESOLUTION_H; y++) {
-//        for (int x = 0; x < RESOLUTION_W; x++) {
-//
-//            ray.d[0] = lerpRange((float)x, 0, (float)RESOLUTION_W, -CAM_FILM_SIZE_W / 2,
-//                                         CAM_FILM_SIZE_W / 2);
-//
-//            ray.d[2] = lerpRange((float)y, 0, (float)RESOLUTION_H, -CAM_FILM_SIZE_H / 2,
-//                                         CAM_FILM_SIZE_H / 2);
-//
-//            float distance = WORLD_MAX_DISTANCE;
-//            float maxDistance = WORLD_MAX_DISTANCE;
-//            Face *nearestFace = nullptr;
-//
-//            // todo this is a test with a single test mesh
-//            Mesh currentMesh = scene.getMeshes()[0];
-//            for (auto  &face: currentMesh.getFaces()) {
-//
-//                bool intersected = isRayIntersectsTriangle(&ray, &face, &distance);
-//                if (!intersected) {
-//                    continue;
-//                }
-//
-//                if (distance < maxDistance) {
-//                    maxDistance = distance;
-//                    nearestFace = &face;
-//                }
-//            }
-//            auto color = Vector3f(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B);
-//
-//            if (nearestFace) {
-//                color[0] = 1;
-//                color[1] = 0;
-//                color[2] = 0;
-//            }
-//            pixels[y * RESOLUTION_W + x] = color;
-//        }
-//    }
+    for (int y = 0; y < RESOLUTION_H; y++) {
+        for (int x = 0; x < RESOLUTION_W; x++) {
+
+            ray.d[0] = lerpRange((float)x, 0, (float)RESOLUTION_W, -CAM_FILM_SIZE_W / 2,
+                                         CAM_FILM_SIZE_W / 2);
+
+            ray.d[2] = lerpRange((float)y, 0, (float)RESOLUTION_H, -CAM_FILM_SIZE_H / 2,
+                                         CAM_FILM_SIZE_H / 2);
+
+            float distance = WORLD_MAX_DISTANCE;
+            float maxDistance = WORLD_MAX_DISTANCE;
+            Face *nearestFace = nullptr;
+
+            for (Mesh &mesh: scene.meshes){
+                for (auto  &face: mesh.faces) {
+
+                    bool intersected = isRayIntersectsTriangle(&ray, &face, &distance);
+                    if (!intersected) {
+                        continue;
+                    }
+
+                    if (distance < maxDistance) {
+                        maxDistance = distance;
+                        nearestFace = &face;
+                    }
+                }
+                auto color = Vector3f(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B);
+
+                if (nearestFace) {
+                    color[0] = 1;
+                    color[1] = 0;
+                    color[2] = 0;
+                }
+                pixels[y * RESOLUTION_W + x] = color;
+            }
+        }
+    }
+
+    t2 = clock();
+    std::cout << "Rendered in " << (t2 - t1) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
 
     writeToFile("test.ppm", RESOLUTION_W, RESOLUTION_H, pixels);
     delete[] pixels;

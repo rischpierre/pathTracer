@@ -11,13 +11,28 @@
 
 
 struct Face {
-    Face(Eigen::Vector3f &v0, Eigen::Vector3f &v1, Eigen::Vector3f &v2, Eigen::Vector3f &n) : v0(v0), v1(v1), v2(v2), n(n) {}
-    Eigen::Vector3f v0, v1, v2, n;
+    Face(Eigen::Vector3f &v0,
+         Eigen::Vector3f &v1,
+         Eigen::Vector3f &v2,
+         Eigen::Vector3f &nf,
+         Eigen::Vector3f &n0,
+         Eigen::Vector3f &n1,
+         Eigen::Vector3f &n2) : v0(v0),
+                                v1(v1),
+                                v2(v2),
+                                nf(nf),
+                                n0(n0),
+                                n1(n1),
+                                n2(n2) {}
+
+    Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
 };
 
 struct Mesh {
-    Mesh(std::vector<Face> &faces) {this->faces = faces;}
-    std::vector<Face> getFaces() {return this->faces;}
+    Mesh(std::vector<Face> &faces) { this->faces = faces; }
+
+    std::vector<Face> getFaces() { return this->faces; }
+
     std::vector<Face> faces;
 };
 

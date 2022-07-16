@@ -12,11 +12,10 @@
 
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
-
 #define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
 #define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
-
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
+
 #define CAM_FILM_SIZE_W 3.6f   // 24 36 film back size
 #define CAM_FILM_SIZE_H 2.25f  // !6:9 ratio
 #define CAM_FOCAL_LENGTH 4  // in mmm

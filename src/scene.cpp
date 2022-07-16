@@ -55,23 +55,28 @@ Scene::Scene(const std::string &path){
             auto n1 = pxr::GfVec3f(normals[v1Id][0], normals[v1Id][1], normals[v1Id][2]);
             auto n2 = pxr::GfVec3f(normals[v2Id][0], normals[v2Id][1], normals[v2Id][2]);
 
+
             v0 = localToWorldMat.Transform(v0);
             v1 = localToWorldMat.Transform(v1);
             v2 = localToWorldMat.Transform(v2);
 
-            // todo do I need to average the 3 n vectors??
-            // todo only rotate the N
-            // todo compute the shading normal with the hit point in order to have smooth normals (shading normals)
-            // https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/shading-normals
-//            n0 = localToWorldMat.Transform(n0);
+            // Transform normals to world space (only Rotation)
+            n0 = localToWorldMat.TransformDir(n0);
+            n1 = localToWorldMat.TransformDir(n1);
+            n2 = localToWorldMat.TransformDir(n2);
+
+            auto n0e = Eigen::Vector3f(n0[0], n0[1], n0[2]);
+            auto n1e = Eigen::Vector3f(n1[0], n1[1], n1[2]);
+            auto n2e = Eigen::Vector3f(n2[0], n2[1], n2[2]);
 
             auto v0e = Eigen::Vector3f(v0[0], v0[1], v0[2]);
             auto v1e = Eigen::Vector3f(v1[0], v1[1], v1[2]);
             auto v2e = Eigen::Vector3f(v2[0], v2[1], v2[2]);
 
-            auto n = Eigen::Vector3f((n0[0] + n1[0] + n2[0])/3, (n0[1] + n1[1] + n1[1])/3, (n0[2] + n0[2] + n2[2])/3);
+            // compute Nf (face normal)
+            auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, n);
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e);
             faces.push_back(face);
         }
 

@@ -24,9 +24,11 @@ Eigen::Vector3f NormalIntegrator::getColor(const Ray &ray) {
 
         // todo make normal integrator
         if (nearestFace) {
-            color[0] = 1;
-            color[1] = 0;
-            color[2] = 0;
+            Eigen::Vector3f normal = nearestFace->n.normalized();
+//            std::cout << "normal: " << normal << std::endl;
+            color[0] = abs(normal.x());
+            color[1] = abs(normal.y());
+            color[2] = abs(normal.z());
         }
     }
     return color;

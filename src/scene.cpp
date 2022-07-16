@@ -15,6 +15,7 @@ Scene::Scene(const std::string &path){
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
         pxr::UsdAttribute pointsAttr = usdMesh.GetPointsAttr();
+        pxr::UsdAttribute normalsAttr = usdMesh.GetNormalsAttr();
         pxr::UsdAttribute fVertexIdAttr = usdMesh.GetFaceVertexIndicesAttr();
         pxr::UsdAttribute fVertexCountsAttr = usdMesh.GetFaceVertexCountsAttr();
 
@@ -22,10 +23,12 @@ Scene::Scene(const std::string &path){
         auto localToWorldMat = usdMesh.ComputeLocalToWorldTransform(0);
 
         pxr::VtVec3fArray points;
+        pxr::VtVec3fArray normals;
         pxr::VtIntArray fVertexIds;
         pxr::VtIntArray fVertexCounts;
 
         pointsAttr.Get(&points);
+        normalsAttr.Get(&normals);
         fVertexIdAttr.Get(&fVertexIds);
         fVertexCountsAttr.Get(&fVertexCounts);
 
@@ -47,15 +50,28 @@ Scene::Scene(const std::string &path){
             auto v0 = pxr::GfVec3f(points[v0Id][0], points[v0Id][1], points[v0Id][2]);
             auto v1 = pxr::GfVec3f(points[v1Id][0], points[v1Id][1], points[v1Id][2]);
             auto v2 = pxr::GfVec3f(points[v2Id][0], points[v2Id][1], points[v2Id][2]);
+
+            auto n0 = pxr::GfVec3f(normals[v0Id][0], normals[v0Id][1], normals[v0Id][2]);
+            auto n1 = pxr::GfVec3f(normals[v1Id][0], normals[v1Id][1], normals[v1Id][2]);
+            auto n2 = pxr::GfVec3f(normals[v2Id][0], normals[v2Id][1], normals[v2Id][2]);
+
             v0 = localToWorldMat.Transform(v0);
             v1 = localToWorldMat.Transform(v1);
             v2 = localToWorldMat.Transform(v2);
+
+            // todo do I need to average the 3 n vectors??
+            // todo only rotate the N
+            // todo compute the shading normal with the hit point in order to have smooth normals (shading normals)
+            // https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/shading-normals
+//            n0 = localToWorldMat.Transform(n0);
 
             auto v0e = Eigen::Vector3f(v0[0], v0[1], v0[2]);
             auto v1e = Eigen::Vector3f(v1[0], v1[1], v1[2]);
             auto v2e = Eigen::Vector3f(v2[0], v2[1], v2[2]);
 
-            Face face(v0e, v1e, v2e);
+            auto n = Eigen::Vector3f((n0[0] + n1[0] + n2[0])/3, (n0[1] + n1[1] + n1[1])/3, (n0[2] + n0[2] + n2[2])/3);
+
+            Face face(v0e, v1e, v2e, n);
             faces.push_back(face);
         }
 

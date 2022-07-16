@@ -11,8 +11,8 @@
 
 
 struct Face {
-    Face(Eigen::Vector3f &v0, Eigen::Vector3f &v1, Eigen::Vector3f &v2) : v0(v0), v1(v1), v2(v2) {}
-    Eigen::Vector3f v0, v1, v2;
+    Face(Eigen::Vector3f &v0, Eigen::Vector3f &v1, Eigen::Vector3f &v2, Eigen::Vector3f &n) : v0(v0), v1(v1), v2(v2), n(n) {}
+    Eigen::Vector3f v0, v1, v2, n;
 };
 
 struct Mesh {

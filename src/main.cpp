@@ -68,10 +68,12 @@ int main(int argc, char *argv[]){
     auto camOrig = Vector3f(0, 0,0);
     auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
 
-    tbb::parallel_for(0, RESOLUTION_H, [&scene, &pixels, &camDir, &camOrig](int y) {
+    NormalIntegrator integrator(scene);
+
+    tbb::parallel_for(0, RESOLUTION_H, [&](int y) {
 
         for (int x = 0; x < RESOLUTION_W; x++) {
-
+            //todo create a sampler for that
             auto ray = Ray(camOrig, camDir);
             ray.d[0] = lerpRange((float)x, 0, (float)RESOLUTION_W, -CAM_FILM_SIZE_W / 2,
                                          CAM_FILM_SIZE_W / 2);
@@ -79,7 +81,6 @@ int main(int argc, char *argv[]){
             ray.d[2] = lerpRange((float)y, 0, (float)RESOLUTION_H, -CAM_FILM_SIZE_H / 2,
                                          CAM_FILM_SIZE_H / 2);
 
-            NormalIntegrator integrator(scene);
             Eigen::Vector3f color = integrator.getColor(ray);
 
             pixels[y * RESOLUTION_W + x] = color;

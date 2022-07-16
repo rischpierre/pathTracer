@@ -8,7 +8,8 @@
 
 #include "scene.h"
 #include "raytracer.h"
-#include "normalIntegrator.h"
+#include "integrators/normalIntegrator.h"
+#include "integrators/facingRatioIntegrator.h"
 
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
@@ -69,6 +70,7 @@ int main(int argc, char *argv[]){
     auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
 
     NormalIntegrator integrator(scene);
+//    FacingRatioIntegrator integrator(scene);
 
     tbb::parallel_for(0, RESOLUTION_H, [&](int y) {
 

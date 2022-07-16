@@ -4,6 +4,7 @@ RUN apt-get -y update
 
 RUN apt-get -y install wget git
 RUN apt-get -y install gdb
+RUN apt-get -y install libtbb-dev
 
 # Cmake custom install because the ppa repo is not up to date for USD
 WORKDIR /tmp

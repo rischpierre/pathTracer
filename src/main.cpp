@@ -7,6 +7,7 @@
 #include "raytracer.h"
 #include "math.h"
 #include <ctime>
+#include <tbb/tbb.h>
 
 using namespace Eigen;
 
@@ -51,6 +52,25 @@ void writeToFile(const std::string &path, int width, int height, const Vector3f 
 
 int main(int argc, char *argv[]){
 
+    // todo test tbb
+//    std::vector<int> test;
+//    std::cout << "start" << std::endl;
+//
+//    for(int i = 0; i < 10; i++) {
+//        std::cout << "start t" << i << std::endl;
+//        test.push_back(i);
+//        usleep(100000);
+//    }
+//
+//    tbb::parallel_for(0, 10, [&test](int i) {
+//        std::cout << "start t" << i << std::endl;
+//        test.push_back(i);
+//        usleep(100000);
+//    });
+//
+//    std::cout << "end" << std::endl;
+
+
     if (argc != 2) {
         std::cout << "Usage: " << argv[0] << " <path to usd scene>" << std::endl;
         return 1;
@@ -67,7 +87,7 @@ int main(int argc, char *argv[]){
     clock_t t1 = clock();
     Scene scene = Scene(path);
     clock_t t2 = clock();
-    std::cout << "Parsed scene in " << (t2 - t1) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
     // todo continue main loop here
 
@@ -86,38 +106,11 @@ int main(int argc, char *argv[]){
 
             ray.d[2] = lerpRange((float)y, 0, (float)RESOLUTION_H, -CAM_FILM_SIZE_H / 2,
                                          CAM_FILM_SIZE_H / 2);
-
-            float distance = WORLD_MAX_DISTANCE;
-            float maxDistance = WORLD_MAX_DISTANCE;
-            Face *nearestFace = nullptr;
-
-            for (Mesh &mesh: scene.meshes){
-                for (auto  &face: mesh.faces) {
-
-                    bool intersected = isRayIntersectsTriangle(&ray, &face, &distance);
-                    if (!intersected) {
-                        continue;
-                    }
-
-                    if (distance < maxDistance) {
-                        maxDistance = distance;
-                        nearestFace = &face;
-                    }
-                }
-                auto color = Vector3f(BG_COLOR_R, BG_COLOR_G, BG_COLOR_B);
-
-                if (nearestFace) {
-                    color[0] = 1;
-                    color[1] = 0;
-                    color[2] = 0;
-                }
-                pixels[y * RESOLUTION_W + x] = color;
-            }
         }
     }
 
     t2 = clock();
-    std::cout << "Rendered in " << (t2 - t1) / (double)CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Rendered in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
     writeToFile("test.ppm", RESOLUTION_W, RESOLUTION_H, pixels);
     delete[] pixels;

@@ -12,10 +12,10 @@
 ### RoadMap
 
 - #### p1
+- [ ] Camera object
 - [ ] Area square lights
 - [ ] Shadows
 - [ ] Smooth shading
-- [ ] Camera object
 - [ ] Diffuse shader
 
 - #### p2

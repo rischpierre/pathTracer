@@ -1,13 +1,17 @@
 #ifndef PATHTRACER_SCENEPARSER_H
 #define PATHTRACER_SCENEPARSER_H
 
+#define STATIC_FRAME 0
+
 #include <iostream>
 
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usdGeom/mesh.h>
+#include <pxr/usd/usdGeom/camera.h>
 #include <pxr/usd/usd/attribute.h>
 #include <Eigen>
+
 
 
 struct Face {
@@ -37,15 +41,25 @@ struct Mesh {
 };
 
 struct Camera {
+    float focalLength;
+    // todo maybe replace with eigen type
+    pxr::GfMatrix4d toWorld;
 };
 
 class Scene {
 public:
     Scene(const std::string &path);
 
-    void parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims);
+    void parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
+                          const pxr::TfToken& type);
+
+    void convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes);
+
+    void parseCamera(const std::vector<pxr::UsdPrim> &cameras);
 
     std::vector<Mesh> meshes;
+
+    Camera camera;
 };
 
 #endif //PATHTRACER_SCENEPARSER_H

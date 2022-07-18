@@ -1,16 +1,41 @@
 #include "scene.h"
 
 
-Scene::Scene(const std::string &path){
+Scene::Scene(const std::string &path) {
 
     const auto stage = pxr::UsdStage::Open(path);
 
-    pxr::UsdPrim root = stage->GetPrimAtPath(pxr::SdfPath {"/"});
+    pxr::UsdPrim root = stage->GetPrimAtPath(pxr::SdfPath{"/"});
+
+    std::vector<pxr::UsdPrim> usdCameras;
+    parsePrimsByType(root, *stage, usdCameras, pxr::TfToken("Camera"));
+
+    if (usdCameras.empty()){
+        std::cerr << "No cameras found in the scene" << std::endl;
+        exit(1);
+    }
+    parseCamera(usdCameras);
 
     std::vector<pxr::UsdPrim> usdMeshes;
-    parseUSDMeshes(root, *stage, usdMeshes);
+    parsePrimsByType(root, *stage, usdMeshes, pxr::TfToken("Mesh"));
+    convertUSDMeshes(usdMeshes);
+
+}
+
+void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
+
+    pxr::UsdGeomCamera camXform = pxr::UsdGeomCamera(cameras[0]);
+    pxr::UsdAttribute focalLengthAttr = camXform.GetFocalLengthAttr();
+
+    this->camera = Camera();
+
+    this->camera.toWorld = camXform.ComputeLocalToWorldTransform(STATIC_FRAME);
+    focalLengthAttr.Get(&this->camera.focalLength, STATIC_FRAME);
+
+}
 
 
+void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
@@ -19,8 +44,7 @@ Scene::Scene(const std::string &path){
         pxr::UsdAttribute fVertexIdAttr = usdMesh.GetFaceVertexIndicesAttr();
         pxr::UsdAttribute fVertexCountsAttr = usdMesh.GetFaceVertexCountsAttr();
 
-        // todo put the time somewhere else
-        auto localToWorldMat = usdMesh.ComputeLocalToWorldTransform(0);
+        auto localToWorldMat = usdMesh.ComputeLocalToWorldTransform(STATIC_FRAME);
 
         pxr::VtVec3fArray points;
         pxr::VtVec3fArray normals;
@@ -81,17 +105,19 @@ Scene::Scene(const std::string &path){
         }
 
         Mesh mesh(faces);
-        meshes.push_back(mesh);
+        this->meshes.push_back(mesh);
     }
 }
 
 
-void Scene::parseUSDMeshes(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims) {
+void
+Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
+                        const pxr::TfToken& type) {
     for (pxr::UsdPrim childPrim: prim.GetChildren()) {
 
-        if (childPrim.GetTypeName() == pxr::TfToken("Mesh")) {
+        if (childPrim.GetTypeName() == type) {
             rPrims.push_back(childPrim);
         }
-        parseUSDMeshes(childPrim, stage, rPrims);
+        parsePrimsByType(childPrim, stage, rPrims, type);
     }
 }

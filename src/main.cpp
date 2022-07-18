@@ -43,6 +43,14 @@ void writeToFile(const std::string &path, int width, int height, const Vector3f 
 
 }
 
+
+//Ray createCameraRay(const Camera &cam, int x, int y){
+//
+//   float imageRatio = float(RESOLUTION_W) / float(RESOLUTION_H);
+//   float focalLength = cam.focalLength;
+//   float xScreenSample =
+//}
+
 int main(int argc, char *argv[]){
 
     if (argc != 2) {

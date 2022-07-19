@@ -4,7 +4,7 @@
 #include <Eigen>
 #include <ctime>
 #include <tbb/tbb.h>
-#include "mathHelper.h"
+#include "helpers.h"
 
 #include "scene.h"
 #include "raytracer.h"
@@ -17,13 +17,10 @@
 #define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
 
-#define CAM_FILM_SIZE_W 3.6f   // 24 36 film back size
-#define CAM_FILM_SIZE_H 2.25f  // !6:9 ratio
-#define CAM_FOCAL_LENGTH 4  // in mmm
 #define RAY_TRACING_THRESHOLD 0.000001
 
 // todo put that somewhere else
-void writeToFile(const std::string &path, int width, int height, const Vector3f *pixels) {
+void writeToFile(const std::string &path, int width, int height, const Eigen::Vector3f *pixels) {
 
     FILE *f = fopen(path.c_str(), "w");
     if (!f) {
@@ -44,12 +41,21 @@ void writeToFile(const std::string &path, int width, int height, const Vector3f 
 }
 
 
-//Ray createCameraRay(const Camera &cam, int x, int y){
-//
-//   float imageRatio = float(RESOLUTION_W) / float(RESOLUTION_H);
-//   float focalLength = cam.focalLength;
-//   float xScreenSample =
-//}
+Ray createCameraRay(const Camera &cam, int x, int y){
+
+   float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
+   float sampleY = (cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2;
+   float sampleZ = -cam.focalLength;  // camera is pointing towards - z
+
+   pxr::GfVec3f rayOrig = cam.toWorld.Transform(pxr::GfVec3f(0));
+   pxr::GfVec3f rayDir = cam.toWorld.TransformDir(pxr::GfVec3f(sampleX, sampleY, sampleZ)).GetNormalized();
+
+   Eigen::Vector3f rayD(rayDir[0], rayDir[1], rayDir[2]);
+   Eigen::Vector3f rayO(rayOrig[0], rayOrig[1], rayOrig[2]);
+
+   Ray ray(rayO, rayD);
+   return ray;
+}
 
 int main(int argc, char *argv[]){
 
@@ -73,29 +79,24 @@ int main(int argc, char *argv[]){
 
     tbb::tick_count t3 = tbb::tick_count::now();
 
-    auto *pixels = new Vector3f[RESOLUTION_W * RESOLUTION_H];
-    auto camOrig = Vector3f(0, 0,0);
-    auto camDir = Vector3f(0, CAM_FOCAL_LENGTH, 0);
+    auto *pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
     NormalIntegrator integrator(scene);
 //    FacingRatioIntegrator integrator(scene);
 
+//    for (int y = 0; y < RESOLUTION_H; y++) {  // remove multithreading for debug
     tbb::parallel_for(0, RESOLUTION_H, [&](int y) {
 
         for (int x = 0; x < RESOLUTION_W; x++) {
-            //todo create a sampler for that
-            auto ray = Ray(camOrig, camDir);
-            ray.d[0] = lerpRange((float)x, 0, (float)RESOLUTION_W, -CAM_FILM_SIZE_W / 2,
-                                         CAM_FILM_SIZE_W / 2);
 
-            ray.d[2] = lerpRange((float)y, 0, (float)RESOLUTION_H, -CAM_FILM_SIZE_H / 2,
-                                         CAM_FILM_SIZE_H / 2);
+            Ray ray = createCameraRay(scene.camera, x, y);
 
             Eigen::Vector3f color = integrator.getColor(ray);
 
             pixels[y * RESOLUTION_W + x] = color;
         }
-    });
+    }
+    ); // end of parallel for
 
     tbb::tick_count t4 = tbb::tick_count::now();
     std::cout << "Rendered in " << (t4 - t3).seconds() << " seconds" << std::endl;

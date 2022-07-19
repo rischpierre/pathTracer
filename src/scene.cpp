@@ -26,11 +26,15 @@ void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
 
     pxr::UsdGeomCamera camXform = pxr::UsdGeomCamera(cameras[0]);
     pxr::UsdAttribute focalLengthAttr = camXform.GetFocalLengthAttr();
+    pxr::UsdAttribute hApertureAttr = camXform.GetHorizontalApertureAttr();
+    pxr::UsdAttribute vApertureAttr = camXform.GetVerticalApertureAttr();
 
     this->camera = Camera();
 
     this->camera.toWorld = camXform.ComputeLocalToWorldTransform(STATIC_FRAME);
     focalLengthAttr.Get(&this->camera.focalLength, STATIC_FRAME);
+    hApertureAttr.Get(&this->camera.hAperture, STATIC_FRAME);
+    vApertureAttr.Get(&this->camera.vAperture, STATIC_FRAME);
 
 }
 

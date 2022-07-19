@@ -11,7 +11,7 @@
  */
 bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance) {
 
-    Vector3f edge1, edge2, p, q, t;
+    Eigen::Vector3f edge1, edge2, p, q, t;
     float det, u, v, invertedDet;
 
     // find the two edges around V0

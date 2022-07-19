@@ -42,6 +42,8 @@ struct Mesh {
 
 struct Camera {
     float focalLength;
+    float hAperture;
+    float vAperture;
     // todo maybe replace with eigen type
     pxr::GfMatrix4d toWorld;
 };

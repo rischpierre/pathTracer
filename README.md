@@ -12,7 +12,7 @@
 ### RoadMap
 
 - #### p1
-- [ ] Camera object
+- [X] Camera object
 - [ ] Area square lights
 - [ ] Shadows
 - [ ] Smooth shading

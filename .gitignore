@@ -32,6 +32,6 @@
 *.app
 .idea
 .reference
-build/
+build-*
 
 *.blend1

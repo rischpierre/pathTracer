@@ -44,7 +44,8 @@ void writeToFile(const std::string &path, int width, int height, const Eigen::Ve
 Ray createCameraRay(const Camera &cam, int x, int y){
 
    float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
-   float sampleY = (cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2;
+   // todo why - for the y sample ?
+   float sampleY = - ((cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2);
    float sampleZ = -cam.focalLength;  // camera is pointing towards - z
 
    pxr::GfVec3f rayOrig = cam.toWorld.Transform(pxr::GfVec3f(0));

@@ -27,3 +27,6 @@
 - [ ] SSS
 - [ ] Multipixel sampling
 - [ ] Rendersettings 
+
+### Secondary Tasks:
+- [ ] Triangulate quads from usd 

@@ -96,3 +96,38 @@ def Xform "Torus_001"
     }
 }
 
+def Xform "Area"
+{
+    matrix4d xformOp:transform = ( (0.874753475189209, 0.153198704123497, -0.45971354842185974, 0), (0.160271555185318, 0.8038405179977417, 0.5728467702865601, 0), (0.4572957754135132, -0.5747787356376648, 0.6786088943481445, 0), (4.585872173309326, 3.0531349182128906, 6.930085182189941, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def RectLight "Area"
+    {
+        color3f inputs:color = (1, 1, 1)
+        float inputs:height = 1
+        float inputs:intensity = 0.1
+        float inputs:specular = 1
+        float inputs:width = 1
+    }
+}
+
+def Xform "Plane"
+{
+    matrix4d xformOp:transform = ( (5.557343006134033, 0, 0, 0), (0, 5.557343006134033, 0, 0), (0, 0, 5.557343006134033, 0), (0, 7.135693550109863, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Mesh "Plane"
+    {
+        int[] faceVertexCounts = [3, 3]
+        int[] faceVertexIndices = [1, 2, 0, 1, 3, 2]
+        normal3f[] normals = [(0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1), (0, 0, 1)] (
+            interpolation = "faceVarying"
+        )
+        point3f[] points = [(-1, -1, 0), (1, -1, 0), (-1, 1, 0), (1, 1, 0)]
+        texCoord2f[] primvars:UVMap = [(1, 0), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+    }
+}
+

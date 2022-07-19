@@ -40,12 +40,20 @@ struct Mesh {
     std::vector<Face> faces;
 };
 
+struct RectLight {
+    float height;
+    float width;
+
+    Eigen::Vector3f color;
+    float intensity;
+    pxr::GfMatrix4d toWorld;   // todo maybe replace with eigen type
+};
+
 struct Camera {
     float focalLength;
     float hAperture;
     float vAperture;
-    // todo maybe replace with eigen type
-    pxr::GfMatrix4d toWorld;
+    pxr::GfMatrix4d toWorld;  // todo maybe replace with eigen type
 };
 
 class Scene {
@@ -59,7 +67,11 @@ public:
 
     void parseCamera(const std::vector<pxr::UsdPrim> &cameras);
 
+    void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights);
+
     std::vector<Mesh> meshes;
+
+    std::vector<Mesh> rectLights;
 
     Camera camera;
 };

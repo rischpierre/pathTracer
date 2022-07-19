@@ -20,6 +20,31 @@ Scene::Scene(const std::string &path) {
     parsePrimsByType(root, *stage, usdMeshes, pxr::TfToken("Mesh"));
     convertUSDMeshes(usdMeshes);
 
+    std::vector<pxr::UsdPrim> usdRectLights;
+    parsePrimsByType(root, *stage, usdRectLights, pxr::TfToken("RectLight"));
+    parseLights(usdRectLights);
+
+}
+
+void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
+
+    for (pxr::UsdPrim light:  usdLights){
+
+
+        pxr::UsdGeomCamera camXform = pxr::UsdGeomBoundable(cameras[0]);
+        pxr::UsdAttribute focalLengthAttr = camXform.GetFocalLengthAttr();
+        pxr::UsdAttribute hApertureAttr = camXform.GetHorizontalApertureAttr();
+        pxr::UsdAttribute vApertureAttr = camXform.GetVerticalApertureAttr();
+
+        this->camera = Camera();
+
+        this->camera.toWorld = camXform.ComputeLocalToWorldTransform(STATIC_FRAME);
+        focalLengthAttr.Get(&this->camera.focalLength, STATIC_FRAME);
+        hApertureAttr.Get(&this->camera.hAperture, STATIC_FRAME);
+        vApertureAttr.Get(&this->camera.vAperture, STATIC_FRAME);
+
+    }
+
 }
 
 void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {

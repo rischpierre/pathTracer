@@ -28,20 +28,25 @@ Scene::Scene(const std::string &path) {
 
 void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
 
-    for (pxr::UsdPrim light:  usdLights){
+    for (const pxr::UsdPrim &light:  usdLights){
+        pxr::UsdGeomBoundable lightXForm = pxr::UsdGeomBoundable(light);
+        pxr::UsdAttribute colorAttr = light.GetAttribute(pxr::TfToken("inputs:color"));
+        pxr::UsdAttribute intensityAttr = light.GetAttribute(pxr::TfToken("inputs:intensity"));
+        pxr::UsdAttribute widthAttr = light.GetAttribute(pxr::TfToken("inputs:width"));
+        pxr::UsdAttribute heightAttr = light.GetAttribute(pxr::TfToken("inputs:height"));
 
+        RectLight newLight;
+        newLight.toWorld = lightXForm.ComputeLocalToWorldTransform(STATIC_FRAME);
 
-        pxr::UsdGeomCamera camXform = pxr::UsdGeomBoundable(cameras[0]);
-        pxr::UsdAttribute focalLengthAttr = camXform.GetFocalLengthAttr();
-        pxr::UsdAttribute hApertureAttr = camXform.GetHorizontalApertureAttr();
-        pxr::UsdAttribute vApertureAttr = camXform.GetVerticalApertureAttr();
+        pxr::GfVec3f color(0);
+        colorAttr.Get(&color, STATIC_FRAME);
+        newLight.color = Eigen::Vector3f(color[0], color[1], color[2]);
 
-        this->camera = Camera();
+        intensityAttr.Get(&newLight.intensity, STATIC_FRAME);
+        widthAttr.Get(&newLight.width, STATIC_FRAME);
+        heightAttr.Get(&newLight.height, STATIC_FRAME);
 
-        this->camera.toWorld = camXform.ComputeLocalToWorldTransform(STATIC_FRAME);
-        focalLengthAttr.Get(&this->camera.focalLength, STATIC_FRAME);
-        hApertureAttr.Get(&this->camera.hAperture, STATIC_FRAME);
-        vApertureAttr.Get(&this->camera.vAperture, STATIC_FRAME);
+        this->rectLights.push_back(newLight);
 
     }
 

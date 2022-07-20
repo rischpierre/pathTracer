@@ -67,11 +67,11 @@ public:
 
     void parseCamera(const std::vector<pxr::UsdPrim> &cameras);
 
-    void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights);
+    void parseLights(const std::vector<pxr::UsdPrim> &usdLights);
 
     std::vector<Mesh> meshes;
 
-    std::vector<Mesh> rectLights;
+    std::vector<RectLight> rectLights;
 
     Camera camera;
 };

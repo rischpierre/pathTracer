@@ -12,8 +12,8 @@
 
 - #### p1
 - [X] Camera object
-- [ ] Area square lights
-- [ ] Shadows
+- [x] Area square lights
+- [x] Shadows
 - [ ] Smooth shading
 - [ ] Diffuse shader
 
@@ -29,3 +29,4 @@
 
 ### Secondary Tasks:
 - [ ] Triangulate quads from usd 
+- [ ] Add log for the ray intersections

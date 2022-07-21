@@ -5,20 +5,6 @@
     upAxis = "Z"
 )
 
-def Xform "Light"
-{
-    matrix4d xformOp:transform = ( (-0.29086464643478394, 0.9551711678504944, -0.05518905818462372, 0), (-0.7711008191108704, -0.1998833566904068, 0.6045247316360474, 0), (0.5663931965827942, 0.21839119493961334, 0.7946722507476807, 0), (4.076245307922363, 1.0054539442062378, 5.903861999511719, 1) )
-    uniform token[] xformOpOrder = ["xformOp:transform"]
-
-    def SphereLight "Light"
-    {
-        color3f inputs:color = (1, 1, 1)
-        float inputs:intensity = 10
-        float inputs:radius = 0.1
-        float inputs:specular = 1
-    }
-}
-
 def Xform "Camera"
 {
     matrix4d xformOp:transform = ( (0.4271079897880554, 0.14395926892757416, -0.02189531736075878, 0), (-0.0009356700466014445, 0.07056359946727753, 0.4456958770751953, 0), (0.14561180770397186, -0.42180731892585754, 0.06708720326423645, 0), (3.876103401184082, -1.9850611686706543, 2.9196105003356934, 1) )
@@ -96,7 +82,7 @@ def Xform "Torus_001"
     }
 }
 
-def Xform "Area"
+def Xform "key"
 {
     matrix4d xformOp:transform = ( (0.874753475189209, 0.153198704123497, -0.45971354842185974, 0), (0.160271555185318, 0.8038405179977417, 0.5728467702865601, 0), (0.4572957754135132, -0.5747787356376648, 0.6786088943481445, 0), (4.585872173309326, 3.0531349182128906, 6.930085182189941, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
@@ -128,6 +114,21 @@ def Xform "Plane"
             interpolation = "faceVarying"
         )
         uniform token subdivisionScheme = "none"
+    }
+}
+
+def Xform "fill"
+{
+    matrix4d xformOp:transform = ( (0.04041047394275665, -0.6247960329055786, 0.7797415852546692, 0), (0.24623025953769684, 0.7625393271446228, 0.5982511043548584, 0), (-0.9683685302734375, 0.16782036423683167, 0.18465827405452728, 0), (-12.581406593322754, 9.792501449584961, 4.561330318450928, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def RectLight "Area_002"
+    {
+        color3f inputs:color = (0.41251838, 0.45023355, 1)
+        float inputs:height = 1
+        float inputs:intensity = 3.7
+        float inputs:specular = 1
+        float inputs:width = 1
     }
 }
 

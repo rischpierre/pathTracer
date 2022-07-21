@@ -49,6 +49,7 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         pxr::GfVec3f position(0);
         position = newLight.toWorld.Transform(position);
         newLight.position = Eigen::Vector3f(position[0], position[1], position[2]);
+        newLight.computeSamples();
         this->rectLights.push_back(newLight);
 
     }
@@ -158,4 +159,27 @@ Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vec
         }
         parsePrimsByType(childPrim, stage, rPrims, type);
     }
+}
+
+std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
+
+    int steps = this->sampleSteps;
+
+    auto samples = std::vector<Eigen::Vector3f>(steps * steps);
+
+    // todo refacto, this is not precise enough
+    int i = 0;
+    for (int x = -steps/2; x < steps/2; x++){
+        for (int y = -steps/2; y < steps/2; y++) {
+            auto sample = pxr::GfVec3f((float)x/this->width, (float)y/this->height, 0);
+            sample = this->toWorld.Transform(sample);
+
+            float jitter = (((float)rand() / (float)RAND_MAX) - 0.5f) * 2;
+
+            Eigen::Vector3f sample_(sample[0] + jitter * this->width/(float)steps, sample[1] + jitter * this->height/(float)steps, sample[2]);
+            samples[i] = sample_;
+            i++;
+        }
+    }
+    return samples;
 }

@@ -55,6 +55,10 @@ struct RectLight {
     Eigen::Vector3f position;
     float intensity;
     pxr::GfMatrix4d toWorld;   // todo maybe replace with eigen type
+
+    int sampleSteps = 6;
+    std::vector<Eigen::Vector3f> computeSamples() const;
+
 };
 
 struct Camera {

@@ -10,24 +10,22 @@
 
 ### RoadMap
 
-- #### p1
+- #### MVP
 - [X] Camera object
 - [x] Area square lights
 - [x] Shadows
+- [ ] Acceleration structure
 - [ ] Smooth shading
 - [ ] Diffuse shader
-
-- #### p2
+- [ ] Multipixel sampling
 - [ ] GI
-
-- #### p3
 - [ ] Refraction
 - [ ] Reflection
 - [ ] SSS
-- [ ] Multipixel sampling
-- [ ] Rendersettings 
 
-### Secondary Tasks:
+### Good to have:
+- [ ] Rendersettings 
 - [ ] Triangulate quads from usd 
 - [ ] Add log for the ray intersections
 - [ ] Support animation to make a gif for the presentation
+- [ ] Make google tests work again

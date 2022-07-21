@@ -23,7 +23,7 @@
 - [ ] Reflection
 - [ ] SSS
 
-### Good to have:
+- ### Good to have:
 - [ ] Rendersettings 
 - [ ] Triangulate quads from usd 
 - [ ] Add log for the ray intersections

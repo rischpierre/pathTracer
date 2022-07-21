@@ -10,8 +10,8 @@ Eigen::Vector3f FacingRatioIntegrator::getColor(const Ray &ray) {
 
     for (Mesh &mesh: this->scene.meshes){
         for (auto  &face: mesh.faces) {
-
-            bool intersected = isRayIntersectsTriangle(&ray, &face, &distance);
+            float u, v;
+            bool intersected = isRayIntersectsTriangle(&ray, &face, &distance, u ,v);
             if (!intersected) {
                 continue;
             }

@@ -114,10 +114,9 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             auto v1 = pxr::GfVec3f(points[v1Id][0], points[v1Id][1], points[v1Id][2]);
             auto v2 = pxr::GfVec3f(points[v2Id][0], points[v2Id][1], points[v2Id][2]);
 
-            auto n0 = pxr::GfVec3f(normals[v0Id][0], normals[v0Id][1], normals[v0Id][2]);
-            auto n1 = pxr::GfVec3f(normals[v1Id][0], normals[v1Id][1], normals[v1Id][2]);
-            auto n2 = pxr::GfVec3f(normals[v2Id][0], normals[v2Id][1], normals[v2Id][2]);
-
+            auto n0 = pxr::GfVec3f(normals[vId][0], normals[vId][1], normals[vId][2]);
+            auto n1 = pxr::GfVec3f(normals[vId + 1][0], normals[vId + 1][1], normals[vId + 1][2]);
+            auto n2 = pxr::GfVec3f(normals[vId + 2][0], normals[vId + 2][1], normals[vId + 2][2]);
 
             v0 = localToWorldMat.Transform(v0);
             v1 = localToWorldMat.Transform(v1);

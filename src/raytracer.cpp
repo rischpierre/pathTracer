@@ -9,10 +9,10 @@
  * intersection between the ray and the face.
  * return: true if the ray intersect the face.
  */
-bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance) {
+bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, float &u, float &v) {
 
     Eigen::Vector3f edge1, edge2, p, q, t;
-    float det, u, v, invertedDet;
+    float det, invertedDet;
 
     // find the two edges around V0
     edge1 = face->v1 - face->v0;

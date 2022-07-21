@@ -14,18 +14,21 @@
 - [X] Camera object
 - [x] Area square lights
 - [x] Shadows
+- [x] Smooth shading
 - [ ] Acceleration structure
-- [ ] Smooth shading
 - [ ] Diffuse shader
 - [ ] Multipixel sampling
 - [ ] GI
 - [ ] Refraction
 - [ ] Reflection
 - [ ] SSS
-
+- [ ] Check for memory leaks
+ 
 - ### Good to have:
 - [ ] Rendersettings 
 - [ ] Triangulate quads from usd 
 - [ ] Add log for the ray intersections
 - [ ] Support animation to make a gif for the presentation
 - [ ] Make google tests work again
+- [ ] Export png
+- [ ] Remove cmake warnings

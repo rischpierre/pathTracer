@@ -13,7 +13,7 @@ public:
     Eigen::Vector3f o, d;
 };
 
-bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance);
+bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, float &u, float &v);
 
 
 #endif //RAYTRACEREXPERIMENT_RAYTRACER_H

@@ -30,3 +30,4 @@
 ### Secondary Tasks:
 - [ ] Triangulate quads from usd 
 - [ ] Add log for the ray intersections
+- [ ] Support animation to make a gif for the presentation

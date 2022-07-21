@@ -1,0 +1,58 @@
+#usda 1.0
+(
+    doc = "Blender v3.2.0"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "Light"
+{
+    matrix4d xformOp:transform = ( (-0.29086464643478394, 0.9551711678504944, -0.05518905818462372, 0), (-0.7711008191108704, -0.1998833566904068, 0.6045247316360474, 0), (0.5663931965827942, 0.21839119493961334, 0.7946722507476807, 0), (4.076245307922363, 1.0054539442062378, 5.903861999511719, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def SphereLight "Light"
+    {
+        color3f inputs:color = (1, 1, 1)
+        float inputs:intensity = 10
+        float inputs:radius = 0.1
+        float inputs:specular = 1
+    }
+}
+
+def Xform "Camera"
+{
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, -4.371138828673793e-8, 1, 0), (0, -1, -4.371138828673793e-8, 0), (0, 0, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Camera "Camera"
+    {
+        float2 clippingRange = (0.1, 100)
+        float focalLength = 50
+        float horizontalAperture = 36
+        float horizontalApertureOffset = 0
+        token projection = "perspective"
+        float verticalAperture = 20.25
+        float verticalApertureOffset = 0
+    }
+}
+
+def Xform "Plane"
+{
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, -4.371138828673793e-8, 1, 0), (0, -1, -4.371138828673793e-8, 0), (0, 6, 0, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Mesh "Plane"
+    {
+        int[] faceVertexCounts = [3]
+        int[] faceVertexIndices = [0, 1, 2]
+        normal3f[] normals = [(0, 0, 1), (0, 0, 1), (0, 0, 1)] (
+            interpolation = "faceVarying"
+        )
+        point3f[] points = [(-1, -1, 0), (1, -1, 0), (0, 1, 0)]
+        texCoord2f[] primvars:UVMap = [(0, 0), (1, 0), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        uniform token subdivisionScheme = "none"
+    }
+}
+

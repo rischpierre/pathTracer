@@ -45,6 +45,7 @@ struct RectLight {
     float width;
 
     Eigen::Vector3f color;
+    Eigen::Vector3f position;
     float intensity;
     pxr::GfMatrix4d toWorld;   // todo maybe replace with eigen type
 };

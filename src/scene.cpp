@@ -46,6 +46,9 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         widthAttr.Get(&newLight.width, STATIC_FRAME);
         heightAttr.Get(&newLight.height, STATIC_FRAME);
 
+        pxr::GfVec3f position(0);
+        position = newLight.toWorld.Transform(position);
+        newLight.position = Eigen::Vector3f(position[0], position[1], position[2]);
         this->rectLights.push_back(newLight);
 
     }

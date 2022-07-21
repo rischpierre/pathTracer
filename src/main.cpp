@@ -10,6 +10,7 @@
 #include "raytracer.h"
 #include "integrators/normalIntegrator.h"
 #include "integrators/facingRatioIntegrator.h"
+#include "integrators/directLightIntegrator.h"
 
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
@@ -82,7 +83,7 @@ int main(int argc, char *argv[]){
 
     auto *pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
-    NormalIntegrator integrator(scene);
+    DirectLightIntegrator integrator(scene);
 //    FacingRatioIntegrator integrator(scene);
 
 //    for (int y = 0; y < RESOLUTION_H; y++) {  // remove multithreading for debug
@@ -92,7 +93,7 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
-            Eigen::Vector3f color = integrator.getColor(ray);
+            Eigen::Vector3f color = integrator.getColor(ray, scene);
 
             pixels[y * RESOLUTION_W + x] = color;
         }

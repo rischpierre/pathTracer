@@ -74,6 +74,7 @@ void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
 
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
+    int faceId = 0;
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
         pxr::UsdAttribute pointsAttr = usdMesh.GetPointsAttr();
@@ -137,11 +138,12 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e);
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId);
             faces.push_back(face);
+            faceId++;
         }
 
-        Mesh mesh(faces);
+        Mesh mesh(faces, primMesh.GetName().GetString());
         this->meshes.push_back(mesh);
     }
 }
@@ -151,7 +153,6 @@ void
 Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
                         const pxr::TfToken& type) {
     for (pxr::UsdPrim childPrim: prim.GetChildren()) {
-
         if (childPrim.GetTypeName() == type) {
             rPrims.push_back(childPrim);
         }

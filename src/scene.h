@@ -21,23 +21,30 @@ struct Face {
          Eigen::Vector3f &nf,
          Eigen::Vector3f &n0,
          Eigen::Vector3f &n1,
-         Eigen::Vector3f &n2) : v0(v0),
+         Eigen::Vector3f &n2,
+         int id) :              v0(v0),
                                 v1(v1),
                                 v2(v2),
                                 nf(nf),
                                 n0(n0),
                                 n1(n1),
-                                n2(n2) {}
+                                n2(n2),
+                                id(id) {}
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
+    int id;
 };
 
 struct Mesh {
-    Mesh(std::vector<Face> &faces) { this->faces = faces; }
-
+    Mesh(std::vector<Face> &faces, const std::string& name) {
+        this->faces = faces;
+        this->name = name;
+    }
     std::vector<Face> getFaces() { return this->faces; }
 
     std::vector<Face> faces;
+    std::string name;
+
 };
 
 struct RectLight {

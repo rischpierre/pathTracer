@@ -84,7 +84,6 @@ int main(int argc, char *argv[]){
     auto *pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
     DirectLightIntegrator integrator(scene);
-//    FacingRatioIntegrator integrator(scene);
 
 //    for (int y = 0; y < RESOLUTION_H; y++) {  // remove multithreading for debug
     tbb::parallel_for(0, RESOLUTION_H, [&](int y) {

@@ -47,5 +47,9 @@ bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance) 
 
     *distance = edge2.dot(q) * invertedDet;
 
-    return true;
+    // if the distance is negative, the ray is on the other side
+    if (*distance > RAY_TRACING_THRESHOLD)
+        return true;
+    else
+        return false;
 }

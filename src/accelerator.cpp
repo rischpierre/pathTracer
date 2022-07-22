@@ -2,7 +2,12 @@
 
 
 void Accelerator::build(const std::vector<Mesh> &meshes){
-    
+
+
+}
+
+void Accelerator::createMainBBbox(const std::vector<Mesh> &meshes){
+
     std::vector<Mesh> meshesBbox;
     float currentMaxX = -std::numeric_limits<float>::max();
     float currentMinX = std::numeric_limits<float>::max();
@@ -12,7 +17,7 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
 
     float currentMaxZ = -std::numeric_limits<float>::max();
     float currentMinZ = std::numeric_limits<float>::max();
-    
+
     for (const auto& mesh: meshes){
         float minx = mesh.bbox.min.x();
         float maxx = mesh.bbox.max.x();
@@ -20,14 +25,14 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
         float maxy = mesh.bbox.max.y();
         float minz = mesh.bbox.min.z();
         float maxz = mesh.bbox.max.z();
-        
+
         if (minx > maxx)
             std::swap(minx, maxx);
         if (miny > maxy)
-            std::swap(miny, maxy); 
+            std::swap(miny, maxy);
         if (minz > maxz)
             std::swap(minz, maxz);
-        
+
         if (minx < currentMinX)
             currentMinX = minx;
         if (maxx > currentMaxX)
@@ -45,6 +50,5 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
     }
     Eigen::Vector3f minE(currentMinX, currentMinY, currentMinZ);
     Eigen::Vector3f maxE(currentMaxX, currentMaxY, currentMaxZ);
-    BBox mainBbox(minE, maxE);
-
+    this->mainBbox = BBox(minE, maxE);
 }

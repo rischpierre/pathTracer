@@ -7,6 +7,11 @@
 class Accelerator {
 public:
     void build(const std::vector<Mesh> &meshes);
+
+    BBox mainBbox;
+
+private:
+    void createMainBBbox(const std::vector<Mesh> &meshes);
 };
 
 

@@ -11,6 +11,7 @@
 #include "integrators/normalIntegrator.h"
 #include "integrators/facingRatioIntegrator.h"
 #include "integrators/directLightIntegrator.h"
+#include "accelerator.h"
 
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
@@ -79,12 +80,19 @@ int main(int argc, char *argv[]){
     clock_t t2 = clock();
     std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
-    tbb::tick_count t3 = tbb::tick_count::now();
 
     auto *pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
+    t1 = clock();
+    Accelerator accelerator;
+    accelerator.build(scene.meshes);
+    t2 = clock();
+    std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
+
+
     DirectLightIntegrator integrator(scene);
 
+    tbb::tick_count t3 = tbb::tick_count::now();
 #ifdef SINGLE_THREADED
     std::cout << "Single threaded" << std::endl;
 

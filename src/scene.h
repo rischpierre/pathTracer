@@ -8,6 +8,7 @@
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
 #include <pxr/usd/usdGeom/mesh.h>
+#include <pxr/base/gf/bbox3d.h>
 #include <pxr/usd/usdGeom/camera.h>
 #include <pxr/usd/usd/attribute.h>
 #include <Eigen>
@@ -35,15 +36,22 @@ struct Face {
     int id;
 };
 
+struct BBox{
+    BBox(Eigen::Vector3f &min,
+         Eigen::Vector3f &max) : min(min), max(max) {}
+
+    Eigen::Vector3f min;
+    Eigen::Vector3f max;
+};
+
 struct Mesh {
-    Mesh(std::vector<Face> &faces, const std::string& name) {
-        this->faces = faces;
-        this->name = name;
-    }
+    Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox) : faces(faces), name(name), bbox(bbox) {}
+
     std::vector<Face> getFaces() { return this->faces; }
 
     std::vector<Face> faces;
     std::string name;
+    BBox bbox;
 
 };
 

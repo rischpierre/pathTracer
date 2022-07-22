@@ -53,3 +53,55 @@ bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, 
     else
         return false;
 }
+
+bool isRayIntersectsBox(const Ray& ray, const BBox& bbox){
+    float tmin, tmax, tymin, tymax, tzmax, tzmin;
+
+    // in order to avoid div by 0
+    Eigen::Vector3f invDir = Eigen::Vector3f(1.f / ray.d.x(), 1.f / ray.d.y(), 1.f / ray.d.z());
+
+    if (invDir.x() >= 0) {
+        tmin = (bbox.min.x() - ray.o.x()) * invDir.x();
+        tmax = (bbox.max.x() - ray.o.x()) * invDir.x();
+    } else{
+        tmax = (bbox.min.x() - ray.o.x()) * invDir.x();
+        tmin = (bbox.max.x() - ray.o.x()) * invDir.x();
+    }
+
+    if (invDir.y() >= 0) {
+        tymin = (bbox.min.y() - ray.o.y()) * invDir.y();
+        tymax = (bbox.max.y() - ray.o.y()) * invDir.y();
+    } else{
+        tymax = (bbox.min.y() - ray.o.y()) * invDir.y();
+        tymin = (bbox.max.y() - ray.o.y()) * invDir.y();
+    }
+
+    // ray misses box in y
+    if ((tmin > tymax) || (tymin > tmax))
+        return false;
+
+    if (tymin > tmin)
+        tmin = tymin;
+
+    if (tymax < tmax)
+        tmax = tymax;
+
+    if (invDir.z() >= 0) {
+        tzmin = (bbox.min.z() - ray.o.z()) * invDir.z();
+        tzmax = (bbox.max.z() - ray.o.z()) * invDir.z();
+    }else{
+        tzmax = (bbox.min.z() - ray.o.z()) * invDir.z();
+        tzmin = (bbox.max.z() - ray.o.z()) * invDir.z();
+    }
+
+    if ((tmin > tzmax) || (tzmin > tmax))
+        return false;
+
+    if (tzmin > tmin)
+        tmin = tzmin;
+
+    if (tzmax < tmax)
+        tmax = tzmax;
+
+    return true;
+}

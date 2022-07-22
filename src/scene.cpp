@@ -85,6 +85,16 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
 
         auto localToWorldMat = usdMesh.ComputeLocalToWorldTransform(STATIC_FRAME);
 
+        pxr::GfBBox3d bbox = usdMesh.ComputeWorldBound(STATIC_FRAME, pxr::TfToken("default"));
+        pxr::GfBBox3d bboxAA = bbox.ComputeAlignedBox();
+        pxr::GfVec3d bboxMin = bboxAA.GetRange().GetMin();
+        pxr::GfVec3d bboxMax = bboxAA.GetRange().GetMax();
+
+        Eigen::Vector3f bboxMinE = Eigen::Vector3f((float)bboxMin[0], (float)bboxMin[1], (float)bboxMin[2]);
+        Eigen::Vector3f bboxMaxE = Eigen::Vector3f((float)bboxMax[0], (float)bboxMax[1], (float)bboxMax[2]);
+
+        BBox BBoxE(bboxMinE, bboxMaxE);
+
         pxr::VtVec3fArray points;
         pxr::VtVec3fArray normals;
         pxr::VtIntArray fVertexIds;
@@ -97,7 +107,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
 
         for (auto &fCount: fVertexCounts){
             if (fCount > 3){
-                std::cout << "Faiure: face with more than 3 vertices (not implemented yet)" << std::endl;
+                std::cout << "Failure: face with more than 3 vertices (not implemented yet)" << std::endl;
                 exit(1);
             }
         }
@@ -143,7 +153,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             faceId++;
         }
 
-        Mesh mesh(faces, primMesh.GetName().GetString());
+        Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE);
         this->meshes.push_back(mesh);
     }
 }

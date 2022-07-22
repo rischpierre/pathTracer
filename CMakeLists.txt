@@ -11,8 +11,10 @@ find_library(USD_SDF sdf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_TF tf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_LIBGF gf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 
+message(${USD_LIBGF})
 
 # todo cmake warning, maybe use the tbb from USD???
 find_library(TBB_LIB tbb)
@@ -23,6 +25,11 @@ file(GLOB_RECURSE SRCS src/*.cpp src/*.h)
 #add_subdirectory(tests)
 
 add_executable(pathTracer ${SRCS})
+
+if (DEFINED SINGLE_THREADED)
+        message("Building single threaded")
+        add_compile_definitions(SINGLE_THREADED)
+endif()
 
 target_include_directories(
         pathTracer
@@ -38,6 +45,7 @@ target_link_libraries(
         ${USD_TF}
         ${USD_USDGEOM}
         ${USD_USD}
+        ${USD_LIBGF}
         ${USD_VT}
         ${TBB_LIB}
 )

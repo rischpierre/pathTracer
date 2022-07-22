@@ -1,0 +1,10 @@
+#ifndef PATHTRACER_ACCELERATOR_H
+#define PATHTRACER_ACCELERATOR_H
+
+
+class accelerator {
+
+};
+
+
+#endif //PATHTRACER_ACCELERATOR_H

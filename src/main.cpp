@@ -85,9 +85,14 @@ int main(int argc, char *argv[]){
 
     DirectLightIntegrator integrator(scene);
 
-//    for (int y = 0; y < RESOLUTION_H; y++) {  // remove multithreading for debug
-    tbb::parallel_for(0, RESOLUTION_H, [&](int y) {
+#ifdef SINGLE_THREADED
+    std::cout << "Single threaded" << std::endl;
 
+    for (int y = 0; y < RESOLUTION_H; y++) {
+#else
+    std::cout << "Multi threaded" << std::endl;
+    tbb::parallel_for(0, RESOLUTION_H, [&](int y) {
+#endif
         for (int x = 0; x < RESOLUTION_W; x++) {
 
             Ray ray = createCameraRay(scene.camera, x, y);
@@ -97,7 +102,9 @@ int main(int argc, char *argv[]){
             pixels[y * RESOLUTION_W + x] = color;
         }
     }
-    ); // end of parallel for
+#ifndef SINGLE_THREADED
+    );
+#endif
 
     tbb::tick_count t4 = tbb::tick_count::now();
     std::cout << "Rendered in " << (t4 - t3).seconds() << " seconds" << std::endl;

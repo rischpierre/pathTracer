@@ -19,6 +19,11 @@ Eigen::Vector3f DirectLightIntegrator::getColor(const Ray &ray, const Scene &sce
     auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
 
     for (Mesh &mesh: this->scene.meshes) {
+
+        // todo bbox optim, to be replaced with acceleration structure
+        if (!isRayIntersectsBox(ray, mesh.bbox))
+            continue;
+
         for (auto &face: mesh.faces) {
             float u, v;
             bool intersected = isRayIntersectsTriangle(&ray, &face, &distance, u, v);
@@ -52,11 +57,15 @@ Eigen::Vector3f DirectLightIntegrator::getColor(const Ray &ray, const Scene &sce
                 Eigen::Vector3f lightDir = (lightSample - intersectionPoint).normalized();
 
                 // to avoid shadow acne
-                Eigen::Vector3f shadowRayOrigin = intersectionPoint + smoothNormal * 0.0001;
+                Eigen::Vector3f shadowRayOrigin = intersectionPoint + smoothNormal * RAY_TRACING_THRESHOLD;
                 Ray shadowRay(shadowRayOrigin, lightDir);
 
                 bool intersected = false;
                 for (Mesh &mesh: this->scene.meshes) {
+
+                    // todo bbox optim, to be replaced with acceleration structure
+                    if (! isRayIntersectsBox(shadowRay, mesh.bbox))
+                        continue;
 
                     for (auto &face: mesh.faces) {
 

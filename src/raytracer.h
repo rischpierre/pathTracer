@@ -15,5 +15,7 @@ public:
 
 bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, float &u, float &v);
 
+bool isRayIntersectsBox(const Ray& ray, const BBox& bbox);
+
 
 #endif //RAYTRACEREXPERIMENT_RAYTRACER_H

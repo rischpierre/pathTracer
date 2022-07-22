@@ -5,23 +5,6 @@
     upAxis = "Z"
 )
 
-def Xform "Camera"
-{
-    matrix4d xformOp:transform = ( (0.4271079897880554, 0.14395926892757416, -0.02189531736075878, 0), (-0.0009356700466014445, 0.07056359946727753, 0.4456958770751953, 0), (0.14561180770397186, -0.42180731892585754, 0.06708720326423645, 0), (3.876103401184082, -1.9850611686706543, 2.9196105003356934, 1) )
-    uniform token[] xformOpOrder = ["xformOp:transform"]
-
-    def Camera "Camera"
-    {
-        float2 clippingRange = (0.1, 100)
-        float focalLength = 50
-        float horizontalAperture = 36
-        float horizontalApertureOffset = 0
-        token projection = "perspective"
-        float verticalAperture = 20.25
-        float verticalApertureOffset = 0
-    }
-}
-
 def Xform "Icosphere"
 {
     matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-2.078943967819214, 8.443337440490723, 0.9416691064834595, 1) )
@@ -114,6 +97,23 @@ def Xform "Plane"
             interpolation = "faceVarying"
         )
         uniform token subdivisionScheme = "none"
+    }
+}
+
+def Xform "Camera"
+{
+    matrix4d xformOp:transform = ( (0.4271079897880554, 0.14395926892757416, -0.02189531736075878, 0), (-0.0009356700466014445, 0.07056359946727753, 0.4456958770751953, 0), (0.14561180770397186, -0.42180731892585754, 0.06708720326423645, 0), (3.876103401184082, -1.9850611686706543, 2.9196105003356934, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Camera "Camera"
+    {
+        float2 clippingRange = (0.1, 100)
+        float focalLength = 50
+        float horizontalAperture = 36
+        float horizontalApertureOffset = 0
+        token projection = "perspective"
+        float verticalAperture = 20.25
+        float verticalApertureOffset = 0
     }
 }
 

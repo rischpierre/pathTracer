@@ -49,7 +49,11 @@ struct BBox {
         return (min + max) / 2;
     }
 
-    explicit operator std::string() const;
+    std::string getStrRepr() const;
+
+    void print() const{
+        std::cout << getStrRepr() << std::endl;
+    }
 };
 
 

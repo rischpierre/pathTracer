@@ -1,39 +1,26 @@
 #include "accelerator.h"
 
 
+std::string Node::getStrRepr() const{
+    return std::string(depth, '.') + "n" + std::to_string(id) + ": " + bbox.getStrRepr() + "\n";
+}
+
+std::string Accelerator::getStrRepr() const{
+    std::string *result = new std::string;
+    getNodeStrRepr(root, 0, result);
+    return *result;
+}
+
 // todo overload operator std::string
-//std::string Accelerator::getRepr(const Node& startNode, int depth){
-//
-//    std::string result;
-//    std::string tabs(depth, '-');
-//
-//    result = tabs + "n" + std::to_string(startNode.id) + " (";
-//    // min
-//    // todo make a print directly to bbox class
-//    for (int i = 0; i < 3; i++){
-//        // * 10 /10 to round u numbers
-//        std::cout << round(startNode.bbox.min[i] * 10.f)/10.f;
-//        if (i < 2)
-//            std::cout << ", ";
-//    }
-//    std::cout << " | ";
-//
-//    // max
-//    for (int i = 0; i < 3; i++){
-//        std::cout << round(startNode.bbox.max[i] * 10.f)/10.f;
-//        if (i < 2)
-//            std::cout << ", ";
-//    }
-//
-//    std::cout << ")" << std::endl;
-//
-//    for(const Node* n: startNode.children){
-//        if (n != nullptr){
-//            getRepr(*n, depth + 1);
-//        }
-//    }
-//    return result;
-//}
+void Accelerator::getNodeStrRepr(const Node& startNode, int depth, std::string* result) const {
+
+    *result += startNode.getStrRepr();
+    for(const Node* n: startNode.children){
+        if (n != nullptr){
+            getNodeStrRepr(*n, depth + 1, result);
+        }
+    }
+}
 
 void Accelerator::build(const std::vector<Mesh> &meshes){
     createMainBBbox(meshes);
@@ -41,25 +28,18 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
     // todo try to start split in 4
     root.bbox = mainBbox;
     root.id = 0;
+    root.depth = 0;
     BBox *newBBoxes = splitBBoxIn4(mainBbox);
     int boxCounter = 1;
     for (int i = 0; i < 4; i++ ){
         Node *child = new Node();
         child->bbox = newBBoxes[i];
+        child->depth = 1;
         child->id = boxCounter;
         root.children[i] = child;
         boxCounter++;
     }
-
-    std::cout << std::string(root.bbox) << std::endl;
-    exit(0);
 }
-
-
-//void Accelerator::createChildren(){
-//
-//}
-
 
 
 BBox* Accelerator::splitBBoxIn4(const BBox& bbox){

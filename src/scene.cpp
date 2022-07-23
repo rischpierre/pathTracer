@@ -1,6 +1,6 @@
 #include "scene.h"
 
-BBox::operator std::string() const {
+std::string BBox::getStrRepr() const {
     Eigen::Vector3f members[2] = {min, max};
 
     std::string result = "(";

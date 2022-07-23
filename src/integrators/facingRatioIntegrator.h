@@ -10,7 +10,6 @@
 
 class FacingRatioIntegrator: BaseIntegrator {
 public:
-    explicit FacingRatioIntegrator(Scene &scn) : BaseIntegrator(scn){};
 
     Eigen::Vector3f getColor(const Ray &ray);
 

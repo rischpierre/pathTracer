@@ -8,12 +8,14 @@
 #define BG_COLOR_B 0.1f
 
 #include "../scene.h"
+#include "../accelerator.h"
 
 class BaseIntegrator {
 public:
-    explicit BaseIntegrator(Scene &scn) : scene(scn){};
+    explicit BaseIntegrator(const Scene &scene, const Accelerator& accelerator) : scene(scene), accelerator(accelerator) {};
 
     Scene scene;
+    Accelerator accelerator;
 };
 
 

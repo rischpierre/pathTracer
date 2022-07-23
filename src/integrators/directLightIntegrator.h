@@ -8,7 +8,7 @@
 
 class DirectLightIntegrator: public BaseIntegrator {
 public:
-    explicit DirectLightIntegrator(Scene &scn) : BaseIntegrator(scn) {};
+    explicit DirectLightIntegrator(const Scene &scene, const Accelerator& accelerator) : BaseIntegrator(scene, accelerator) {};
 
     Eigen::Vector3f getColor(const Ray &ray, const Scene &scene);
 

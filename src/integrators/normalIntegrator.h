@@ -8,7 +8,6 @@
 
 class NormalIntegrator: public BaseIntegrator {
 public:
-    explicit NormalIntegrator(Scene &scn) : BaseIntegrator(scn){};
 
     Eigen::Vector3f getColor(const Ray &ray, const Scene &scene, bool debug);
 

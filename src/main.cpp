@@ -89,8 +89,7 @@ int main(int argc, char *argv[]){
     t2 = clock();
     std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
-
-    DirectLightIntegrator integrator(scene);
+    DirectLightIntegrator integrator(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
 #ifdef SINGLE_THREADED

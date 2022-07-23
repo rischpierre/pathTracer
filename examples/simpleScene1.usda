@@ -5,9 +5,26 @@
     upAxis = "Z"
 )
 
+def Xform "Camera"
+{
+    matrix4d xformOp:transform = ( (0.21712663769721985, 0.39511561393737793, -0.019094333052635193, 0), (-0.11195739358663559, 0.08227123320102692, 0.42932724952697754, 0), (0.3794027864933014, -0.2018415480852127, 0.13761693239212036, 0), (30.611614227294922, -16.460546493530273, 12.507616996765137, 1) )
+    uniform token[] xformOpOrder = ["xformOp:transform"]
+
+    def Camera "Camera"
+    {
+        float2 clippingRange = (0.1, 100)
+        float focalLength = 50
+        float horizontalAperture = 36
+        float horizontalApertureOffset = 0
+        token projection = "perspective"
+        float verticalAperture = 20.25
+        float verticalApertureOffset = 0
+    }
+}
+
 def Xform "Icosphere"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-2.078943967819214, 8.443337440490723, 0.9416691064834595, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-2.1478052139282227, 1.315821647644043, 0.9416691064834595, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Icosphere"
@@ -27,7 +44,7 @@ def Xform "Icosphere"
 
 def Xform "Cube"
 {
-    matrix4d xformOp:transform = ( (0.8591263294219971, -0.509128749370575, -0.05186409875750542, 0), (0.44191762804985046, 0.6869431734085083, 0.576903760433197, 0), (-0.2580905854701996, -0.518552839756012, 0.8151639103889465, 0), (1.2665268182754517, 7.9686479568481445, 1.3382474184036255, 1) )
+    matrix4d xformOp:transform = ( (0.8591263294219971, -0.509128749370575, -0.05186409875750542, 0), (0.44191762804985046, 0.6869431734085083, 0.576903760433197, 0), (-0.2580905854701996, -0.518552839756012, 0.8151639103889465, 0), (1.1976655721664429, 0.8411321640014648, 1.3382474184036255, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Cube_001"
@@ -47,7 +64,7 @@ def Xform "Cube"
 
 def Xform "Torus_001"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 5.903784275054932, 0, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-0.06886124610900879, -1.223731517791748, -7.450580596923828e-9, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Torus_001"
@@ -67,7 +84,7 @@ def Xform "Torus_001"
 
 def Xform "key"
 {
-    matrix4d xformOp:transform = ( (0.874753475189209, 0.153198704123497, -0.45971354842185974, 0), (0.160271555185318, 0.8038405179977417, 0.5728467702865601, 0), (0.4572957754135132, -0.5747787356376648, 0.6786088943481445, 0), (4.585872173309326, 3.0531349182128906, 6.930085182189941, 1) )
+    matrix4d xformOp:transform = ( (0.874753475189209, 0.153198704123497, -0.45971354842185974, 0), (0.160271555185318, 0.8038405179977417, 0.5728467702865601, 0), (0.4572957754135132, -0.5747787356376648, 0.6786088943481445, 0), (4.517010688781738, -4.074380874633789, 6.930085182189941, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def RectLight "Area"
@@ -82,7 +99,7 @@ def Xform "key"
 
 def Xform "Plane"
 {
-    matrix4d xformOp:transform = ( (5.557343006134033, 0, 0, 0), (0, 5.557343006134033, 0, 0), (0, 0, 5.557343006134033, 0), (0, 7.135693550109863, 0, 1) )
+    matrix4d xformOp:transform = ( (2.9705238342285156, 0, 0, 0), (0, 2.9705238342285156, 0, 0), (0, 0, 2.9705238342285156, 0), (-0.06886124610900879, 0.008177757263183594, -7.450580596923828e-9, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Plane"
@@ -100,26 +117,9 @@ def Xform "Plane"
     }
 }
 
-def Xform "Camera"
-{
-    matrix4d xformOp:transform = ( (0.4271079897880554, 0.14395926892757416, -0.02189531736075878, 0), (-0.0009356700466014445, 0.07056359946727753, 0.4456958770751953, 0), (0.14561180770397186, -0.42180731892585754, 0.06708720326423645, 0), (3.876103401184082, -1.9850611686706543, 2.9196105003356934, 1) )
-    uniform token[] xformOpOrder = ["xformOp:transform"]
-
-    def Camera "Camera"
-    {
-        float2 clippingRange = (0.1, 100)
-        float focalLength = 50
-        float horizontalAperture = 36
-        float horizontalApertureOffset = 0
-        token projection = "perspective"
-        float verticalAperture = 20.25
-        float verticalApertureOffset = 0
-    }
-}
-
 def Xform "fill"
 {
-    matrix4d xformOp:transform = ( (0.04041047394275665, -0.6247960329055786, 0.7797415852546692, 0), (0.24623025953769684, 0.7625393271446228, 0.5982511043548584, 0), (-0.9683685302734375, 0.16782036423683167, 0.18465827405452728, 0), (-12.581406593322754, 9.792501449584961, 4.561330318450928, 1) )
+    matrix4d xformOp:transform = ( (0.04041047394275665, -0.6247960329055786, 0.7797415852546692, 0), (0.24623025953769684, 0.7625393271446228, 0.5982511043548584, 0), (-0.9683685302734375, 0.16782036423683167, 0.18465827405452728, 0), (-12.650267601013184, 2.6649856567382812, 4.561330318450928, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def RectLight "Area_002"
@@ -134,7 +134,7 @@ def Xform "fill"
 
 def Xform "Sphere"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-2.2862777709960938, 6.6366190910339355, 0, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-2.3551390171051025, -0.49089670181274414, -7.450580596923828e-9, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Sphere_001"

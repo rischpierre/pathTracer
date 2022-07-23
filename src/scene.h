@@ -37,11 +37,18 @@ struct Face {
 };
 
 struct BBox{
+    BBox() {}
+
     BBox(Eigen::Vector3f &min,
          Eigen::Vector3f &max) : min(min), max(max) {}
 
     Eigen::Vector3f min;
     Eigen::Vector3f max;
+
+    Eigen::Vector3f center() const {
+        return (min + max) / 2;
+    }
+
 };
 
 struct Mesh {

@@ -2,10 +2,86 @@
 
 
 void Accelerator::build(const std::vector<Mesh> &meshes){
+    createMainBBbox(meshes);
 
+    // todo try to start split in 4
+    root.bbox = mainBbox;
+    BBox *newBBoxes = splitBBoxIn4(mainBbox);
+    int boxCounter = 1;
+    for (int i = 0; i < 4; i++ ){
+        Node *child = new Node();
+        child->bbox = newBBoxes[i];
+        child->id = boxCounter;
+        root.children[i] = child;
+        boxCounter++;
+    }
+    print(root, 0);
+}
+
+void Accelerator::print(const Node& startNode, int depth){
+
+    std::string tabs(depth, '-');
+    std::cout << tabs << "n" << startNode.id << " (";
+    // min
+    // todo make a print directly to bbox class
+    for (int i = 0; i < 3; i++){
+        // * 10 /10 to round u numbers
+        std::cout << round(startNode.bbox.min[i] * 10.f)/10.f;
+        if (i < 2)
+            std::cout << ", ";
+    }
+    std::cout << " | ";
+
+    // max
+    for (int i = 0; i < 3; i++){
+        std::cout << round(startNode.bbox.max[i] * 10.f)/10.f;
+        if (i < 2)
+            std::cout << ", ";
+    }
+
+    std::cout << ")" << std::endl;
+
+    for(const Node* n: startNode.children){
+        if (n != nullptr){
+            print(*n, depth + 1);
+        }
+    }
 
 }
 
+BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
+
+    static BBox bboxes[4];
+    // todo get the 2 largest edges and split in 2
+
+    float minSize = std::numeric_limits<float>::max();
+    int minAxis = -1;
+    for (int axis=0; axis < 3; axis++){
+        float size = bbox.max[axis] - bbox.min[axis];
+        if (size < minSize){
+            minSize = size;
+            minAxis = axis;
+        }
+    }
+
+    // todo split along z, use the minAxis for that later
+
+    Eigen::Vector3f translateY(0, (bbox.max[1] - bbox.min[1]) / 2, 0);
+    Eigen::Vector3f translateX((bbox.max[0] - bbox.min[0]) / 2, 0, 0);
+
+    int boxId = 0;
+    for(int i = 0; i < 2; i++){
+        for(int j = 0; j < 2; j++) {
+            Eigen::Vector3f childMax = bbox.max - translateX * (i ^ 1) - translateY * (j ^ 1);
+            Eigen::Vector3f childMin = bbox.min + translateX * i + translateY * j;
+
+            bboxes[boxId] = BBox(childMin, childMax);
+            boxId++;
+        }
+    }
+
+    return bboxes;
+}
 void Accelerator::createMainBBbox(const std::vector<Mesh> &meshes){
 
     std::vector<Mesh> meshesBbox;
@@ -52,3 +128,4 @@ void Accelerator::createMainBBbox(const std::vector<Mesh> &meshes){
     Eigen::Vector3f maxE(currentMaxX, currentMaxY, currentMaxZ);
     this->mainBbox = BBox(minE, maxE);
 }
+

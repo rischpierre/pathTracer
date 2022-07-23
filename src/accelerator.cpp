@@ -24,8 +24,10 @@ void Accelerator::getNodeStrRepr(const Node& startNode, int depth, std::string* 
 
 void Accelerator::build(const std::vector<Mesh> &meshes){
     createMainBBbox(meshes);
+    // todo start building graph recursively (4 levels)
+    // todo the end nodes are leaf nodes, make it a vector in the struct
+    // todo for each leaf node, link a the available meshes, if there are no faces in the box, delete the node
 
-    // todo try to start split in 4
     root.bbox = mainBbox;
     root.id = 0;
     root.depth = 0;

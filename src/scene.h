@@ -36,7 +36,7 @@ struct Face {
     int id;
 };
 
-struct BBox{
+struct BBox {
     BBox() {}
 
     BBox(Eigen::Vector3f &min,
@@ -49,7 +49,9 @@ struct BBox{
         return (min + max) / 2;
     }
 
+    explicit operator std::string() const;
 };
+
 
 struct Mesh {
     Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox) : faces(faces), name(name), bbox(bbox) {}

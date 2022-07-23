@@ -15,7 +15,11 @@ public:
     BBox mainBbox;
     Node root;
     void build(const std::vector<Mesh> &meshes);
-    void print(const Node& startNode, int depth);
+//    void print(const Node& startNode, int depth);
+
+//    friend std::ostream& operator<<(const std::ostream& os, const Node& startNode);
+//
+//    std::string Accelerator::getRepr(const Node& startNode, int depth);
 
 private:
     void createMainBBbox(const std::vector<Mesh> &meshes);

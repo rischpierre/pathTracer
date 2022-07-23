@@ -1,11 +1,46 @@
 #include "accelerator.h"
 
 
+// todo overload operator std::string
+//std::string Accelerator::getRepr(const Node& startNode, int depth){
+//
+//    std::string result;
+//    std::string tabs(depth, '-');
+//
+//    result = tabs + "n" + std::to_string(startNode.id) + " (";
+//    // min
+//    // todo make a print directly to bbox class
+//    for (int i = 0; i < 3; i++){
+//        // * 10 /10 to round u numbers
+//        std::cout << round(startNode.bbox.min[i] * 10.f)/10.f;
+//        if (i < 2)
+//            std::cout << ", ";
+//    }
+//    std::cout << " | ";
+//
+//    // max
+//    for (int i = 0; i < 3; i++){
+//        std::cout << round(startNode.bbox.max[i] * 10.f)/10.f;
+//        if (i < 2)
+//            std::cout << ", ";
+//    }
+//
+//    std::cout << ")" << std::endl;
+//
+//    for(const Node* n: startNode.children){
+//        if (n != nullptr){
+//            getRepr(*n, depth + 1);
+//        }
+//    }
+//    return result;
+//}
+
 void Accelerator::build(const std::vector<Mesh> &meshes){
     createMainBBbox(meshes);
 
     // todo try to start split in 4
     root.bbox = mainBbox;
+    root.id = 0;
     BBox *newBBoxes = splitBBoxIn4(mainBbox);
     int boxCounter = 1;
     for (int i = 0; i < 4; i++ ){
@@ -15,39 +50,17 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
         root.children[i] = child;
         boxCounter++;
     }
-    print(root, 0);
+
+    std::cout << std::string(root.bbox) << std::endl;
+    exit(0);
 }
 
-void Accelerator::print(const Node& startNode, int depth){
 
-    std::string tabs(depth, '-');
-    std::cout << tabs << "n" << startNode.id << " (";
-    // min
-    // todo make a print directly to bbox class
-    for (int i = 0; i < 3; i++){
-        // * 10 /10 to round u numbers
-        std::cout << round(startNode.bbox.min[i] * 10.f)/10.f;
-        if (i < 2)
-            std::cout << ", ";
-    }
-    std::cout << " | ";
+//void Accelerator::createChildren(){
+//
+//}
 
-    // max
-    for (int i = 0; i < 3; i++){
-        std::cout << round(startNode.bbox.max[i] * 10.f)/10.f;
-        if (i < 2)
-            std::cout << ", ";
-    }
 
-    std::cout << ")" << std::endl;
-
-    for(const Node* n: startNode.children){
-        if (n != nullptr){
-            print(*n, depth + 1);
-        }
-    }
-
-}
 
 BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
 

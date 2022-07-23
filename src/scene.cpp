@@ -1,5 +1,27 @@
 #include "scene.h"
 
+BBox::operator std::string() const {
+    Eigen::Vector3f members[2] = {min, max};
+
+    std::string result = "(";
+    int j = 0;
+    for (const auto& member: members){
+
+        for (int i = 0; i < 3; i++){
+            std::string value = std::to_string(max[i]);
+            result += value.substr(0, value.length() - 4);
+            if (i < 2)
+            result += ", ";
+        }
+        if (j == 0)
+            result += " | ";
+        j++;
+    }
+
+    result += ")";
+    return result;
+
+}
 
 Scene::Scene(const std::string &path) {
 

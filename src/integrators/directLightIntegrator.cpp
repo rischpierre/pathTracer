@@ -19,34 +19,32 @@ Eigen::Vector3f DirectLightIntegrator::getColor(const Ray &ray, const Scene &sce
     auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
 
     // todo make a new integrator for this test acceleration struct
-    int i = 0;
-    const BBox* nearestBox = nullptr;
     const Node* nearestNode = nullptr;
     float minRayBoxDistance = std::numeric_limits<float>::max();
-    for (const Node* n: accelerator.root.children){
-        if (!n)
-            continue;
 
-        if (i > 2)
-            i = 0;
+    // todo remove this tracing of  bboxes
+    for (const Node* gn: accelerator.root.children){
+        for (const Node* xn: gn->children) {
+            for (const Node *n: xn->children) {
+                if (!n)
+                    continue;
 
-        if(isRayIntersectsBox(ray, n->bbox)){
-            float rayBoxDistance = (n->bbox.center() - ray.o).norm();
-            if (rayBoxDistance < minRayBoxDistance) {
-                minRayBoxDistance = rayBoxDistance;
-                nearestBox = &n->bbox;
-                nearestNode = n;
+                if (isRayIntersectsBox(ray, n->bbox)) {
+                    float rayBoxDistance = (n->bbox.center() - ray.o).norm();
 
+                    if (rayBoxDistance < minRayBoxDistance) {
+                        minRayBoxDistance = rayBoxDistance;
+                        nearestNode = n;
+                    }
+                }
             }
         }
-        i++;
     }
     if (nearestNode){
-        color[nearestNode->id % 3] = 1.f;
+        color[nearestNode->id % 3] = (float)nearestNode->id / 100.f;
         return color;
     }
 
-    // todo end
 
     for (Mesh &mesh: this->scene.meshes) {
 

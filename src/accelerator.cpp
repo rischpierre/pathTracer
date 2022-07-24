@@ -57,8 +57,38 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
         child->id = boxCounter;
         root.children[i] = child;
         boxCounter++;
+
     }
+
+    // todo remove this fake recursion
+    for (Node* child: root.children){
+        BBox *GnewBBoxes = splitBBoxIn4(child->bbox);
+        for (int j = 0; j < 4; j++ ){
+            Node *Gchild = new Node();
+            Gchild->bbox = GnewBBoxes[j];
+            Gchild->depth = 2;
+            Gchild->id = boxCounter;
+            child->children[j] = Gchild;
+            boxCounter++;
+        }
+    }
+
+    for (Node* child: root.children){
+        for (Node* Gchild: child->children) {
+            BBox *GnewBBoxes = splitBBoxIn4(Gchild->bbox);
+            for (int j = 0; j < 4; j++) {
+                Node *GGchild = new Node();
+                GGchild->bbox = GnewBBoxes[j];
+                GGchild->depth = 2;
+                GGchild->id = boxCounter;
+                Gchild->children[j] = GGchild;
+                boxCounter++;
+            }
+        }
+    }
+    print();
 }
+
 
 
 BBox* Accelerator::splitBBoxIn4(const BBox& bbox){

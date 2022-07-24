@@ -45,6 +45,15 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
     // todo the end nodes are leaf nodes, make it a vector in the struct
     // todo for each leaf node, link a the available meshes, if there are no faces in the box, delete the node
 
+    // todo get all faces in the scene
+
+    std::vector<Face> allFaces;
+    for (const Mesh& mesh: meshes){
+        for (const Face& face: mesh.faces){
+            allFaces.push_back(face);
+        }
+    }
+
     root.bbox = mainBbox;
     root.id = 0;
     root.depth = 0;
@@ -77,15 +86,30 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
         for (Node* Gchild: child->children) {
             BBox *GnewBBoxes = splitBBoxIn4(Gchild->bbox);
             for (int j = 0; j < 4; j++) {
+                BBox currentBBox = GnewBBoxes[j];
+                // todo find if there are faces in the box
+
+                std::vector<Face> facesInBox;
+                for (const Face& face: allFaces){
+                    if (currentBBox.isFaceInside(face))
+                        facesInBox.push_back(face);
+                }
+
+                // skip the node's creation
+                if (facesInBox.empty())
+                    continue;
+
                 Node *GGchild = new Node();
-                GGchild->bbox = GnewBBoxes[j];
-                GGchild->depth = 2;
+                GGchild->bbox = currentBBox;
+                GGchild->depth = 3;
                 GGchild->id = boxCounter;
+                GGchild->faces = facesInBox;
                 Gchild->children[j] = GGchild;
                 boxCounter++;
             }
         }
     }
+
     print();
 }
 
@@ -130,6 +154,13 @@ BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
             } else {  // z
                 childMax = bbox.max - translateX * (i ^ 1) - translateY * (j ^ 1);
                 childMin = bbox.min + translateX * i + translateY * j;
+            }
+
+            //swap values if min is over the max
+            for (int k = 0; k < 3; k++){
+                if (childMin[k] > childMax[k]){
+                    std::swap(childMin[k], childMax[k]);
+                }
             }
 
             bboxes[boxId] = BBox(childMin, childMax);

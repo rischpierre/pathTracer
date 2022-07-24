@@ -34,6 +34,10 @@ struct Face {
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
     int id;
+
+    Eigen::Vector3f getCenter() const{
+        return (v0 + v1 + v2) / 3.0f;
+    }
 };
 
 struct BBox {
@@ -54,6 +58,33 @@ struct BBox {
     void print() const{
         std::cout << getStrRepr() << std::endl;
     }
+
+    bool isFaceInside(const Face& face) const{
+        // todo at least one of the face's vertex should be in the box
+        Eigen::Vector3f v0 = face.v0;
+        Eigen::Vector3f v1 = face.v1;
+        Eigen::Vector3f v2 = face.v2;
+
+
+        if (v0.x() >= min.x() && v0.x() <= max.x() &&
+            v0.y() >= min.y() && v0.y() <= max.y() &&
+            v0.z() >= min.z() && v0.z() <= max.z()){
+            return true;
+        }
+        if  (v1.x() >= min.x() && v1.x() <= max.x() &&
+             v1.y() >= min.y() && v1.y() <= max.y() &&
+             v1.z() >= min.z() && v1.z() <= max.z()){
+            return true;
+        }
+
+        if (v2.x() >= min.x() && v2.x() <= max.x() &&
+            v2.y() >= min.y() && v2.y() <= max.y() &&
+            v2.z() >= min.z() && v2.z() <= max.z()){
+            return true;
+        }
+        return false;
+    }
+
 };
 
 

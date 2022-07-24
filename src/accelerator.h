@@ -9,6 +9,7 @@ struct Node{
     BBox bbox;
     int id = 0;
     int depth = 0;
+    std::vector<Face> faces;
 
     [[nodiscard]] std::string getStrRepr() const;
 

@@ -8,7 +8,7 @@ std::string BBox::getStrRepr() const {
     for (const auto& member: members){
 
         for (int i = 0; i < 3; i++){
-            std::string value = std::to_string(max[i]);
+            std::string value = std::to_string(member[i]);
             result += value.substr(0, value.length() - 4);
             if (i < 2)
             result += ", ";

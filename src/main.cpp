@@ -12,6 +12,7 @@
 #include "integrators/facingRatioIntegrator.h"
 #include "integrators/directLightIntegrator.h"
 #include "accelerator.h"
+#include "integrators/debugAccIntegrator.h"
 
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
@@ -89,7 +90,8 @@ int main(int argc, char *argv[]){
     t2 = clock();
     std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
-    DirectLightIntegrator integrator(scene, accelerator);
+    DirectLightIntegrator integratorDirect(scene, accelerator);
+    DebugAccIntegrator integratorDebug(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
 #ifdef SINGLE_THREADED
@@ -104,9 +106,10 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
-            Eigen::Vector3f color = integrator.getColor(ray, scene);
+            Eigen::Vector3f colorDirect = integratorDirect.getColor(ray, scene);
+            Eigen::Vector3f colorDebug = integratorDebug.getColor(ray, scene);
 
-            pixels[y * RESOLUTION_W + x] = color;
+            pixels[y * RESOLUTION_W + x] = (5 * colorDebug/6 + colorDirect/6);
         }
     }
 #ifndef SINGLE_THREADED

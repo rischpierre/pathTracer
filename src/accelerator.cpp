@@ -1,5 +1,22 @@
 #include "accelerator.h"
+/*
+Steps
+- split bbox arround the main axis
+- Split 2*4 times first
+- Use it in the directintegartor to check if its working
+- x time split
 
+Algo:
+For each node
+ Split to 4
+ For each child
+   Get faces inside the bbox
+    # to test get the faces from the parent
+    If no face available then delete node
+    Else add faces to the node
+     If nb of faces > 20 then recurse
+     Else set node to be a leaf
+*/
 
 std::string Node::getStrRepr() const{
     return std::string(depth, '.') + "n" + std::to_string(id) + ": " + bbox.getStrRepr() + "\n";
@@ -58,17 +75,32 @@ BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
             minAxis = axis;
         }
     }
+    if (minAxis == -1){
+        std::cerr << "Error finding axis for splitting the bbox" << std::endl;
+        exit(1);
+    }
 
-    // todo split along z, use the minAxis for that later
-
+    Eigen::Vector3f translateX( (bbox.max[0] - bbox.min[0]) / 2, 0, 0);
     Eigen::Vector3f translateY(0, (bbox.max[1] - bbox.min[1]) / 2, 0);
-    Eigen::Vector3f translateX((bbox.max[0] - bbox.min[0]) / 2, 0, 0);
+    Eigen::Vector3f translateZ(0, 0, (bbox.max[2] - bbox.min[2]) / 2);
 
     int boxId = 0;
-    for(int i = 0; i < 2; i++){
-        for(int j = 0; j < 2; j++) {
-            Eigen::Vector3f childMax = bbox.max - translateX * (i ^ 1) - translateY * (j ^ 1);
-            Eigen::Vector3f childMin = bbox.min + translateX * i + translateY * j;
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            Eigen::Vector3f childMin, childMax;
+
+            if (minAxis == 0){ // x
+                childMax = bbox.max - translateY * (i ^ 1) - translateZ * (j ^ 1);
+                childMin = bbox.min + translateY * i + translateZ * j;
+
+            } else if (minAxis ==1){ // y
+                childMax = bbox.max - translateX * (i ^ 1) - translateZ * (j ^ 1);
+                childMin = bbox.min + translateX * i + translateZ * j;
+
+            } else {  // z
+                childMax = bbox.max - translateX * (i ^ 1) - translateY * (j ^ 1);
+                childMin = bbox.min + translateX * i + translateY * j;
+            }
 
             bboxes[boxId] = BBox(childMin, childMax);
             boxId++;

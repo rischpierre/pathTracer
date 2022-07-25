@@ -13,16 +13,9 @@ find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIBGF gf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
 
-message(${USD_LIBGF})
-
-# todo cmake warning, maybe use the tbb from USD???
-find_library(TBB_LIB tbb)
-
-file(GLOB_RECURSE SRCS src/*.cpp src/*.h)
-
-# todo fix google tests
-#add_subdirectory(tests)
+file(GLOB_RECURSE SRCS sources/*.cpp sources/*.h)
 
 add_executable(pathTracer ${SRCS})
 
@@ -47,5 +40,59 @@ target_link_libraries(
         ${USD_USD}
         ${USD_LIBGF}
         ${USD_VT}
-        ${TBB_LIB}
+        ${USD_LIB_TBB}
 )
+
+
+# Unittest
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.12.1
+)
+
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+file(GLOB SOURCES_TESTS tests/*.cpp)
+
+add_executable(
+        runTests
+        ${SOURCES_TESTS}
+)
+
+target_include_directories(
+        runTests
+        SYSTEM
+        PUBLIC
+        ${USD_INCLUDE_DIRECTORY}
+        $ENV{EIGEN3_INCLUDE_DIR}
+)
+
+
+file(GLOB_RECURSE SOURCES_TO_TEST sources/*.cpp sources/*.h)
+file(GLOB SOURCE_MAIN sources/main.cpp)
+
+list(REMOVE_ITEM SOURCES_TO_TEST ${SOURCE_MAIN})
+
+add_library(libToTest ${SOURCES_TO_TEST})
+
+target_include_directories(
+        libToTest
+        SYSTEM
+        PUBLIC
+        ${USD_INCLUDE_DIRECTORY}
+        $ENV{EIGEN3_INCLUDE_DIR}
+)
+
+target_link_libraries(
+        runTests
+        libToTest
+        GTest::gtest_main
+)
+
+include(GoogleTest)
+
+gtest_discover_tests(runTests)

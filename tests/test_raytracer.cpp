@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "../src/raytracer.h"
+#include "../sources/raytracer.h"
 
 
 TEST(raytracer, test_ray_inside_triangle) {

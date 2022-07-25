@@ -14,7 +14,7 @@ find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
 
-file(GLOB_RECURSE SRCS src/*.cpp src/*.h)
+file(GLOB_RECURSE SRCS sources/*.cpp sources/*.h)
 
 add_executable(pathTracer ${SRCS})
 
@@ -63,8 +63,8 @@ target_include_directories(
 )
 
 
-file(GLOB_RECURSE SOURCES_TO_TEST src/*.cpp src/*.h)
-file(GLOB SOURCE_MAIN src/main.cpp)
+file(GLOB_RECURSE SOURCES_TO_TEST sources/*.cpp sources/*.h)
+file(GLOB SOURCE_MAIN sources/main.cpp)
 
 message(${SOURCE_MAIN})
 

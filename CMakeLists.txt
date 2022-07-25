@@ -49,9 +49,11 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
+file(GLOB SOURCES_TESTS tests/*.cpp)
+
 add_executable(
         runTests
-        "/home/pierre/packages/pathTracer/tests/test_raytracer.cpp"
+        ${SOURCES_TESTS}
 )
 
 target_include_directories(
@@ -66,11 +68,8 @@ target_include_directories(
 file(GLOB_RECURSE SOURCES_TO_TEST sources/*.cpp sources/*.h)
 file(GLOB SOURCE_MAIN sources/main.cpp)
 
-message(${SOURCE_MAIN})
-
 list(REMOVE_ITEM SOURCES_TO_TEST ${SOURCE_MAIN})
 
-message(${SOURCES_TO_TEST})
 add_library(libToTest ${SOURCES_TO_TEST})
 
 target_include_directories(

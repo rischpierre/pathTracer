@@ -16,8 +16,6 @@ find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
 
 file(GLOB_RECURSE SRCS src/*.cpp src/*.h)
 
-add_subdirectory(tests)
-
 add_executable(pathTracer ${SRCS})
 
 target_include_directories(
@@ -37,3 +35,58 @@ target_link_libraries(
         ${USD_VT}
         ${USD_LIB_TBB}
 )
+
+
+# Unittest
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest.git
+        GIT_TAG release-1.12.1
+)
+
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(
+        runTests
+        "/home/pierre/packages/pathTracer/tests/test_raytracer.cpp"
+)
+
+target_include_directories(
+        runTests
+        SYSTEM
+        PUBLIC
+        ${USD_INCLUDE_DIRECTORY}
+        $ENV{EIGEN3_INCLUDE_DIR}
+)
+
+
+file(GLOB_RECURSE SOURCES_TO_TEST src/*.cpp src/*.h)
+file(GLOB SOURCE_MAIN src/main.cpp)
+
+message(${SOURCE_MAIN})
+
+list(REMOVE_ITEM SOURCES_TO_TEST ${SOURCE_MAIN})
+
+message(${SOURCES_TO_TEST})
+add_library(libToTest ${SOURCES_TO_TEST})
+
+target_include_directories(
+        libToTest
+        SYSTEM
+        PUBLIC
+        ${USD_INCLUDE_DIRECTORY}
+        $ENV{EIGEN3_INCLUDE_DIR}
+)
+
+target_link_libraries(
+        runTests
+        libToTest
+        GTest::gtest_main
+)
+
+include(GoogleTest)
+
+gtest_discover_tests(runTests)

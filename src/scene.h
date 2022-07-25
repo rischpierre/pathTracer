@@ -22,7 +22,7 @@ struct Face {
          Eigen::Vector3f &n0,
          Eigen::Vector3f &n1,
          Eigen::Vector3f &n2,
-         int id) :              v0(v0),
+         int id = 0) :          v0(v0),
                                 v1(v1),
                                 v2(v2),
                                 nf(nf),

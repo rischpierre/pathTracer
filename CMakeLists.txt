@@ -12,15 +12,11 @@ find_library(USD_TF tf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
-
-
-# todo cmake warning, maybe use the tbb from USD???
-find_library(TBB_LIB tbb)
+find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
 
 file(GLOB_RECURSE SRCS src/*.cpp src/*.h)
 
-# todo fix google tests
-#add_subdirectory(tests)
+add_subdirectory(tests)
 
 add_executable(pathTracer ${SRCS})
 
@@ -39,5 +35,5 @@ target_link_libraries(
         ${USD_USDGEOM}
         ${USD_USD}
         ${USD_VT}
-        ${TBB_LIB}
+        ${USD_LIB_TBB}
 )

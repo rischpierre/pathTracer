@@ -31,9 +31,10 @@ public:
 
     BBox* splitBBoxIn4(const BBox& bbox);
 
+    void createMainBBbox(const std::vector<Mesh> &meshes);
+
 private:
     void getNodeStrRepr(const Node& startNode, int depth, std::string* result) const;
-    void createMainBBbox(const std::vector<Mesh> &meshes);
 };
 
 

@@ -114,7 +114,6 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
 }
 
 
-
 BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
 
     static BBox bboxes[4];

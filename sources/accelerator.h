@@ -29,11 +29,11 @@ public:
         std::cout << getStrRepr() << std::endl;
     }
 
+    BBox* splitBBoxIn4(const BBox& bbox);
 
 private:
     void getNodeStrRepr(const Node& startNode, int depth, std::string* result) const;
     void createMainBBbox(const std::vector<Mesh> &meshes);
-    BBox* splitBBoxIn4(const BBox& bbox);
 };
 
 

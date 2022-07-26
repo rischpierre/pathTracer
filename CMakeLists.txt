@@ -93,6 +93,17 @@ target_include_directories(
 )
 
 target_link_libraries(
+        libToTest
+        ${LIB_PNG}
+        ${USD_SDF}
+        ${USD_TF}
+        ${USD_USDGEOM}
+        ${USD_USD}
+        ${USD_LIBGF}
+        ${USD_VT}
+        ${USD_LIB_TBB}
+)
+target_link_libraries(
         runTests
         libToTest
         GTest::gtest_main

@@ -15,6 +15,9 @@ find_library(USD_LIBGF gf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
 
+find_package(PNG REQUIRED)
+
+
 file(GLOB_RECURSE SRCS sources/*.cpp sources/*.h)
 
 add_executable(pathTracer ${SRCS})
@@ -28,12 +31,14 @@ target_include_directories(
         pathTracer
         SYSTEM
         PUBLIC
+
         ${USD_INCLUDE_DIRECTORY}
         $ENV{EIGEN3_INCLUDE_DIR}
         )
 
 target_link_libraries(
         pathTracer
+        ${LIB_PNG}
         ${USD_SDF}
         ${USD_TF}
         ${USD_USDGEOM}

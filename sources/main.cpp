@@ -14,36 +14,16 @@
 #include "accelerator.h"
 #include "integrators/debugAccIntegrator.h"
 
+
 #define MAIN_RESOLUTION_W 1280
 #define MAIN_RESOLUTION_H 720
-#define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
+#define RESOLUTION_DIVIDER 4 // should be a multiple of 2 or 1
 #define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
-
 #define RAY_TRACING_THRESHOLD 0.000001
 
-// todo put that somewhere else
-void writeToFile(const std::string &path, int width, int height, const Eigen::Vector3f *pixels) {
 
-    FILE *f = fopen(path.c_str(), "w");
-    if (!f) {
-        std::cout << "Error opening file!" << std::endl;
-        exit(1);
-    }
-
-    fprintf(f, "P3\n%d %d\n%d\n", width, height, 255);
-
-    for (int i = 0; i < width * height; i++) {
-        int r = pixels[i](0) * 255;
-        int g = pixels[i](1) * 255;
-        int b = pixels[i](2) * 255;
-        fprintf(f, "%d %d %d\n", r, g, b);
-    }
-    std::cout << "Wrote file " << path << std::endl;
-
-}
-
-
+// todo move in camera class
 Ray createCameraRay(const Camera &cam, int x, int y){
 
    float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
@@ -67,6 +47,7 @@ int main(int argc, char *argv[]){
         std::cout << "Usage: " << argv[0] << " <path to usd scene>" << std::endl;
         return 1;
     }
+    std::string resultImageFile = "render.png";
 
     std::ifstream file;
     std::string path = argv[1];
@@ -119,7 +100,9 @@ int main(int argc, char *argv[]){
     tbb::tick_count t4 = tbb::tick_count::now();
     std::cout << "Rendered in " << (t4 - t3).seconds() << " seconds" << std::endl;
 
-    writeToFile("test.ppm", RESOLUTION_W, RESOLUTION_H, pixels);
+    write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
+    std::cout << "Wrote file " << resultImageFile << std::endl;
+
     delete[] pixels;
 
     return 0;

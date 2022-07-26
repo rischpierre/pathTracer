@@ -19,7 +19,6 @@ TEST(raytracer, test_ray_inside_triangle) {
     Face f(t1, t2, t3, nf, n0, n1, n2);
 
     float distance, u, v;
-    std::cout << "test" << std::endl;
     ASSERT_TRUE(isRayIntersectsTriangle(&ray, &f, &distance, u, v));
 }
 

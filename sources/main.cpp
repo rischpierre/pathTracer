@@ -45,6 +45,7 @@ int main(int argc, char *argv[]){
         std::cout << "Usage: " << argv[0] << " <path to usd scene>" << std::endl;
         return 1;
     }
+    std::string resultImageFile = "render.png";
 
     std::ifstream file;
     std::string path = argv[1];
@@ -82,8 +83,8 @@ int main(int argc, char *argv[]){
     tbb::tick_count t4 = tbb::tick_count::now();
     std::cout << "Rendered in " << (t4 - t3).seconds() << " seconds" << std::endl;
 
-    write_png_file("test.png", RESOLUTION_W, RESOLUTION_H, pixels);
-    std::cout << "Wrote file " << path << std::endl;
+    write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
+    std::cout << "Wrote file " << resultImageFile << std::endl;
 
     delete[] pixels;
 

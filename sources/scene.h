@@ -16,21 +16,31 @@
 
 
 struct Face {
-    Face(Eigen::Vector3f &v0,
-         Eigen::Vector3f &v1,
-         Eigen::Vector3f &v2,
-         Eigen::Vector3f &nf,
-         Eigen::Vector3f &n0,
-         Eigen::Vector3f &n1,
-         Eigen::Vector3f &n2,
-         int id = 0) :          v0(v0),
-                                v1(v1),
-                                v2(v2),
-                                nf(nf),
-                                n0(n0),
-                                n1(n1),
-                                n2(n2),
+    Face(Eigen::Vector3f v0 = Eigen::Vector3f(0),
+         Eigen::Vector3f v1 = Eigen::Vector3f(0),
+         Eigen::Vector3f v2 = Eigen::Vector3f(0),
+         Eigen::Vector3f nf = Eigen::Vector3f(0),
+         Eigen::Vector3f n0 = Eigen::Vector3f(0),
+         Eigen::Vector3f n1 = Eigen::Vector3f(0),
+         Eigen::Vector3f n2 = Eigen::Vector3f(0),
+         int id = 0) :          v0(std::move(v0)),
+                                v1(std::move(v1)),
+                                v2(std::move(v2)),
+                                nf(std::move(nf)),
+                                n0(std::move(n0)),
+                                n1(std::move(n1)),
+                                n2(std::move(n2)),
                                 id(id) {}
+    Face(const Face& f){
+        v0 = f.v0;
+        v1 = f.v1;
+        v2 = f.v2;
+        nf = f.nf;
+        n0 = f.n0;
+        n1 = f.n1;
+        n2 = f.n2;
+        id = f.id;
+    }
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
     int id;

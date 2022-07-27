@@ -2,7 +2,7 @@
 #include "../sources/accelerator.h"
 
 
-TEST(accelerator, test_bbox_split) {
+TEST(accelerator, test_bbox_split_in_4) {
     Accelerator acc;
 
     Eigen::Vector3f start(0, 0, 0);
@@ -24,6 +24,60 @@ TEST(accelerator, test_bbox_split) {
     ASSERT_EQ(newBBoxes[3].max, Eigen::Vector3f(10, 10, 5));
 }
 
+TEST(accelerator, test_bbox_split_in_2) {
+    Accelerator acc;
+
+    Eigen::Vector3f start(0, 0, 0);
+    Eigen::Vector3f end(5, 10, 5);
+
+    BBox bbox(start, end);
+
+    BBox* newBBoxes = acc.splitBBoxIn2(bbox);
+    ASSERT_EQ(newBBoxes[0].min, Eigen::Vector3f(0, 0, 0));
+    ASSERT_EQ(newBBoxes[0].max, Eigen::Vector3f(5, 5, 5));
+
+    ASSERT_EQ(newBBoxes[1].min, Eigen::Vector3f(0, 5, 0));
+    ASSERT_EQ(newBBoxes[1].max, Eigen::Vector3f(5, 10, 5));
+}
+
+TEST(accelerator, test_build_structure) {
+    Accelerator acc;
+
+    // todo Create multiple triangles for the test
+    Face faceOrig(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(1, 0, 0), Eigen::Vector3f(0, 1, 0));
+
+    Face faceOrigBig(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(3, 0, 0), Eigen::Vector3f(0, 3, 0));
+
+    std::vector<Eigen::Vector3f> positions = {
+            Eigen::Vector3f(10, 10, 2),
+            Eigen::Vector3f(12, 12, 1),
+            Eigen::Vector3f(2, 2, 0),
+            Eigen::Vector3f(-10, -8, 0),
+
+    };
+    std::vector<Face> faces;
+    for (const Eigen::Vector3f pos : positions) {
+        Face f = Face(faceOrig);
+        f.v0 += pos;
+        f.v1 += pos;
+        f.v2 += pos;
+
+        faces.push_back(f);
+    }
+
+    Face faceBig = Face(faceOrigBig);
+    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
+    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
+    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
+
+    faces.push_back(faceBig);
+
+
+    acc.build(faces);
+
+    ASSERT_FALSE(true);
+}
+
 TEST(accelerator, test_create_main_bbox) {
     Accelerator acc;
 
@@ -37,9 +91,7 @@ TEST(accelerator, test_create_main_bbox) {
     Eigen::Vector3f end2(0, 0, -2);
     BBox b2(start2, end2);
 
-    // todo how to create default args even with references in params?
-    Face f1(none, none, none, none, none, none, none);
-    Face f2(none, none, none, none, none, none, none);
+    Face f1, f2;
 
     std::vector<Face> faces1 = {f1};
     std::vector<Face> faces2 = {f2};

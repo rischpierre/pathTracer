@@ -113,6 +113,57 @@ void Accelerator::build(const std::vector<Mesh> &meshes){
     print();
 }
 
+BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {
+
+    static BBox bboxes[2];
+
+    float maxSize = -std::numeric_limits<float>::max();
+    int maxAxis = -1;
+    for (int axis = 0; axis < 3; axis++) {
+        float size = bbox.max[axis] - bbox.min[axis];
+        if (size > maxSize) {
+            maxSize = size;
+            maxAxis = axis;
+        }
+    }
+    if (maxAxis == -1) {
+        throw std::runtime_error("Error finding axis for splitting the bbox");
+    }
+
+    Eigen::Vector3f translateX((bbox.max[0] - bbox.min[0]) / 2, 0, 0);
+    Eigen::Vector3f translateY(0, (bbox.max[1] - bbox.min[1]) / 2, 0);
+    Eigen::Vector3f translateZ(0, 0, (bbox.max[2] - bbox.min[2]) / 2);
+
+    int boxId = 0;
+    for (int i = 0; i < 2; i++) {
+        Eigen::Vector3f childMin, childMax;
+
+        if (maxAxis == 0) { // x
+            childMax = bbox.max - translateX * (i ^ 1);
+            childMin = bbox.min + translateX * i;
+
+        } else if (maxAxis == 1) { // y
+            childMax = bbox.max - translateY * (i ^ 1);
+            childMin = bbox.min + translateY * i;
+
+        } else {  // z
+            childMax = bbox.max - translateZ * (i ^ 1);
+            childMin = bbox.min + translateZ * i;
+        }
+
+        //swap values if min is over the max
+        for (int k = 0; k < 3; k++) {
+            if (childMin[k] > childMax[k]) {
+                std::swap(childMin[k], childMax[k]);
+            }
+        }
+
+        bboxes[boxId] = BBox(childMin, childMax);
+        boxId++;
+    }
+
+    return bboxes;
+}
 
 BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
 

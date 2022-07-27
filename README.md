@@ -7,7 +7,7 @@
 - Path tracer using USD: https://github.com/JoshuaSenouf/tracer
 - Path tracer topics: https://www.scratchapixel.com/
 - Aera Light algorithm: http://raytracerchallenge.com/bonus/area-light.html
-
+- Acceleration structure: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 ### RoadMap
 
 - #### MVP

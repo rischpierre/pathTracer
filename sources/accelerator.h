@@ -29,6 +29,7 @@ public:
         std::cout << getStrRepr() << std::endl;
     }
 
+    BBox* splitBBoxIn2(const BBox& bbox);
     BBox* splitBBoxIn4(const BBox& bbox);
 
     void createMainBBbox(const std::vector<Mesh> &meshes);

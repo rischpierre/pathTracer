@@ -56,26 +56,30 @@ TEST(accelerator, test_build_structure) {
 
     };
     std::vector<Face> faces;
-    for (const Eigen::Vector3f pos : positions) {
+    int id = 0;
+    for (const Eigen::Vector3f& pos : positions) {
         Face f = Face(faceOrig);
         f.v0 += pos;
         f.v1 += pos;
         f.v2 += pos;
+        f.id = id;
 
         faces.push_back(f);
+        id++;
     }
 
     Face faceBig = Face(faceOrigBig);
-    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
-    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
-    faceBig.v0 += Eigen::Vector3f(2, 2, 2);
+    Eigen::Vector3f transform(2, 2, 2);
+    faceBig.v0 += transform;
+    faceBig.v1 += transform;
+    faceBig.v2 += transform;
+    faceBig.id = id;
 
     faces.push_back(faceBig);
 
-
     acc.build(faces);
 
-    ASSERT_FALSE(true);
+
 }
 
 TEST(accelerator, test_create_main_bbox) {
@@ -101,7 +105,7 @@ TEST(accelerator, test_create_main_bbox) {
 
     std::vector<Mesh> meshes = {m1, m2};
 
-    acc.createMainBBbox(meshes);
+    acc.createBBoxFromMeshes(meshes);
 
     ASSERT_EQ(acc.mainBbox.min, Eigen::Vector3f(-10, -10, -10));
     ASSERT_EQ(acc.mainBbox.max, Eigen::Vector3f(10, 10, 2));

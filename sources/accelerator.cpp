@@ -1,116 +1,43 @@
 #include "accelerator.h"
-/*
-Steps
-- split bbox arround the main axis
-- Split 2*4 times first
-- Use it in the directintegartor to check if its working
-- x time split
 
-Algo:
-For each node
- Split to 4
- For each child
-   Get faces inside the bbox
-    # to test get the faces from the parent
-    If no face available then delete node
-    Else add faces to the node
-     If nb of faces > 20 then recurse
-     Else set node to be a leaf
-*/
+//std::string BVHNode::getStrRepr() const{
+//    return std::string(depth, '.') + "n" + std::to_string(id) + ": " + bbox.getStrRepr() + "\n";
+//}
 
-std::string Node::getStrRepr() const{
-    return std::string(depth, '.') + "n" + std::to_string(id) + ": " + bbox.getStrRepr() + "\n";
-}
+//std::string Accelerator::getStrRepr() const{
+//    std::string *result = new std::string;
+//    getNodeStrRepr(root, 0, result);
+//    return *result;
+//}
 
-std::string Accelerator::getStrRepr() const{
-    std::string *result = new std::string;
-    getNodeStrRepr(root, 0, result);
-    return *result;
-}
+//void Accelerator::getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const {
+//
+//    *result += startNode.getStrRepr();
+//    for(const BVHNode* n: startNode.children){
+//        if (n != nullptr){
+//            getNodeStrRepr(*n, depth + 1, result);
+//        }
+//    }
+//}
 
-// todo overload operator std::string
-void Accelerator::getNodeStrRepr(const Node& startNode, int depth, std::string* result) const {
-
-    *result += startNode.getStrRepr();
-    for(const Node* n: startNode.children){
-        if (n != nullptr){
-            getNodeStrRepr(*n, depth + 1, result);
-        }
-    }
-}
-
-void Accelerator::build(const std::vector<Mesh> &meshes){
-    createMainBBbox(meshes);
-    // todo start building graph recursively (4 levels)
-    // todo the end nodes are leaf nodes, make it a vector in the struct
-    // todo for each leaf node, link a the available meshes, if there are no faces in the box, delete the node
-
-    // todo get all faces in the scene
+void Accelerator::build(const std::vector<Face> &faces){
 
     std::vector<Face> allFaces;
-    for (const Mesh& mesh: meshes){
-        for (const Face& face: mesh.faces){
-            allFaces.push_back(face);
+    int firstId = 0;
+    int lastID = -1;
+    for (const Face& face: faces){
+        allFaces.push_back(face);
+        if (face.id > lastID){
+            lastID = face.id;
         }
     }
 
-    root.bbox = mainBbox;
-    root.id = 0;
-    root.depth = 0;
-    BBox *newBBoxes = splitBBoxIn4(mainBbox);
-    int boxCounter = 1;
-    for (int i = 0; i < 4; i++ ){
-        Node *child = new Node();
-        child->bbox = newBBoxes[i];
-        child->depth = 1;
-        child->id = boxCounter;
-        root.children[i] = child;
-        boxCounter++;
+    root = BVHNode();
+    root.firstFaceId = firstId;
+    root.lastFaceId = lastID;
+    root.bbox = createBBoxFromFaces(allFaces);
+    std::cout << "BVH root bbox: " << root.bbox.getStrRepr() << std::endl;
 
-    }
-
-    // todo remove this fake recursion
-    for (Node* child: root.children){
-        BBox *GnewBBoxes = splitBBoxIn4(child->bbox);
-        for (int j = 0; j < 4; j++ ){
-            Node *Gchild = new Node();
-            Gchild->bbox = GnewBBoxes[j];
-            Gchild->depth = 2;
-            Gchild->id = boxCounter;
-            child->children[j] = Gchild;
-            boxCounter++;
-        }
-    }
-
-    for (Node* child: root.children){
-        for (Node* Gchild: child->children) {
-            BBox *GnewBBoxes = splitBBoxIn4(Gchild->bbox);
-            for (int j = 0; j < 4; j++) {
-                BBox currentBBox = GnewBBoxes[j];
-                // todo find if there are faces in the box
-
-                std::vector<Face> facesInBox;
-                for (const Face& face: allFaces){
-                    if (currentBBox.isFaceInside(face))
-                        facesInBox.push_back(face);
-                }
-
-                // skip the node's creation
-                if (facesInBox.empty())
-                    continue;
-
-                Node *GGchild = new Node();
-                GGchild->bbox = currentBBox;
-                GGchild->depth = 3;
-                GGchild->id = boxCounter;
-                GGchild->faces = facesInBox;
-                Gchild->children[j] = GGchild;
-                boxCounter++;
-            }
-        }
-    }
-
-    print();
 }
 
 BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {
@@ -220,7 +147,7 @@ BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
 
     return bboxes;
 }
-void Accelerator::createMainBBbox(const std::vector<Mesh> &meshes){
+BBox Accelerator::createBBoxFromMeshes(const std::vector<Mesh> &meshes){
 
     std::vector<Mesh> meshesBbox;
     float currentMaxX = -std::numeric_limits<float>::max();
@@ -264,6 +191,37 @@ void Accelerator::createMainBBbox(const std::vector<Mesh> &meshes){
     }
     Eigen::Vector3f minE(currentMinX, currentMinY, currentMinZ);
     Eigen::Vector3f maxE(currentMaxX, currentMaxY, currentMaxZ);
-    this->mainBbox = BBox(minE, maxE);
+    return BBox(minE, maxE);
+}
+
+BBox Accelerator::createBBoxFromFaces(const std::vector<Face> &faces){
+
+    float currentMaxX = -std::numeric_limits<float>::max();
+    float currentMinX = std::numeric_limits<float>::max();
+    float currentMaxY = -std::numeric_limits<float>::max();
+    float currentMinY = std::numeric_limits<float>::max();
+    float currentMaxZ = -std::numeric_limits<float>::max();
+    float currentMinZ = std::numeric_limits<float>::max();
+
+    for (const auto& face: faces) {
+        std::vector<Eigen::Vector3f> vertices = {face.v0, face.v1, face.v2};
+        for(const Eigen::Vector3f& vertex: vertices){
+            if (vertex.x() < currentMinX)
+                currentMinX = vertex.x();
+            if (vertex.x() > currentMaxX)
+                currentMaxX = vertex.x();
+            if (vertex.y() < currentMinY)
+                currentMinY = vertex.y();
+            if (vertex.y() > currentMaxY)
+                currentMaxY = vertex.y();
+            if (vertex.z() < currentMinZ)
+                currentMinZ = vertex.z();
+            if (vertex.z() > currentMaxZ)
+                currentMaxZ = vertex.z();
+        }
+    }
+    Eigen::Vector3f minE(currentMinX, currentMinY, currentMinZ);
+    Eigen::Vector3f maxE(currentMaxX, currentMaxY, currentMaxZ);
+    return BBox(minE, maxE);
 }
 

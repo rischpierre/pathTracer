@@ -4,38 +4,33 @@
 
 #include "scene.h"
 
-struct Node{
-    Node* children[4] = {nullptr, nullptr, nullptr, nullptr};
+struct BVHNode{
+    BVHNode* left;
+    BVHNode* right;
     BBox bbox;
-    int id = 0;
-    int depth = 0;
-    std::vector<Face> faces;
-
-    [[nodiscard]] std::string getStrRepr() const;
-
-    void print() const{
-        std::cout << getStrRepr() << std::endl;
-    };
+    int firstFaceId;
+    int lastFaceId;
 };
 
 class Accelerator {
 public:
     BBox mainBbox;
-    Node root;
-    void build(const std::vector<Mesh> &meshes);
+    BVHNode root;
+    void build(const std::vector<Face> &faces);
 
-    [[nodiscard]] std::string getStrRepr() const;
-    void print() const {
-        std::cout << getStrRepr() << std::endl;
-    }
+//    [[nodiscard]] std::string getStrRepr() const;
+//    void print() const {
+//        std::cout << getStrRepr() << std::endl;
+//    }
 
     BBox* splitBBoxIn2(const BBox& bbox);
     BBox* splitBBoxIn4(const BBox& bbox);
 
-    void createMainBBbox(const std::vector<Mesh> &meshes);
+    BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
+    BBox createBBoxFromFaces(const std::vector<Face> &faces);
 
-private:
-    void getNodeStrRepr(const Node& startNode, int depth, std::string* result) const;
+//private:
+//    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };
 
 

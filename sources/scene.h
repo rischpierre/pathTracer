@@ -16,13 +16,13 @@
 
 
 struct Face {
-    Face(Eigen::Vector3f v0 = Eigen::Vector3f(0),
-         Eigen::Vector3f v1 = Eigen::Vector3f(0),
-         Eigen::Vector3f v2 = Eigen::Vector3f(0),
-         Eigen::Vector3f nf = Eigen::Vector3f(0),
-         Eigen::Vector3f n0 = Eigen::Vector3f(0),
-         Eigen::Vector3f n1 = Eigen::Vector3f(0),
-         Eigen::Vector3f n2 = Eigen::Vector3f(0),
+    explicit Face(Eigen::Vector3f v0 = Eigen::Vector3f(),
+         Eigen::Vector3f v1 = Eigen::Vector3f(),
+         Eigen::Vector3f v2 = Eigen::Vector3f(),
+         Eigen::Vector3f nf = Eigen::Vector3f(),
+         Eigen::Vector3f n0 = Eigen::Vector3f(),
+         Eigen::Vector3f n1 = Eigen::Vector3f(),
+         Eigen::Vector3f n2 = Eigen::Vector3f(),
          int id = 0) :          v0(std::move(v0)),
                                 v1(std::move(v1)),
                                 v2(std::move(v2)),
@@ -67,6 +67,16 @@ struct BBox {
 
     void print() const{
         std::cout << getStrRepr() << std::endl;
+    }
+
+    bool isFaceCenterInside(const Face& face) const{
+        Eigen::Vector3f center = face.getCenter();
+        for (int i = 0; i < 3; i++){
+            if (center[i] < min[i] || center[i] > max[i])
+                return false;
+        }
+
+        return true;
     }
 
     bool isFaceInside(const Face& face) const{

@@ -44,17 +44,21 @@ TEST(accelerator, test_build_structure) {
     Accelerator acc;
 
     // todo Create multiple triangles for the test
-    Face faceOrig(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(1, 0, 0), Eigen::Vector3f(0, 1, 0));
+    Face faceOrig(Eigen::Vector3f(0, 0, 0),
+                  Eigen::Vector3f(1, 0, 0),
+                  Eigen::Vector3f(0, 1, 0));
 
-    Face faceOrigBig(Eigen::Vector3f(0, 0, 0), Eigen::Vector3f(3, 0, 0), Eigen::Vector3f(0, 3, 0));
+    Face faceOrigBig(Eigen::Vector3f(0, 0, 0),
+                     Eigen::Vector3f(3, 0, 0),
+                     Eigen::Vector3f(0, 3, 0));
 
     std::vector<Eigen::Vector3f> positions = {
             Eigen::Vector3f(10, 10, 2),
             Eigen::Vector3f(12, 12, 1),
             Eigen::Vector3f(2, 2, 0),
             Eigen::Vector3f(-10, -8, 0),
-
     };
+
     std::vector<Face> faces;
     int id = 0;
     for (const Eigen::Vector3f& pos : positions) {
@@ -78,7 +82,15 @@ TEST(accelerator, test_build_structure) {
     faces.push_back(faceBig);
 
     acc.build(faces);
+    BVHNode root = acc.build(faces);
 
+    acc.print(root);
+
+    // test only first level
+    std::vector<int> expectedFacesR = {0, 1, 2, 4};
+    std::vector<int> expectedFacesL = {3};
+    ASSERT_EQ(root.leftChild->facesID, expectedFacesL);
+    ASSERT_EQ(root.rightChild->facesID, expectedFacesR);
 
 }
 

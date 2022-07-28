@@ -20,24 +20,89 @@
 //    }
 //}
 
-void Accelerator::build(const std::vector<Face> &faces){
+
+
+void Accelerator::print(const BVHNode& node, int depth){
+    std::cout << std::string(depth, ' ') << " node: " << "fCount: " << node.facesID.size();
+    std::cout << node.bbox.getStrRepr() << std::endl;
+
+   if (node.leftChild != nullptr){
+       print(*node.leftChild, depth + 1);
+   }
+    if (node.rightChild != nullptr){
+        print(*node.rightChild, depth + 1);
+    }
+}
+
+BVHNode Accelerator::build(const std::vector<Face> &faces){
 
     std::vector<Face> allFaces;
-    int firstId = 0;
-    int lastID = -1;
+    std::vector<int> faceIds;
     for (const Face& face: faces){
         allFaces.push_back(face);
-        if (face.id > lastID){
-            lastID = face.id;
-        }
+        faceIds.push_back(face.id);
     }
 
     root = BVHNode();
-    root.firstFaceId = firstId;
-    root.lastFaceId = lastID;
+    root.facesID = faceIds;
     root.bbox = createBBoxFromFaces(allFaces);
-    std::cout << "BVH root bbox: " << root.bbox.getStrRepr() << std::endl;
 
+    buildRecursive(root, allFaces);
+
+    return root;
+}
+
+void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces){
+    int minFaceCount = 2;
+    if (startNode.facesID.size() <= minFaceCount){
+        return;
+    }
+
+    BBox* bboxes = splitBBoxIn2(startNode.bbox);
+    BBox leftBbox = bboxes[0];
+    BBox rightBbox = bboxes[1];
+
+    std::vector<int> leftFacesIds, rightFacesIds;
+    for (const int& faceId: startNode.facesID){
+
+        const Face& face = faces[faceId];
+        if (leftBbox.isFaceCenterInside(face)){
+            leftFacesIds.push_back(faceId);
+        } else {
+            rightFacesIds.push_back(faceId);
+        }
+    }
+
+    // todo refacto both of these loops
+    if(!leftFacesIds.empty()){
+        auto* left = new BVHNode();
+        left->facesID = leftFacesIds;
+
+        // rescale bbox to fit all faces
+        std::vector<Face> leftFaces;
+        for (const int& faceId: leftFacesIds){
+            leftFaces.push_back(faces[faceId]);
+        }
+        left->bbox = createBBoxFromFaces(leftFaces);
+
+        startNode.leftChild = left;
+        buildRecursive(*left, faces);
+    }
+
+    if(!rightFacesIds.empty()){
+        auto* right = new BVHNode();
+        right->facesID = rightFacesIds;
+
+        // rescale bbox to fit all faces
+        std::vector<Face> rightFaces;
+        for (const int& faceId: rightFacesIds){
+            rightFaces.push_back(faces[faceId]);
+        }
+        right->bbox = createBBoxFromFaces(rightFaces);
+
+        startNode.rightChild = right;
+        buildRecursive(*right, faces);
+    }
 }
 
 BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {

@@ -5,18 +5,17 @@
 #include "scene.h"
 
 struct BVHNode{
-    BVHNode* left;
-    BVHNode* right;
+    BVHNode* leftChild;
+    BVHNode* rightChild;
     BBox bbox;
-    int firstFaceId;
-    int lastFaceId;
+    std::vector<int> facesID;
 };
 
 class Accelerator {
 public:
     BBox mainBbox;
     BVHNode root;
-    void build(const std::vector<Face> &faces);
+    BVHNode build(const std::vector<Face> &faces);
 
 //    [[nodiscard]] std::string getStrRepr() const;
 //    void print() const {
@@ -26,6 +25,9 @@ public:
     BBox* splitBBoxIn2(const BBox& bbox);
     BBox* splitBBoxIn4(const BBox& bbox);
 
+    void print(const BVHNode& node, int depth = 0);
+
+    void buildRecursive(BVHNode &startNode, const std::vector<Face> &faces);
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 

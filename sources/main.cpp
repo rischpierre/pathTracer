@@ -67,7 +67,16 @@ int main(int argc, char *argv[]){
 
     t1 = clock();
     Accelerator accelerator;
-    accelerator.build(scene.meshes);
+
+    std::vector<Face> faces;
+    for (auto &mesh : scene.meshes){
+        for (auto &face : mesh.faces){
+            faces.push_back(face);
+        }
+    }
+
+    accelerator.build(faces);
+
     t2 = clock();
     std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 

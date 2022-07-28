@@ -47,13 +47,16 @@ BVHNode Accelerator::build(const std::vector<Face> &faces){
     root.facesID = faceIds;
     root.bbox = createBBoxFromFaces(allFaces);
 
-    buildRecursive(root, allFaces);
-
+    buildRecursive(root, allFaces );
+    print(root);
     return root;
 }
 
-void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces){
-    int minFaceCount = 2;
+void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, int depth){
+    if (depth > 2)
+        return;
+
+    int minFaceCount = 50;
     if (startNode.facesID.size() <= minFaceCount){
         return;
     }
@@ -86,7 +89,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         left->bbox = createBBoxFromFaces(leftFaces);
 
         startNode.leftChild = left;
-        buildRecursive(*left, faces);
+        buildRecursive(*left, faces, depth + 1);
     }
 
     if(!rightFacesIds.empty()){
@@ -101,7 +104,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         right->bbox = createBBoxFromFaces(rightFaces);
 
         startNode.rightChild = right;
-        buildRecursive(*right, faces);
+        buildRecursive(*right, faces, depth + 1);
     }
 }
 

@@ -14,9 +14,7 @@ find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIBGF gf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
-
-find_package(PNG REQUIRED)
-
+find_library(LIB_PNG png)
 
 file(GLOB_RECURSE SRCS sources/*.cpp sources/*.h)
 
@@ -31,7 +29,6 @@ target_include_directories(
         pathTracer
         SYSTEM
         PUBLIC
-
         ${USD_INCLUDE_DIRECTORY}
         $ENV{EIGEN3_INCLUDE_DIR}
         )

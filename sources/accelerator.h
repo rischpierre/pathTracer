@@ -27,7 +27,7 @@ public:
 
     void print(const BVHNode& node, int depth = 0);
 
-    void buildRecursive(BVHNode &startNode, const std::vector<Face> &faces);
+    void buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, int depth=0);
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 

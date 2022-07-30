@@ -62,8 +62,7 @@ int main(int argc, char *argv[]){
     clock_t t2 = clock();
     std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 
-
-    auto *pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
+    Eigen::Vector3f pixels[RESOLUTION_W * RESOLUTION_H];
 
     t1 = clock();
     Accelerator accelerator;
@@ -111,8 +110,6 @@ int main(int argc, char *argv[]){
 
     write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
     std::cout << "Wrote file " << resultImageFile << std::endl;
-
-    delete[] pixels;
 
     return 0;
 }

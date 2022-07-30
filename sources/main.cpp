@@ -97,7 +97,7 @@ int main(int argc, char *argv[]){
             Ray ray = createCameraRay(scene.camera, x, y);
 
             Eigen::Vector3f colorDirect = integratorDirect.getColor(ray, scene);
-            Eigen::Vector3f colorDebug = integratorDebug.getColor(ray, scene);
+            Eigen::Vector3f colorDebug = integratorDebug.getColor(ray, scene, accelerator);
 
             pixels[y * RESOLUTION_W + x] = (5 * colorDebug/6 + colorDirect/6);
         }

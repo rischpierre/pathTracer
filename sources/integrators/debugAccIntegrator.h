@@ -10,7 +10,7 @@ class DebugAccIntegrator: public BaseIntegrator {
 public:
     explicit DebugAccIntegrator(const Scene &scene, const Accelerator& accelerator) : BaseIntegrator(scene, accelerator) {};
 
-    Eigen::Vector3f getColor(const Ray &ray, const Scene &scene);
+    Eigen::Vector3f getColor(const Ray &ray, const Scene &scene, const Accelerator& accelerator);
 
 };
 #endif

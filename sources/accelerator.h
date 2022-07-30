@@ -3,10 +3,11 @@
 
 
 #include "scene.h"
+#include "raytracer.h"
 
 struct BVHNode{
-    BVHNode* leftChild;
-    BVHNode* rightChild;
+    BVHNode* leftChild = nullptr;
+    BVHNode* rightChild = nullptr;
     BBox bbox;
     std::vector<int> facesID;
 };
@@ -14,7 +15,7 @@ struct BVHNode{
 class Accelerator {
 public:
     BBox mainBbox;
-    BVHNode root;
+    BVHNode* root;
     BVHNode build(const std::vector<Face> &faces);
 
 //    [[nodiscard]] std::string getStrRepr() const;
@@ -31,7 +32,14 @@ public:
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 
-//private:
+    std::vector<Face> getIntersectedFaces(const Ray& ray) const;
+    void getIntersectedFacesRecursive(const BVHNode& node, const Ray& ray, std::vector<int>* intersectedFaces) const;
+
+    std::vector<BBox> getIntersectedBboxes(const Ray &ray) const;
+    void getIntersectedBboxesRecursive(const BVHNode& node, const Ray &ray, std::vector<BBox>* bboxes) const;
+
+private:
+    std::vector<Face> allFaces;
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };
 

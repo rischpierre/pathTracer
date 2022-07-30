@@ -10,6 +10,7 @@ struct BVHNode{
     BVHNode* rightChild = nullptr;
     BBox bbox;
     std::vector<int> facesID;
+    int id =0;
 };
 
 class Accelerator {
@@ -35,11 +36,12 @@ public:
     std::vector<Face> getIntersectedFaces(const Ray& ray) const;
     void getIntersectedFacesRecursive(const BVHNode& node, const Ray& ray, std::vector<int>* intersectedFaces) const;
 
-    std::vector<BBox> getIntersectedBboxes(const Ray &ray) const;
-    void getIntersectedBboxesRecursive(const BVHNode& node, const Ray &ray, std::vector<BBox>* bboxes) const;
+    std::vector<BVHNode> getIntersectedNodes(const Ray &ray) const;
+    void getIntersectedNodesRecursive(const BVHNode& node, const Ray &ray, std::vector<BVHNode>* nodes) const;
 
 private:
     std::vector<Face> allFaces;
+    int nodeIdCounter = 0;
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };
 

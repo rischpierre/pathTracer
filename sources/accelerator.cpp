@@ -23,7 +23,7 @@
 
 
 void Accelerator::print(const BVHNode& node, int depth){
-    std::cout << std::string(depth, ' ') << " node: " << "fCount: " << node.facesID.size();
+    std::cout << std::string(depth, ' ') << " node" << node.id << " fCount: " << node.facesID.size();
     std::cout << node.bbox.getStrRepr() << std::endl;
 
    if (node.leftChild != nullptr){
@@ -46,12 +46,13 @@ BVHNode Accelerator::build(const std::vector<Face> &faces){
     root->facesID = faceIds;
     root->bbox = createBBoxFromFaces(allFaces);
 
-    buildRecursive(*root, allFaces );
+    buildRecursive(*root, allFaces);
     print(*root);
     return *root;
 }
 
 void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, int depth){
+
     if (depth > 2)
         return;
 
@@ -78,6 +79,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
     // todo refacto both of these loops
     if(!leftFacesIds.empty()){
         auto* left = new BVHNode();
+        left->id = ++nodeIdCounter;
         left->facesID = leftFacesIds;
 
         // rescale bbox to fit all faces
@@ -93,6 +95,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
 
     if(!rightFacesIds.empty()){
         auto* right = new BVHNode();
+        right->id = ++nodeIdCounter;
         right->facesID = rightFacesIds;
 
         // rescale bbox to fit all faces
@@ -292,26 +295,26 @@ BBox Accelerator::createBBoxFromFaces(const std::vector<Face> &faces){
     return BBox(minE, maxE);
 }
 
-std::vector<BBox> Accelerator::getIntersectedBboxes(const Ray &ray) const {
-    std::vector<BBox> bboxes;
-    getIntersectedBboxesRecursive(*root, ray, &bboxes);
+std::vector<BVHNode> Accelerator::getIntersectedNodes(const Ray &ray) const {
+    std::vector<BVHNode> nodes;
+    getIntersectedNodesRecursive(*root, ray, &nodes);
 
-    return bboxes;
+    return nodes;
 }
 
-void Accelerator::getIntersectedBboxesRecursive(const BVHNode& node, const Ray &ray, std::vector<BBox>* bboxes) const {
+void Accelerator::getIntersectedNodesRecursive(const BVHNode& node, const Ray &ray, std::vector<BVHNode>* nodes) const {
 
     // leaf node
     if (node.leftChild == nullptr && node.rightChild == nullptr){
-        bboxes->push_back(node.bbox);
+        nodes->push_back(node);
         return;
     }
 
     if (isRayIntersectsBox(ray, node.bbox)){
         if (node.leftChild != nullptr)
-            getIntersectedBboxesRecursive(*node.leftChild, ray, bboxes);
+            getIntersectedNodesRecursive(*node.leftChild, ray, nodes);
         if (node.rightChild != nullptr)
-            getIntersectedBboxesRecursive(*node.rightChild, ray, bboxes);
+            getIntersectedNodesRecursive(*node.rightChild, ray, nodes);
     }
 
 }

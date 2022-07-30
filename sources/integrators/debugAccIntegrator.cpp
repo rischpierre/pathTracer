@@ -5,22 +5,22 @@ Eigen::Vector3f DebugAccIntegrator::getColor(const Ray &ray, const Scene &scene,
 
     auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
 
-    const BBox* nearestBBox= nullptr;
+    const BVHNode* nearestNode= nullptr;
     float minRayBoxDistance = std::numeric_limits<float>::max();
 
-    std::vector<BBox> intersectedBBoxes = accelerator.getIntersectedBboxes(ray);
+    std::vector<BVHNode> intersectedNodes = accelerator.getIntersectedNodes(ray);
 
-    for (const BBox& bbox : intersectedBBoxes) {
-        float rayBoxDistance = (bbox.center() - ray.o).norm();
+    for (const BVHNode& node : intersectedNodes) {
+        float rayBoxDistance = (node.bbox.center() - ray.o).norm();
 
         if (rayBoxDistance < minRayBoxDistance) {
             minRayBoxDistance = rayBoxDistance;
-            nearestBBox = &bbox;
+            nearestNode= &node;
         }
     }
 
-    if (nearestBBox){
-        color[0] = 1;
+    if (nearestNode){
+        color[nearestNode->id % 3] = 1;
     }
     return color;
 

@@ -20,11 +20,8 @@ Eigen::Vector3f DebugAccIntegrator::getColor(const Ray &ray, const Scene &scene,
     }
 
     if (nearestNode){
-//        color[nearestNode->id % 3] = 1;
-        if (nearestNode->id == 6)
-            color[0] = 1;
-        else if (nearestNode->id == 3)
-            color[1] = 1;
+        color[nearestNode->id % 3] = 1;
+
     }
     return color;
 

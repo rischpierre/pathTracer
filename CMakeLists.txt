@@ -81,6 +81,8 @@ list(REMOVE_ITEM SOURCES_TO_TEST ${SOURCE_MAIN})
 
 add_library(libToTest ${SOURCES_TO_TEST})
 
+set(CMAKE_CXX_FLAGS -Wno-deprecated)
+
 target_include_directories(
         libToTest
         SYSTEM

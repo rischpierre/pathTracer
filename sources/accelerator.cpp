@@ -34,15 +34,14 @@ void Accelerator::print(const BVHNode& node, int depth){
     }
 }
 
-BVHNode Accelerator::build(const std::vector<Face> &faces){
+BVHNode Accelerator::build(){
 
     std::vector<int> faceIds;
-    for (const Face& face: faces){
+    for (const Face& face: allFaces){
         allFaces.push_back(face);
         faceIds.push_back(face.id);
     }
 
-    root = new BVHNode();
     root->facesID = faceIds;
     root->bbox = createBBoxFromFaces(allFaces);
 
@@ -78,8 +77,8 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
 
     // todo refacto both of these loops
     if(!leftFacesIds.empty()){
-        auto* left = new BVHNode();
-        left->id = ++nodeIdCounter;
+
+        BVHNode *left = &allNodes[++nodeIdCounter];
         left->facesID = leftFacesIds;
 
         // rescale bbox to fit all faces
@@ -90,12 +89,11 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         left->bbox = createBBoxFromFaces(leftFaces);
 
         startNode.leftChild = left;
-        buildRecursive(*left, faces, depth + 1);
+        buildRecursive(*left, leftFaces, depth + 1);
     }
 
     if(!rightFacesIds.empty()){
-        auto* right = new BVHNode();
-        right->id = ++nodeIdCounter;
+        BVHNode *right = &allNodes[++nodeIdCounter];
         right->facesID = rightFacesIds;
 
         // rescale bbox to fit all faces
@@ -106,7 +104,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         right->bbox = createBBoxFromFaces(rightFaces);
 
         startNode.rightChild = right;
-        buildRecursive(*right, faces, depth + 1);
+        buildRecursive(*right, rightFaces, depth + 1);
     }
 }
 

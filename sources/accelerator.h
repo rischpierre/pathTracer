@@ -15,9 +15,33 @@ struct BVHNode{
 
 class Accelerator {
 public:
-    BBox mainBbox;
-    BVHNode* root;
-    BVHNode build(const std::vector<Face> &faces);
+
+    explicit Accelerator(const Scene& scene) : scene(scene) {
+        getAllFaces();
+
+        // init all bvh nodes
+        int maxNodeNumber = allFaces.size() * 2 - 1;
+        for (int i = 0; i < maxNodeNumber ; i++){
+            BVHNode node;
+            node.id = i;
+            allNodes.push_back(node);
+        }
+
+        // init root node
+        root = &allNodes[0];
+
+    };
+
+
+    void getAllFaces(){
+        for (auto &mesh : scene.meshes){
+            for (auto &face : mesh.faces){
+                allFaces.push_back(face);
+            }
+        }
+
+    };
+    BVHNode build();
 
 //    [[nodiscard]] std::string getStrRepr() const;
 //    void print() const {
@@ -39,9 +63,14 @@ public:
     std::vector<BVHNode> getIntersectedNodes(const Ray &ray) const;
     void getIntersectedNodesRecursive(const BVHNode& node, const Ray &ray, std::vector<BVHNode>* nodes) const;
 
+
 private:
+    std::vector<BVHNode> allNodes;
     std::vector<Face> allFaces;
     int nodeIdCounter = 0;
+    const Scene& scene;
+    BBox mainBbox{};
+    BVHNode* root{};
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };
 

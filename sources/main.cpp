@@ -65,16 +65,10 @@ int main(int argc, char *argv[]){
     Eigen::Vector3f pixels[RESOLUTION_W * RESOLUTION_H];
 
     t1 = clock();
-    Accelerator accelerator;
 
-    std::vector<Face> faces;
-    for (auto &mesh : scene.meshes){
-        for (auto &face : mesh.faces){
-            faces.push_back(face);
-        }
-    }
+    Accelerator accelerator(scene);
 
-    accelerator.build(faces);
+    accelerator.build();
 
     t2 = clock();
     std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;

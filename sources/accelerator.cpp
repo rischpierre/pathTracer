@@ -50,19 +50,19 @@ BVHNode Accelerator::build(){
     return *root;
 }
 
-void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, int depth){
+void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, uint8_t depth){
 
-    if (depth > 2)
+    if (depth > buildDepthLimit)
         return;
 
-    int minFaceCount = 50;
-    if (startNode.facesID.size() <= minFaceCount){
+    if (startNode.facesID.size() <= buildMinFaceCount){
         return;
     }
 
-    BBox* bboxes = splitBBoxIn2(startNode.bbox);
-    BBox leftBbox = bboxes[0];
-    BBox rightBbox = bboxes[1];
+    BBox leftBbox;
+    BBox rightBbox;
+
+    splitBBoxIn2(startNode.bbox, leftBbox, rightBbox);
 
     std::vector<int> leftFacesIds, rightFacesIds;
     for (const int& faceId: startNode.facesID){
@@ -74,6 +74,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
             rightFacesIds.push_back(faceId);
         }
     }
+    // todo bug with the bbox having the same fCount and continuing to split
 
     // todo refacto both of these loops
     if(!leftFacesIds.empty()){
@@ -84,7 +85,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         // rescale bbox to fit all faces
         std::vector<Face> leftFaces;
         for (const int& faceId: leftFacesIds){
-            leftFaces.push_back(faces[faceId]);
+            leftFaces.push_back(allFaces[faceId]);
         }
         left->bbox = createBBoxFromFaces(leftFaces);
 
@@ -99,16 +100,17 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
         // rescale bbox to fit all faces
         std::vector<Face> rightFaces;
         for (const int& faceId: rightFacesIds){
-            rightFaces.push_back(faces[faceId]);
+            rightFaces.push_back(allFaces[faceId]);
         }
-        right->bbox = createBBoxFromFaces(rightFaces);
+        BBox rightBbox2 = createBBoxFromFaces(rightFaces);
+        right->bbox = rightBbox2;
 
         startNode.rightChild = right;
         buildRecursive(*right, rightFaces, depth + 1);
     }
 }
 
-BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {
+BBox* Accelerator::splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right) {
 
     static BBox bboxes[2];
 
@@ -129,7 +131,6 @@ BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {
     Eigen::Vector3f translateY(0, (bbox.max[1] - bbox.min[1]) / 2, 0);
     Eigen::Vector3f translateZ(0, 0, (bbox.max[2] - bbox.min[2]) / 2);
 
-    int boxId = 0;
     for (int i = 0; i < 2; i++) {
         Eigen::Vector3f childMin, childMax;
 
@@ -152,9 +153,13 @@ BBox* Accelerator::splitBBoxIn2(const BBox& bbox) {
                 std::swap(childMin[k], childMax[k]);
             }
         }
-
-        bboxes[boxId] = BBox(childMin, childMax);
-        boxId++;
+        if (i == 0) {
+            left.min = childMin;
+            left.max = childMax;
+        } else {
+            right.min = childMin;
+            right.max = childMax;
+        }
     }
 
     return bboxes;

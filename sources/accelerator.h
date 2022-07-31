@@ -48,12 +48,12 @@ public:
 //        std::cout << getStrRepr() << std::endl;
 //    }
 
-    BBox* splitBBoxIn2(const BBox& bbox);
-    BBox* splitBBoxIn4(const BBox& bbox);
+    BBox* splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right);
+    BBox* splitBBoxIn4(const BBox& bbox); // todo not a good idea to return a list -> memory issues
 
     void print(const BVHNode& node, int depth = 0);
 
-    void buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, int depth=0);
+    void buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, uint8_t depth=0);
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 
@@ -71,6 +71,9 @@ private:
     const Scene& scene;
     BBox mainBbox{};
     BVHNode* root{};
+    uint8_t buildDepthLimit = 3;
+    uint8_t buildMinFaceCount = 50;
+
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };
 

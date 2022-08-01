@@ -23,7 +23,7 @@
 
 
 void Accelerator::print(const BVHNode& node, int depth){
-    std::cout << std::string(depth, ' ') << " node" << node.id << " fCount: " << node.facesID.size();
+    std::cout << std::string(depth, '.') << "node" << node.id << " fCount: " << node.facesID.size();
     std::cout << node.bbox.getStrRepr() << std::endl;
 
    if (node.leftChild != nullptr){
@@ -45,12 +45,12 @@ BVHNode Accelerator::build(){
     root->facesID = faceIds;
     root->bbox = createBBoxFromFaces(allFaces);
 
-    buildRecursive(*root, allFaces);
+    buildRecursive(*root);
     print(*root);
     return *root;
 }
 
-void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &faces, uint8_t depth){
+void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth){
 
     if (depth > buildDepthLimit)
         return;
@@ -67,52 +67,47 @@ void Accelerator::buildRecursive(BVHNode &startNode, const std::vector<Face> &fa
     std::vector<int> leftFacesIds, rightFacesIds;
     for (const int& faceId: startNode.facesID){
 
-        const Face& face = faces[faceId];
+        const Face& face = allFaces[faceId];
         if (leftBbox.isFaceCenterInside(face)){
             leftFacesIds.push_back(faceId);
         } else {
             rightFacesIds.push_back(faceId);
         }
     }
+
     // todo bug with the bbox having the same fCount and continuing to split
+    // 0: left, 1: right
+    for (uint8_t i = 0; i < 2; i++){
 
-    // todo refacto both of these loops
-    if(!leftFacesIds.empty()){
+        // skip if no faces
+        if (i == 0 && leftFacesIds.empty())
+            continue;
+        else if (i == 1 && rightFacesIds.empty())
+            continue;
 
-        BVHNode *left = &allNodes[++nodeIdCounter];
-        left->facesID = leftFacesIds;
+        // all nodes are initialized in advance to avoid initializing them on the heap
+        BVHNode *childNode = &allNodes[++nodeIdCounter];
+        if (i == 0)
+            childNode->facesID = leftFacesIds;
+        else
+            childNode->facesID = rightFacesIds;
 
-        // rescale bbox to fit all faces
-        std::vector<Face> leftFaces;
+        std::vector<Face> newFaces;
         for (const int& faceId: leftFacesIds){
-            leftFaces.push_back(allFaces[faceId]);
+            newFaces.push_back(allFaces[faceId]);
         }
-        left->bbox = createBBoxFromFaces(leftFaces);
+        childNode->bbox = createBBoxFromFaces(newFaces);
 
-        startNode.leftChild = left;
-        buildRecursive(*left, leftFaces, depth + 1);
-    }
+        if (i == 0)
+            startNode.leftChild = childNode;
+        else
+            startNode.rightChild = childNode;
 
-    if(!rightFacesIds.empty()){
-        BVHNode *right = &allNodes[++nodeIdCounter];
-        right->facesID = rightFacesIds;
-
-        // rescale bbox to fit all faces
-        std::vector<Face> rightFaces;
-        for (const int& faceId: rightFacesIds){
-            rightFaces.push_back(allFaces[faceId]);
-        }
-        BBox rightBbox2 = createBBoxFromFaces(rightFaces);
-        right->bbox = rightBbox2;
-
-        startNode.rightChild = right;
-        buildRecursive(*right, rightFaces, depth + 1);
+        buildRecursive(*childNode, depth + 1);
     }
 }
 
-BBox* Accelerator::splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right) {
-
-    static BBox bboxes[2];
+void Accelerator::splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right) {
 
     float maxSize = -std::numeric_limits<float>::max();
     int maxAxis = -1;
@@ -161,65 +156,8 @@ BBox* Accelerator::splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right) {
             right.max = childMax;
         }
     }
-
-    return bboxes;
 }
 
-BBox* Accelerator::splitBBoxIn4(const BBox& bbox){
-
-    static BBox bboxes[4];
-    // todo get the 2 largest edges and split in 2
-
-    float minSize = std::numeric_limits<float>::max();
-    int minAxis = -1;
-    for (int axis=0; axis < 3; axis++){
-        float size = bbox.max[axis] - bbox.min[axis];
-        if (size < minSize){
-            minSize = size;
-            minAxis = axis;
-        }
-    }
-    if (minAxis == -1){
-        std::cerr << "Error finding axis for splitting the bbox" << std::endl;
-        exit(1);
-    }
-
-    Eigen::Vector3f translateX( (bbox.max[0] - bbox.min[0]) / 2, 0, 0);
-    Eigen::Vector3f translateY(0, (bbox.max[1] - bbox.min[1]) / 2, 0);
-    Eigen::Vector3f translateZ(0, 0, (bbox.max[2] - bbox.min[2]) / 2);
-
-    int boxId = 0;
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            Eigen::Vector3f childMin, childMax;
-
-            if (minAxis == 0){ // x
-                childMax = bbox.max - translateY * (i ^ 1) - translateZ * (j ^ 1);
-                childMin = bbox.min + translateY * i + translateZ * j;
-
-            } else if (minAxis ==1){ // y
-                childMax = bbox.max - translateX * (i ^ 1) - translateZ * (j ^ 1);
-                childMin = bbox.min + translateX * i + translateZ * j;
-
-            } else {  // z
-                childMax = bbox.max - translateX * (i ^ 1) - translateY * (j ^ 1);
-                childMin = bbox.min + translateX * i + translateY * j;
-            }
-
-            //swap values if min is over the max
-            for (int k = 0; k < 3; k++){
-                if (childMin[k] > childMax[k]){
-                    std::swap(childMin[k], childMax[k]);
-                }
-            }
-
-            bboxes[boxId] = BBox(childMin, childMax);
-            boxId++;
-        }
-    }
-
-    return bboxes;
-}
 BBox Accelerator::createBBoxFromMeshes(const std::vector<Mesh> &meshes){
 
     std::vector<Mesh> meshesBbox;

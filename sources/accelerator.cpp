@@ -21,6 +21,9 @@
 //}
 
 
+void Accelerator::print(int depth){
+    print(*root, depth);
+}
 
 void Accelerator::print(const BVHNode& node, int depth){
     std::cout << std::string(depth, '.') << "node" << node.id << " fCount: " << node.facesID.size();
@@ -46,7 +49,7 @@ BVHNode Accelerator::build(){
     root->bbox = createBBoxFromFaces(allFaces);
 
     buildRecursive(*root);
-    print(*root);
+    print();
     return *root;
 }
 

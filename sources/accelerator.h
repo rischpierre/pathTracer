@@ -50,6 +50,7 @@ public:
 
     void splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right);
 
+    void print(int depth = 0);
     void print(const BVHNode& node, int depth = 0);
 
     void buildRecursive(BVHNode &startNode, uint8_t depth = 0);

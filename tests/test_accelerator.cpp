@@ -4,7 +4,16 @@
 
 TEST(accelerator, test_successfull_build){
 
-    ASSERT_FALSE(false);
+    Scene s("../examples/test_acceleration.usda");
+
+    Accelerator acc(s);
+
+    acc.build();
+    acc.print();
+    
+    // todo check if the acceleration structure is built correctly
+
+    ASSERT_FALSE(true);
 }
 
 

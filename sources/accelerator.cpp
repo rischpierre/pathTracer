@@ -53,6 +53,29 @@ BVHNode Accelerator::build(){
     return *root;
 }
 
+void Accelerator::exportBBoxesToUsd(const std::string& filePath) const {
+    auto stage = pxr::UsdStage::CreateNew(filePath);
+
+    auto billboard = pxr::UsdGeomMesh::Define(stage, pxr::SdfPath("/billboard"));
+
+    billboard.CreatePointsAttr(pxr::VtValue{pxr::VtArray<pxr::GfVec3f> {
+            {-430, -145, 0},
+            {430, -145, 0},
+            {430, 145, 0},
+            {-430, 145, 0},
+    }});
+    billboard.CreateFaceVertexCountsAttr(pxr::VtValue{pxr::VtArray<int> {4}});
+    billboard.CreateFaceVertexIndicesAttr(pxr::VtValue{pxr::VtArray<int> {0, 1, 2, 3}});
+    billboard.CreateExtentAttr(pxr::VtValue{pxr::VtArray<pxr::GfVec3f> {
+            {
+                    {-430, -145, 0},
+                    {430, 145, 0},
+            }
+    }});
+
+    stage->Save();
+}
+
 void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth){
 
     if (depth > buildDepthLimit)

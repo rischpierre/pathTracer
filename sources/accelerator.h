@@ -4,6 +4,8 @@
 
 #include "scene.h"
 #include "raytracer.h"
+#include <pxr/usd/usdGeom/sphere.h>
+
 
 struct BVHNode{
     BVHNode* leftChild = nullptr;
@@ -62,6 +64,8 @@ public:
 
     std::vector<BVHNode> getIntersectedNodes(const Ray &ray) const;
     void getIntersectedNodesRecursive(const BVHNode& node, const Ray &ray, std::vector<BVHNode>* nodes) const;
+
+    void exportBBoxesToUsd(const std::string& filePath) const;
 
 
 private:

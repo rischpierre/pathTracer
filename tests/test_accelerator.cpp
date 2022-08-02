@@ -13,7 +13,8 @@ TEST(accelerator, test_successfull_build){
     
     // todo check if the acceleration structure is built correctly
 
-    ASSERT_FALSE(true);
+    acc.exportBBoxesToUsd("tmp.usda");
+    ASSERT_TRUE(false);
 }
 
 

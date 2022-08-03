@@ -32,3 +32,6 @@
 - [ ] Make google tests work again
 - [ ] Export png
 - [ ] Remove cmake warnings
+
+- ### Limitations:
+- [ ] BVH the triangles should have roughly the same size

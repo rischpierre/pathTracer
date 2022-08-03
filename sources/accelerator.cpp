@@ -46,51 +46,45 @@ void Accelerator::exportBBoxesToUsd(const std::string& filePath) const {
             continue;
         }
 
-        // only leaf nodes
-        if (node.leftChild == nullptr && node.rightChild == nullptr) {
+        auto mesh = pxr::UsdGeomMesh::Define(stage, pxr::SdfPath("/bbox" + std::to_string(node.id)));
 
-            std::cout << node.id << std::endl;
+        pxr::VtArray<pxr::GfVec3f> points;
+        pxr::VtArray<int> faceVertexCount;
+        pxr::VtArray<int> faceVertexIndices;
 
-            auto mesh = pxr::UsdGeomMesh::Define(stage, pxr::SdfPath("/bbox" + std::to_string(node.id)));
+        // box has 8 points
+        points = {
+                {bbox.min.x(), bbox.min.y(), bbox.min.z()},
+                {bbox.max.x(), bbox.min.y(), bbox.min.z()},
+                {bbox.max.x(), bbox.max.y(), bbox.min.z()},
+                {bbox.min.x(), bbox.max.y(), bbox.min.z()},
 
-            pxr::VtArray<pxr::GfVec3f> points;
-            pxr::VtArray<int> faceVertexCount;
-            pxr::VtArray<int> faceVertexIndices;
+                {bbox.min.x(), bbox.min.y(), bbox.max.z()},
+                {bbox.max.x(), bbox.min.y(), bbox.max.z()},
+                {bbox.max.x(), bbox.max.y(), bbox.max.z()},
+                {bbox.min.x(), bbox.max.y(), bbox.max.z()},
+        };
 
-            // box has 8 points
-            points = {
-                    {bbox.min.x(), bbox.min.y(), bbox.min.z()},
-                    {bbox.max.x(), bbox.min.y(), bbox.min.z()},
-                    {bbox.max.x(), bbox.max.y(), bbox.min.z()},
-                    {bbox.min.x(), bbox.max.y(), bbox.min.z()},
+        faceVertexIndices = {
+                0, 1, 2, 3,
+                4, 5, 6, 7,
+                0, 1, 5, 4,
+                2, 6, 7, 3,
+                0, 3, 7, 4,
+                1, 2, 6, 5,
+        };
+        faceVertexCount = {4, 4, 4, 4, 4, 4};
 
-                    {bbox.min.x(), bbox.min.y(), bbox.max.z()},
-                    {bbox.max.x(), bbox.min.y(), bbox.max.z()},
-                    {bbox.max.x(), bbox.max.y(), bbox.max.z()},
-                    {bbox.min.x(), bbox.max.y(), bbox.max.z()},
-            };
-
-            faceVertexIndices = {
-                    0, 1, 2, 3,
-                    4, 5, 6, 7,
-                    0, 1, 5, 4,
-                    2, 6, 7, 3,
-                    0, 3, 7, 4,
-                    1, 2, 6, 5,
-            };
-            faceVertexCount = {4, 4, 4, 4, 4, 4};
-
-            mesh.CreatePointsAttr(pxr::VtValue(points));
-            mesh.CreateFaceVertexCountsAttr(pxr::VtValue{faceVertexCount});
-            mesh.CreateFaceVertexIndicesAttr(pxr::VtValue{faceVertexIndices});
+        mesh.CreatePointsAttr(pxr::VtValue(points));
+        mesh.CreateFaceVertexCountsAttr(pxr::VtValue{faceVertexCount});
+        mesh.CreateFaceVertexIndicesAttr(pxr::VtValue{faceVertexIndices});
         }
-    }
 
     std::cout << "exportBBoxesToUsd: " << filePath << std::endl;
     stage->Save();
 }
 
-void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth, uint nodeId){
+void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth){
 
     if (depth > buildDepthLimit)
         return;
@@ -105,13 +99,16 @@ void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth, uint nodeId)
     splitBBoxIn2(startNode.bbox, leftBbox, rightBbox);
 
     std::vector<int> leftFacesIds, rightFacesIds;
+    std::vector<Face> leftFaces, rightFaces;
     for (const int& faceId: startNode.facesID){
 
         const Face& face = allFaces[faceId];
         if (leftBbox.isFaceCenterInside(face)){
             leftFacesIds.push_back(faceId);
+            leftFaces.push_back(face);
         } else {
             rightFacesIds.push_back(faceId);
+            rightFaces.push_back(face);
         }
     }
 
@@ -126,25 +123,29 @@ void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth, uint nodeId)
             continue;
 
         // all nodes are initialized in advance to avoid initializing them on the heap
-        BVHNode *childNode = &allNodes[++nodeIdCounter];
-        childNode->id = ++nodeId;
-        if (i == 0)
+        nodeIdCounter++;
+        BVHNode *childNode = &allNodes[nodeIdCounter];
+        childNode->id = nodeIdCounter;
+
+        if (i == 0){
             childNode->facesID = leftFacesIds;
-        else
-            childNode->facesID = rightFacesIds;
-
-        std::vector<Face> newFaces;
-        for (const int& faceId: leftFacesIds){
-            newFaces.push_back(allFaces[faceId]);
-        }
-        childNode->bbox = createBBoxFromFaces(newFaces);
-
-        if (i == 0)
+            BBox newBBox = createBBoxFromFaces(leftFaces);
+            childNode->bbox = newBBox;
             startNode.leftChild = childNode;
-        else
+        }
+        else{
+            childNode->facesID = rightFacesIds;
+            BBox newBBox = createBBoxFromFaces(rightFaces);
+            childNode->bbox = newBBox;
             startNode.rightChild = childNode;
+        }
 
-        buildRecursive(*childNode, depth + 1, nodeId);
+        // stop recursion to avoid having the same bbox size
+        if (childNode->facesID.size() == startNode.facesID.size()){
+            continue;
+        }
+
+        buildRecursive(*childNode, depth + 1);
     }
 }
 

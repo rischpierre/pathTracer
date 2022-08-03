@@ -49,7 +49,7 @@ public:
     void print(int depth = 0);
     void print(const BVHNode& node, int depth = 0);
 
-    void buildRecursive(BVHNode &startNode, uint8_t depth = 0, uint nodeId=1);
+    void buildRecursive(BVHNode &startNode, uint8_t depth = 0);
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 
@@ -69,8 +69,8 @@ private:
     const Scene& scene;
     BBox mainBbox{};
     BVHNode* root{};
-    uint8_t buildDepthLimit = 3;
-    uint8_t buildMinFaceCount = 2;
+    uint8_t buildDepthLimit = 20;
+    uint8_t buildMinFaceCount = 5;
 
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };

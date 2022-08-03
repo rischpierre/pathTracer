@@ -8,10 +8,11 @@
 
 #include "scene.h"
 #include "raytracer.h"
+#include "accelerator.h"
 #include "integrators/normalIntegrator.h"
 #include "integrators/facingRatioIntegrator.h"
 #include "integrators/directLightIntegrator.h"
-#include "accelerator.h"
+#include "integrators/globalIlumIntegrator.h"
 #include "integrators/debugAccIntegrator.h"
 
 
@@ -75,7 +76,7 @@ int main(int argc, char *argv[]){
 
     std::cout << " (" << accelerator.getNodeNumber() << " nodes)" << std::endl;
 
-    DirectLightIntegrator integratorDirect(scene, accelerator);
+    GlobalIlumIntegrator integrator(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
 #ifdef SINGLE_THREADED
@@ -90,7 +91,7 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
-            Eigen::Vector3f colorDirect = integratorDirect.getColor(ray, scene);
+            Eigen::Vector3f colorDirect = integrator.getColor(ray, scene);
 
             pixels[y * RESOLUTION_W + x] =  colorDirect;
         }

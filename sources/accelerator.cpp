@@ -1,26 +1,5 @@
 #include "accelerator.h"
 
-//std::string BVHNode::getStrRepr() const{
-//    return std::string(depth, '.') + "n" + std::to_string(id) + ": " + bbox.getStrRepr() + "\n";
-//}
-
-//std::string Accelerator::getStrRepr() const{
-//    std::string *result = new std::string;
-//    getNodeStrRepr(root, 0, result);
-//    return *result;
-//}
-
-//void Accelerator::getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const {
-//
-//    *result += startNode.getStrRepr();
-//    for(const BVHNode* n: startNode.children){
-//        if (n != nullptr){
-//            getNodeStrRepr(*n, depth + 1, result);
-//        }
-//    }
-//}
-
-
 void Accelerator::print(int depth){
     print(*root, depth);
 }
@@ -73,12 +52,6 @@ void Accelerator::exportBBoxesToUsd(const std::string& filePath) const {
             std::cout << node.id << std::endl;
 
             auto mesh = pxr::UsdGeomMesh::Define(stage, pxr::SdfPath("/bbox" + std::to_string(node.id)));
-
-            float sizeX = bbox.max.x() - bbox.min.x();
-            float sizeY = bbox.max.y() - bbox.min.y();
-            float sizeZ = bbox.max.z() - bbox.min.z();
-
-
 
             pxr::VtArray<pxr::GfVec3f> points;
             pxr::VtArray<int> faceVertexCount;

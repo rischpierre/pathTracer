@@ -69,8 +69,8 @@ private:
     const Scene& scene;
     BBox mainBbox{};
     BVHNode* root{};
-    uint8_t buildDepthLimit = 1;
-    uint8_t buildMinFaceCount = 50;
+    uint8_t buildDepthLimit = 3;
+    uint8_t buildMinFaceCount = 2;
 
 //    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
 };

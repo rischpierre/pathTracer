@@ -12,7 +12,7 @@ struct BVHNode{
     BVHNode* rightChild = nullptr;
     BBox bbox;
     std::vector<int> facesID;
-    int id =0;
+    int id = -1;
 };
 
 class Accelerator {
@@ -25,7 +25,6 @@ public:
         int maxNodeNumber = allFaces.size() * 2 - 1;
         for (int i = 0; i < maxNodeNumber ; i++){
             BVHNode node;
-            node.id = i;
             allNodes.push_back(node);
         }
 
@@ -45,17 +44,12 @@ public:
     };
     BVHNode build();
 
-//    [[nodiscard]] std::string getStrRepr() const;
-//    void print() const {
-//        std::cout << getStrRepr() << std::endl;
-//    }
-
     void splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right);
 
     void print(int depth = 0);
     void print(const BVHNode& node, int depth = 0);
 
-    void buildRecursive(BVHNode &startNode, uint8_t depth = 0);
+    void buildRecursive(BVHNode &startNode, uint8_t depth = 0, uint nodeId=1);
     BBox createBBoxFromMeshes(const std::vector<Mesh> &meshes);
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 

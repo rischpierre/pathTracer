@@ -19,7 +19,7 @@ class Accelerator {
 public:
 
     explicit Accelerator(const Scene& scene) : scene(scene) {
-        getAllFaces();
+        _parseAllFaces();
 
         // init all bvh nodes
         int maxNodeNumber = allFaces.size() * 2 - 1;
@@ -33,15 +33,10 @@ public:
 
     };
 
+    int getNodeNumber() const {return nodeIdCounter;};
 
-    void getAllFaces(){
-        for (auto &mesh : scene.meshes){
-            for (auto &face : mesh.faces){
-                allFaces.push_back(face);
-            }
-        }
+    std::vector<Face> getFaces() const { return allFaces;};
 
-    };
     BVHNode build();
 
     void splitBBoxIn2(const BBox& bbox, BBox& left, BBox& right);
@@ -72,7 +67,15 @@ private:
     uint8_t buildDepthLimit = 20;
     uint8_t buildMinFaceCount = 5;
 
-//    void getNodeStrRepr(const BVHNode& startNode, int depth, std::string* result) const;
+    void _parseAllFaces(){
+        for (auto &mesh : scene.meshes){
+            for (auto &face : mesh.faces){
+                allFaces.push_back(face);
+            }
+        }
+
+    };
+
 };
 
 

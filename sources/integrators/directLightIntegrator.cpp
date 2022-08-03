@@ -18,77 +18,64 @@ Eigen::Vector3f DirectLightIntegrator::getColor(const Ray &ray, const Scene &sce
 
     auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
 
-    for (Mesh &mesh: this->scene.meshes) {
+    for(Face& face: accelerator.getIntersectedFaces(ray)) {
 
-        // todo bbox optim, to be replaced with acceleration structure
-        if (!isRayIntersectsBox(ray, mesh.bbox))
+        float u, v;
+        bool intersected = isRayIntersectsTriangle(&ray, &face, &distance, u, v);
+        if (!intersected) {
             continue;
+        }
 
-        for (auto &face: mesh.faces) {
-            float u, v;
-            bool intersected = isRayIntersectsTriangle(&ray, &face, &distance, u, v);
-            if (!intersected) {
-                continue;
-            }
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearestFace = &face;
+            nearestFaceU = u;
+            nearestFaceV = v;
 
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestFace = &face;
-                nearestFaceU = u;
-                nearestFaceV = v;
-
-            }
         }
     }
 
-    if (nearestFace) {
-        Eigen::Vector3f smoothNormal;
-        Eigen::Vector3f intersectionPoint = ray.o + ray.d * minDistance;
-        Eigen::Vector2f uv = Eigen::Vector2f(nearestFaceU, nearestFaceV);
-        computeShadingPoint(uv, *nearestFace, intersectionPoint, smoothNormal);
+    if (!nearestFace)
+        return color;
 
-        smoothNormal = smoothNormal.normalized();
+    Eigen::Vector3f smoothNormal;
+    Eigen::Vector3f intersectionPoint = ray.o + ray.d * minDistance;
+    Eigen::Vector2f uv = Eigen::Vector2f(nearestFaceU, nearestFaceV);
+    computeShadingPoint(uv, *nearestFace, intersectionPoint, smoothNormal);
+
+    smoothNormal = smoothNormal.normalized();
 
 
-        for (auto& light: scene.rectLights){
+    for (auto& light: scene.rectLights){
 
-            for (auto &lightSample: light.computeSamples()) {
+        for (auto &lightSample: light.computeSamples()) {
 
-                Eigen::Vector3f lightDir = (lightSample - intersectionPoint).normalized();
+            Eigen::Vector3f lightDir = (lightSample - intersectionPoint).normalized();
 
-                // to avoid shadow acne
-                Eigen::Vector3f shadowRayOrigin = intersectionPoint + smoothNormal * RAY_TRACING_THRESHOLD;
-                Ray shadowRay(shadowRayOrigin, lightDir);
+            // to avoid shadow acne
+            Eigen::Vector3f shadowRayOrigin = intersectionPoint + smoothNormal * 0.00001;
+            Ray shadowRay(shadowRayOrigin, lightDir);
 
-                bool intersected = false;
-                for (Mesh &mesh: this->scene.meshes) {
+            bool intersected = false;
 
-                    // todo bbox optim, to be replaced with acceleration structure
-                    if (! isRayIntersectsBox(shadowRay, mesh.bbox))
-                        continue;
+            for (const Face& face: accelerator.getIntersectedFaces(shadowRay)) {
 
-                    for (auto &face: mesh.faces) {
-
-                        // skip the face that was hit by the ray
-                        if (face.id == nearestFace->id) {
-                            continue;
-                        }
-
-                        float u, v;
-                        intersected = isRayIntersectsTriangle(&shadowRay, &face, &distance, u, v);
-                        if (intersected)
-                            break;
-                    }
-                    if (intersected)
-                        break;
+                if (face.id == nearestFace->id) {
+                    continue;
                 }
 
-                if (!intersected) {
-                    // light intensity is exposure so its squared
-                    color += ((light.color * light.intensity * light.intensity *
-                              std::max(0.f, lightDir.dot(smoothNormal))) /
-                             (4 * 3.14 * lightDir.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
+                float u, v;
+                intersected = isRayIntersectsTriangle(&shadowRay, &face, &distance, u, v);
+                if (intersected) {
+                    break;
                 }
+            }
+
+            if (!intersected) {
+                // light intensity is exposure so its squared
+                color += ((light.color * light.intensity * light.intensity *
+                          std::max(0.f, lightDir.dot(smoothNormal))) /
+                         (4 * 3.14 * lightDir.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
             }
         }
     }

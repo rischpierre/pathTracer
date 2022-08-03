@@ -71,10 +71,11 @@ int main(int argc, char *argv[]){
     accelerator.build();
 
     t2 = clock();
-    std::cout << "Generating acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
+    std::cout << "Build acceleration structure in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds";
+
+    std::cout << " (" << accelerator.getNodeNumber() << " nodes)" << std::endl;
 
     DirectLightIntegrator integratorDirect(scene, accelerator);
-    DebugAccIntegrator integratorDebug(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
 #ifdef SINGLE_THREADED
@@ -90,9 +91,8 @@ int main(int argc, char *argv[]){
             Ray ray = createCameraRay(scene.camera, x, y);
 
             Eigen::Vector3f colorDirect = integratorDirect.getColor(ray, scene);
-            Eigen::Vector3f colorDebug = integratorDebug.getColor(ray, scene, accelerator);
 
-            pixels[y * RESOLUTION_W + x] = (5 * colorDebug/6 + colorDirect/6);
+            pixels[y * RESOLUTION_W + x] =  colorDirect;
         }
     }
 #ifndef SINGLE_THREADED

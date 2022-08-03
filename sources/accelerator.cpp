@@ -29,7 +29,6 @@ BVHNode Accelerator::build(){
     root->bbox = createBBoxFromFaces(allFaces);
 
     buildRecursive(*root, 1);
-    print();
     return *root;
 }
 
@@ -285,6 +284,16 @@ std::vector<BVHNode> Accelerator::getIntersectedNodes(const Ray &ray) const {
     return nodes;
 }
 
+std::vector<Face> Accelerator::getIntersectedFaces(const Ray &ray) const {
+    std::vector<Face> faces;
+    for(const BVHNode& node: getIntersectedNodes(ray)){
+        for(int faceId: node.facesID){
+            faces.push_back(allFaces[faceId]);
+        }
+    }
+    return faces;
+}
+
 void Accelerator::getIntersectedNodesRecursive(const BVHNode& node, const Ray &ray, std::vector<BVHNode>* nodes) const {
 
     // leaf node
@@ -302,34 +311,4 @@ void Accelerator::getIntersectedNodesRecursive(const BVHNode& node, const Ray &r
 
 }
 
-
-std::vector<Face> Accelerator::getIntersectedFaces(const Ray &ray) const {
-    std::vector<int> facesIDs;
-    getIntersectedFacesRecursive(*root, ray, &facesIDs);
-
-    std::vector<Face> faces;
-    for (int faceID: facesIDs){
-        faces.push_back(allFaces[faceID]);
-    }
-    return faces;
-}
-void Accelerator::getIntersectedFacesRecursive(const BVHNode& node, const Ray &ray, std::vector<int>* faceIDs) const {
-
-    if (node.facesID.empty())
-        return;
-
-    // leaf node
-    if (node.leftChild == nullptr && node.rightChild == nullptr){
-        for (const auto& faceID: node.facesID){
-            faceIDs->push_back(faceID);
-        }
-        return;
-    }
-
-    if (isRayIntersectsBox(ray, node.bbox)){
-        getIntersectedFacesRecursive(*node.leftChild, ray, faceIDs);
-        getIntersectedFacesRecursive(*node.rightChild, ray, faceIDs);
-    }
-
-}
 

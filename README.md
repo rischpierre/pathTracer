@@ -15,14 +15,13 @@
 - [x] Area square lights
 - [x] Shadows
 - [x] Smooth shading
-- [ ] Acceleration structure
+- [x] Acceleration structure
+- [ ] GI
 - [ ] Diffuse shader
 - [ ] Multipixel sampling
-- [ ] GI
 - [ ] Refraction
 - [ ] Reflection
 - [ ] SSS
-- [ ] Check for memory leaks
  
 - ### Good to have:
 - [ ] Rendersettings 

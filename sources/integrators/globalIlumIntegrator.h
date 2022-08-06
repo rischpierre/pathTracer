@@ -19,7 +19,7 @@ class GlobalIlumIntegrator: public BaseIntegrator {
 public:
     explicit GlobalIlumIntegrator(const Scene &scene, const Accelerator& accelerator) : BaseIntegrator(scene, accelerator) {};
 
-    Eigen::Vector3f getColor(const Ray &ray, const Scene &scene);
+    Eigen::Vector3f castRay(const Ray &ray, const Scene &scene, uint depth=0);
 
     Eigen::Vector3f getDirectContribution(
             const Ray &ray,
@@ -28,6 +28,9 @@ public:
     );
 
     static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint);
+
+private:
+    uint indirectSamples = 16;
 
 };
 #endif

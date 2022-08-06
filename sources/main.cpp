@@ -68,7 +68,6 @@ int main(int argc, char *argv[]){
     t1 = clock();
 
     Accelerator accelerator(scene);
-
     accelerator.build();
 
     t2 = clock();
@@ -91,9 +90,9 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
-            Eigen::Vector3f colorDirect = integrator.getColor(ray, scene);
+            Eigen::Vector3f color = integrator.castRay(ray, scene);
 
-            pixels[y * RESOLUTION_W + x] =  colorDirect;
+            pixels[y * RESOLUTION_W + x] =  color;
         }
     }
 #ifndef SINGLE_THREADED

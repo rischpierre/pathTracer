@@ -1,7 +1,6 @@
 #include "globalIlumIntegrator.h"
 
 
-
 ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
         float u,
         float v,
@@ -10,7 +9,6 @@ ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
         ){
 
     // Gouraud's smooth shading technique
-    // interpolate the normal of the face at the hit point
     Eigen::Vector3f smoothNormal = ((1 - u - v) * face.n0 + u * face.n1 + v * face.n2).normalized();
 
     return ShadingPoint {
@@ -65,18 +63,24 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
     return color;
 }
 
-Eigen::Vector3f GlobalIlumIntegrator::getColor(const Ray &ray, const Scene &scene) {
+Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
+
+    auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
+
+    if (depth > 3)
+        return color;
+
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;
     Face *nearestFace = nullptr;
     float nearestFaceU = 0, nearestFaceV = 0;
 
-    auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
 
     for(Face& face: accelerator.getIntersectedFaces(ray)) {
 
         float u, v;
         bool intersected = isRayIntersectsTriangle(&ray, &face, &distance, u, v);
+
         if (!intersected) {
             continue;
         }
@@ -92,15 +96,23 @@ Eigen::Vector3f GlobalIlumIntegrator::getColor(const Ray &ray, const Scene &scen
 
     if (!nearestFace)
         return color;
-    Eigen::Vector3f hitPoint = ray.o + ray.d * minDistance;
-    ShadingPoint shadingPoint = computeShadingPoint(
-        nearestFaceU,
-        nearestFaceV,
-        *nearestFace,
-        hitPoint
-    );
 
-    color += getDirectContribution(ray, scene, shadingPoint);
+
+    Eigen::Vector3f hitPoint = ray.o + ray.d * minDistance;
+    ShadingPoint shdPoint = computeShadingPoint(nearestFaceU, nearestFaceV, *nearestFace, hitPoint);
+
+    color += getDirectContribution(ray, scene, shdPoint);
+
+    Eigen::Vector3f indirectContribution{0, 0 , 0};
+//  todo need to create a new ray for each sample arround the hemisphere
+
+//    for (uint i = 0; i < indirectSamples; indirectSamples++){
+//        Ray newRay{
+//        indirectContribution += castRay(ray, scene, depth + 1);
+//    }
+
+    float objectAlbedo = 0.18;
+    color += indirectContribution / indirectSamples * objectAlbedo;
 
     return color;
 }

@@ -56,11 +56,19 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
                 // light intensity is exposure so its squared
                 color += ((light.color * light.intensity * light.intensity *
                            std::max(0.f, lightDir.dot(shadingPoint.n))) /
-                          (4 * 3.14 * lightDir.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
+                          (4 * M_1_PI * lightDir.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
             }
         }
     }
     return color;
+}
+
+Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
+   float sinTheta = std::sqrt(1 - r1 * r1);
+    float phi = 2 * (float)M_PI * r2;
+    float x = sinTheta * std::cos(phi);
+    float y = sinTheta * std::sin(phi);
+    return {x, y, r1};
 }
 
 Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
@@ -103,13 +111,25 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
 
     color += getDirectContribution(ray, scene, shdPoint);
 
+    // this is used to rotate the sample on the hemisphere
+    Eigen::Matrix2f rotationMatrix{shdPoint.n.x(), shdPoint.n.y(), shdPoint.n.y(), -shdPoint.n.x()};
+
     Eigen::Vector3f indirectContribution{0, 0 , 0};
 //  todo need to create a new ray for each sample arround the hemisphere
+// todo read about casting rays in 3d: https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
 
-//    for (uint i = 0; i < indirectSamples; indirectSamples++){
-//        Ray newRay{
-//        indirectContribution += castRay(ray, scene, depth + 1);
-//    }
+    for (uint i = 0; i < indirectSamples; indirectSamples++){
+
+        Eigen::Vector3f sample = createHemisphereSample(rand(), rand());
+
+        // todo need to rotate the sample on the N of hitPoint.
+
+        Ray newRay{&shdPoint.hitPoint, sampleDir)};
+
+        // todo need to compute the pdf, cdf...
+
+        indirectContribution += castRay(ray, scene, depth + 1);
+    }
 
     float objectAlbedo = 0.18;
     color += indirectContribution / indirectSamples * objectAlbedo;

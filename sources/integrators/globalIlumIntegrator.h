@@ -21,6 +21,8 @@ public:
 
     Eigen::Vector3f castRay(const Ray &ray, const Scene &scene, uint depth=0);
 
+    Eigen::Vector3f createHemisphereSample(const float& r1, const float& r2);
+
     Eigen::Vector3f getDirectContribution(
             const Ray &ray,
             const Scene &scene,

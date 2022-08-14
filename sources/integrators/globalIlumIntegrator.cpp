@@ -112,24 +112,24 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     color += getDirectContribution(ray, scene, shdPoint);
 
     // this is used to rotate the sample on the hemisphere
-    Eigen::Matrix2f rotationMatrix{shdPoint.n.x(), shdPoint.n.y(), shdPoint.n.y(), -shdPoint.n.x()};
+    // Eigen::Matrix2f rotationMatrix{shdPoint.n.x(), shdPoint.n.y(), shdPoint.n.y(), -shdPoint.n.x()};
 
     Eigen::Vector3f indirectContribution{0, 0 , 0};
 //  todo need to create a new ray for each sample arround the hemisphere
 // todo read about casting rays in 3d: https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
 
-    for (uint i = 0; i < indirectSamples; indirectSamples++){
+    // for (uint i = 0; i < indirectSamples; indirectSamples++){
 
-        Eigen::Vector3f sample = createHemisphereSample(rand(), rand());
+    //     Eigen::Vector3f sample = createHemisphereSample(rand(), rand());
 
-        // todo need to rotate the sample on the N of hitPoint.
+    //     // todo need to rotate the sample on the N of hitPoint.
 
-        Ray newRay{&shdPoint.hitPoint, sampleDir)};
+    //     // Ray newRay{&shdPoint.hitPoint, sampleDir)};
 
-        // todo need to compute the pdf, cdf...
+    //     // todo need to compute the pdf, cdf...
 
-        indirectContribution += castRay(ray, scene, depth + 1);
-    }
+    //     indirectContribution += castRay(ray, scene, depth + 1);
+    // }
 
     float objectAlbedo = 0.18;
     color += indirectContribution / indirectSamples * objectAlbedo;

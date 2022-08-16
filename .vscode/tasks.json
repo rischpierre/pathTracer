@@ -4,10 +4,22 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "run pathTracer",
+            "label": "build and run simpleScene1",
             "type": "shell",
-            "command": ".${workspaceFolder}/build/pathTracer",
-            "args": ["${workspaceFolder}/examples/simpleScene1.usda"]
+            "command": "${workspaceFolder}/build/pathTracer",
+            "args": [
+                "${workspaceFolder}/examples/simpleScene1.usda"
+            ],
+            "options": {"cwd": "${workspaceFolder}/build"},
+            "dependsOn": [
+                "build pathTracer"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build pathTracer",
+            "type": "shell",
+            "command": "cmake --build ${workspaceFolder}/build --config Release --target all -j ${nproc}"
         }
     ]
 }

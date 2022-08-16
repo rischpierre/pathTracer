@@ -131,8 +131,8 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     //     indirectContribution += castRay(ray, scene, depth + 1);
     // }
 
-    float objectAlbedo = 0.18;
-    color += indirectContribution / indirectSamples * objectAlbedo;
+    // float objectAlbedo = 0.18;
+    // color += indirectContribution / indirectSamples * objectAlbedo;
 
-    return color;
+    return color * 0.10;
 }

@@ -64,19 +64,31 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
 }
 
 Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
-   float sinTheta = std::sqrt(1 - r1 * r1);
+    float sinTheta = std::sqrt(1 - r1 * r1);
     float phi = 2 * (float)M_PI * r2;
     float x = sinTheta * std::cos(phi);
     float y = sinTheta * std::sin(phi);
     return {x, y, r1};
 }
 
+void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f& r_Nt, Eigen::Vector3f& r_Nb){
+
+    // generate a cartesian coordinate system from the normal
+    // r_Nt is on the plane perpendicular to N
+    if (std::fabs(N.x()) > std::fabs(N.y))
+        r_Nt = Eigen::Vector3f(N.z(), 0 , -N.x()) / sqrtf(N.x(), * N.x(), + N.z() * N.z());
+    else
+        r_Nt - Eigen::Vector3f(0, -N.z(), N.y()) / sqrtf(N.y() * N.y() + N.z() * N.z());
+
+    Nb = N.cross(Nt);
+
+}
+
+
 Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
 
-    auto color = Eigen::Vector3f(0.f, 0.f, 0.f);
-
     if (depth > 3)
-        return color;
+        return {0, 0, 0};
 
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;
@@ -103,36 +115,38 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     }
 
     if (!nearestFace)
-        return color;
+        return {0, 0, 0};
 
 
     Eigen::Vector3f hitPoint = ray.o + ray.d * minDistance;
     ShadingPoint shdPoint = computeShadingPoint(nearestFaceU, nearestFaceV, *nearestFace, hitPoint);
 
-    color += getDirectContribution(ray, scene, shdPoint);
+    Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
+    Eigen::Vector3f indirectContribution{0, 0, 0};
 
-    // this is used to rotate the sample on the hemisphere
-    // Eigen::Matrix2f rotationMatrix{shdPoint.n.x(), shdPoint.n.y(), shdPoint.n.y(), -shdPoint.n.x()};
+    Eigen::Vector3f Nb, Nt;  // sample coordinates
+    createCoordinateSystemFromNormal(shadingPoint.N, Nb, Nt);
+    float pdf = 1 / (2 * M_1_PI);
 
-    Eigen::Vector3f indirectContribution{0, 0 , 0};
-//  todo need to create a new ray for each sample arround the hemisphere
-// todo read about casting rays in 3d: https://www.scratchapixel.com/lessons/3d-basic-rendering/global-illumination-path-tracing/global-illumination-path-tracing-practical-implementation
+    for (uint i = 0; i < indirectSamples; indirectSamples++){
+        float r1 = rand();
+        float r2 = rand();
 
-    // for (uint i = 0; i < indirectSamples; indirectSamples++){
+        Eigen::Vector3f sampleLocal = createHemisphereSample(r1, r2);
 
-    //     Eigen::Vector3f sample = createHemisphereSample(rand(), rand());
+        // transform sample with the coordinate system
+        Eigen::Vector3f sampleWorld = {
+            sample.x() * Nb.x() + sample.y() * shdPoint.N.x() + sample.z() * Nt.x(),
+            sample.x() * Nb.y() + sample.y() * shdPoint.N.y() + sample.z() * Nt.y(),
+            sample.x() * Nb.z() + sample.y() * shdPoint.N.z() + sample.z() * Nt.z(),
+        }  
+        // r1 is cos(theta)
+        float bias = 0.00001 // todo maybe reuse the one in the shadow ray?
+        indirectContribution += r1 * castRay(ray + sampleWorld * bias , scene, depth + 1) / pdf;
+    }
+    indirectContribution \= (float)indirectSamples;
 
-    //     // todo need to rotate the sample on the N of hitPoint.
-
-    //     // Ray newRay{&shdPoint.hitPoint, sampleDir)};
-
-    //     // todo need to compute the pdf, cdf...
-
-    //     indirectContribution += castRay(ray, scene, depth + 1);
-    // }
-
-    // float objectAlbedo = 0.18;
-    // color += indirectContribution / indirectSamples * objectAlbedo;
-
-    return color * 0.10;
+    // todo get the albedo from the object
+    float objectAlbedo = 0.18;
+    return (indirectContribution + directContribution) * objectAlbedo;
 }

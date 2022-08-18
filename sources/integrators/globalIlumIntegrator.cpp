@@ -64,10 +64,10 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
 }
 
 Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
-    float sinTheta = std::sqrt(1 - r1 * r1);
+    float sinTheta = sqrtf(1 - r1 * r1);
     float phi = 2 * (float)M_PI * r2;
-    float x = sinTheta * std::cos(phi);
-    float y = sinTheta * std::sin(phi);
+    float x = sinTheta * cos(phi);
+    float y = sinTheta * sin(phi);
     return {x, y, r1};
 }
 
@@ -75,19 +75,18 @@ void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f&
 
     // generate a cartesian coordinate system from the normal
     // r_Nt is on the plane perpendicular to N
-    if (std::fabs(N.x()) > std::fabs(N.y))
-        r_Nt = Eigen::Vector3f(N.z(), 0 , -N.x()) / sqrtf(N.x(), * N.x(), + N.z() * N.z());
+    if (fabs(N.x()) > fabs(N.y()))
+        r_Nt = Eigen::Vector3f(N.z(), 0 , -N.x()) / sqrtf(N.x() * N.x() + N.z() * N.z());
     else
-        r_Nt - Eigen::Vector3f(0, -N.z(), N.y()) / sqrtf(N.y() * N.y() + N.z() * N.z());
+        r_Nt = Eigen::Vector3f(0, -N.z(), N.y()) / sqrtf(N.y() * N.y() + N.z() * N.z());
 
-    Nb = N.cross(Nt);
+    r_Nb = N.cross(r_Nt);
 
 }
 
 
 Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
-
-    if (depth > 3)
+    if (depth > indirectDepth)
         return {0, 0, 0};
 
     float distance = WORLD_MAX_DISTANCE;
@@ -124,27 +123,36 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
     Eigen::Vector3f indirectContribution{0, 0, 0};
 
-    Eigen::Vector3f Nb, Nt;  // sample coordinates
-    createCoordinateSystemFromNormal(shadingPoint.N, Nb, Nt);
+    Eigen::Vector3f Nb{0, 0, 0};
+    Eigen::Vector3f Nt{0, 0, 0};
+    
+    createCoordinateSystemFromNormal(shdPoint.n, Nb, Nt);
     float pdf = 1 / (2 * M_1_PI);
 
-    for (uint i = 0; i < indirectSamples; indirectSamples++){
-        float r1 = rand();
-        float r2 = rand();
+    for (uint i = 0; i < indirectSamples; i++){
+        float r1 = (float)rand()/RAND_MAX;
+        float r2 = (float)rand()/RAND_MAX;
 
-        Eigen::Vector3f sampleLocal = createHemisphereSample(r1, r2);
+        Eigen::Vector3f sample = createHemisphereSample(r1, r2);
 
         // transform sample with the coordinate system
         Eigen::Vector3f sampleWorld = {
-            sample.x() * Nb.x() + sample.y() * shdPoint.N.x() + sample.z() * Nt.x(),
-            sample.x() * Nb.y() + sample.y() * shdPoint.N.y() + sample.z() * Nt.y(),
-            sample.x() * Nb.z() + sample.y() * shdPoint.N.z() + sample.z() * Nt.z(),
-        }  
+            sample.x() * Nb.x() + sample.y() * shdPoint.n.x() + sample.z() * Nt.x(),
+            sample.x() * Nb.y() + sample.y() * shdPoint.n.y() + sample.z() * Nt.y(),
+            sample.x() * Nb.z() + sample.y() * shdPoint.n.z() + sample.z() * Nt.z()
+        }; 
+
         // r1 is cos(theta)
-        float bias = 0.00001 // todo maybe reuse the one in the shadow ray?
-        indirectContribution += r1 * castRay(ray + sampleWorld * bias , scene, depth + 1) / pdf;
+        float bias = 0.00001f; // todo maybe reuse the one in the shadow ray?
+
+        // todo create a new contructor for the Ray to simplify this
+        Eigen::Vector3f newRayOrigin = hitPoint + shdPoint.n * bias;
+        Eigen::Vector3f newRayDirection = sampleWorld;
+        Ray newRay(newRayOrigin, newRayDirection);
+
+        indirectContribution += r1 * castRay(newRay, scene, depth + 1) / pdf;
     }
-    indirectContribution \= (float)indirectSamples;
+    indirectContribution /= (float)indirectSamples;
 
     // todo get the albedo from the object
     float objectAlbedo = 0.18;

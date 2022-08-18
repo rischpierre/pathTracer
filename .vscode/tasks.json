@@ -10,16 +10,27 @@
             "args": [
                 "${workspaceFolder}/examples/simpleScene1.usda"
             ],
-            "options": {"cwd": "${workspaceFolder}/build"},
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
             "dependsOn": [
-                "build pathTracer"
+                "CMake: build"
             ],
             "problemMatcher": []
         },
         {
-            "label": "build pathTracer",
-            "type": "shell",
-            "command": "cmake --build ${workspaceFolder}/build --config Release --target all -j ${nproc}"
+            "type": "cmake",
+            "label": "CMake: build",
+            "command": "build",
+            "targets": [
+                "pathTracer"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "CMake template build task"
         }
     ]
 }

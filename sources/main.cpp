@@ -78,6 +78,8 @@ int main(int argc, char *argv[]){
     GlobalIlumIntegrator integrator(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
+    int progress = 0;
+
 #ifdef SINGLE_THREADED
     std::cout << "Single threaded" << std::endl;
 
@@ -90,9 +92,15 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
+            if (progress % ((RESOLUTION_H * RESOLUTION_W) / 10) == 0) { // every 10%
+                int percentage = int((float)progress * 100 /(RESOLUTION_H * RESOLUTION_W));
+                std::cout << percentage << " %" << std::endl; 
+            }
+
             Eigen::Vector3f color = integrator.castRay(ray, scene);
 
             pixels[y * RESOLUTION_W + x] =  color;
+            progress++;
         }
     }
 #ifndef SINGLE_THREADED

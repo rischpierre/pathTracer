@@ -36,3 +36,4 @@ build-*
 build
 
 *.blend1
+.vscode/*.log

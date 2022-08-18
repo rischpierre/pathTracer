@@ -91,7 +91,7 @@ def Xform "key"
     {
         color3f inputs:color = (1, 0.7745831, 0.2508405)
         float inputs:height = 2
-        float inputs:intensity = 4
+        float inputs:intensity = 2 
         float inputs:specular = 1
         float inputs:width = 2
     }
@@ -106,7 +106,7 @@ def Xform "fill"
     {
         color3f inputs:color = (0.41251838, 0.45023355, 1)
         float inputs:height = 1
-        float inputs:intensity = 3.7
+        float inputs:intensity = 3 
         float inputs:specular = 1
         float inputs:width = 1
     }

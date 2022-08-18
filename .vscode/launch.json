@@ -1,6 +1,5 @@
 {
     "configurations": [
-        
     {
         "name": "gdb",
         "type": "cppdbg",

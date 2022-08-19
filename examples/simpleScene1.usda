@@ -138,9 +138,9 @@ def Xform "key"
 
     def RectLight "Area"
     {
-        color3f inputs:color = (1, 0.7745831, 0.2508405)
+        color3f inputs:color = (1, 1, 1)
         float inputs:height = 2
-        float inputs:intensity = 3
+        float inputs:intensity = 2
         float inputs:specular = 1
         float inputs:width = 2
     }

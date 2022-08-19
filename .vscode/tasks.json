@@ -16,6 +16,10 @@
             "dependsOn": [
                 "CMake: build"
             ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         },
         {
@@ -25,10 +29,7 @@
             "targets": [
                 "pathTracer"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+
             "problemMatcher": [],
             "detail": "CMake template build task"
         }

@@ -11,6 +11,7 @@ find_library(USD_SDF sdf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_TF tf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USD usd HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_USDGEOM usdGeom HINTS ${USD_LIBRARY_DIRECTORY})
+find_library(USD_SHADE usdShade HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIBGF gf HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_VT vt HINTS ${USD_LIBRARY_DIRECTORY})
 find_library(USD_LIB_TBB tbb HINTS ${USD_LIBRARY_DIRECTORY})
@@ -43,6 +44,7 @@ target_link_libraries(
         ${USD_SDF}
         ${USD_TF}
         ${USD_USDGEOM}
+        ${USD_SHADE}
         ${USD_USD}
         ${USD_LIBGF}
         ${USD_VT}
@@ -101,6 +103,7 @@ target_link_libraries(
         ${USD_SDF}
         ${USD_TF}
         ${USD_USDGEOM}
+        ${USD_SHADE}
         ${USD_USD}
         ${USD_LIBGF}
         ${USD_VT}

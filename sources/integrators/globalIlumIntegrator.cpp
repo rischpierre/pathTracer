@@ -120,7 +120,11 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     Eigen::Vector3f hitPoint = ray.o + ray.d * minDistance;
     ShadingPoint shdPoint = computeShadingPoint(nearestFaceU, nearestFaceV, *nearestFace, hitPoint);
 
+    Eigen::Vector3f albedo = scene.getShaderFromFace(*nearestFace).diffuse;
+
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
+    directContribution = directContribution.cwiseProduct(albedo); 
+
     Eigen::Vector3f indirectContribution{0, 0, 0};
 
     Eigen::Vector3f Nb{0, 0, 0};
@@ -154,7 +158,6 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     }
     indirectContribution /= (float)indirectSamples;
 
-    // todo get the albedo from the object
-    float objectAlbedo = 0.18;
-    return (indirectContribution + directContribution) * objectAlbedo;
+    indirectContribution = indirectContribution.cwiseProduct(albedo);
+    return indirectContribution + directContribution;
 }

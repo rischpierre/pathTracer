@@ -32,6 +32,16 @@ Scene::Scene(const std::string &path) {
     std::vector<pxr::UsdPrim> usdCameras;
     parsePrimsByType(root, *stage, usdCameras, pxr::TfToken("Camera"));
 
+    // std::vector<pxr::UsdPrim> usdMaterials;
+    // parsePrimsByType(root, *stage, usdMaterials, pxr::TfToken("Shader"));
+
+    // for (const auto& material: usdMaterials){
+    //     // std::cout << material.GetName() << std::endl;
+    //     auto scope = material.GetParent();
+    //     auto mat = scope.GetParent();
+    //     std::cout << mat.GetName() << std::endl; 
+    // }
+
     if (usdCameras.empty()){
         std::cerr << "No cameras found in the scene" << std::endl;
         exit(1);
@@ -98,6 +108,11 @@ void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
     int faceId = 0;
+    uint materialId = 1;  // default shader id is 0
+    bool materialFound = false;
+    Shader defaultShader;
+    shaders.push_back(defaultShader);
+
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
         pxr::UsdAttribute pointsAttr = usdMesh.GetPointsAttr();
@@ -133,7 +148,32 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
                 exit(1);
             }
         }
+        auto bindingApi = pxr::UsdShadeMaterialBindingAPI(usdMesh);
+        auto relationship = bindingApi.GetDirectBindingRel();
+        auto direct = pxr::UsdShadeMaterialBindingAPI::DirectBinding {relationship};
+        
+        if (direct.GetMaterial()) {
+            auto material = direct.GetMaterialPath();
+            auto materialPrim = bindingApi.GetPrim().GetStage()->GetPrimAtPath(material);
+            if (materialPrim.IsValid()) {
+                auto descendants = materialPrim.GetAllDescendants();
+                for(auto descendant: descendants){
+                    if (descendant.GetTypeName() == "Shader")
+                        std::cout << descendant.GetName() << std::endl;
+                        pxr::GfVec3f diffuseColor;
+                        pxr::UsdAttribute diffuseAttr = descendant.GetAttribute(pxr::TfToken("inputs:diffuseColor"));
+                        diffuseAttr.Get(&diffuseColor);
+                        Eigen::Vector3f diffuse(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
+                        Shader shader{diffuse, materialPrim.GetName(), materialId};
 
+                        shaders.push_back(shader);
+
+                        materialId++;
+                        materialFound = true;
+                        break;
+                }
+            }
+        }
         std::vector<Eigen::Vector3f> vertices;
         std::vector<Face> faces;
         for (int vId=0; vId < fVertexIds.size(); vId = vId + 3){
@@ -170,7 +210,11 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId);
+            uint matId = 0;
+            if (materialFound)
+                matId = materialId;
+
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, matId);
             faces.push_back(face);
             faceId++;
         }
@@ -213,4 +257,13 @@ std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
         }
     }
     return samples;
+}
+
+Shader Scene::getShaderFromFace(const Face& face) const {
+    for (auto shader: this->shaders) {
+        if (shader.id == face.shaderId)
+            return shader;
+    }
+    return Shader();
+
 }

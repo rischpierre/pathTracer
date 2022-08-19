@@ -11,26 +11,35 @@
 #include <pxr/base/gf/bbox3d.h>
 #include <pxr/usd/usdGeom/camera.h>
 #include <pxr/usd/usd/attribute.h>
+#include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <Eigen>
 
 
+struct Shader {
+    Eigen::Vector3f diffuse{0.18, 0.18, 0.18};
+    std::string name;
+    uint id;
+};
 
 struct Face {
-    explicit Face(Eigen::Vector3f v0 = Eigen::Vector3f(),
+    explicit Face(
+         Eigen::Vector3f v0 = Eigen::Vector3f(),
          Eigen::Vector3f v1 = Eigen::Vector3f(),
          Eigen::Vector3f v2 = Eigen::Vector3f(),
          Eigen::Vector3f nf = Eigen::Vector3f(),
          Eigen::Vector3f n0 = Eigen::Vector3f(),
          Eigen::Vector3f n1 = Eigen::Vector3f(),
          Eigen::Vector3f n2 = Eigen::Vector3f(),
-         int id = 0) :          v0(std::move(v0)),
+         int id = 0,
+         uint shaderId = 0) :   v0(std::move(v0)),
                                 v1(std::move(v1)),
                                 v2(std::move(v2)),
                                 nf(std::move(nf)),
                                 n0(std::move(n0)),
                                 n1(std::move(n1)),
                                 n2(std::move(n2)),
-                                id(id) {}
+                                id(id),
+                                shaderId(shaderId) {}
     Face(const Face& f){
         v0 = f.v0;
         v1 = f.v1;
@@ -40,10 +49,12 @@ struct Face {
         n1 = f.n1;
         n2 = f.n2;
         id = f.id;
+        shaderId = f.shaderId;
     }
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
     int id;
+    uint shaderId;
 
     Eigen::Vector3f getCenter() const{
         return (v0 + v1 + v2) / 3.0f;
@@ -153,9 +164,11 @@ public:
 
     void parseLights(const std::vector<pxr::UsdPrim> &usdLights);
 
-    std::vector<Mesh> meshes;
+    Shader getShaderFromFace(const Face& face) const;
 
+    std::vector<Mesh> meshes;
     std::vector<RectLight> rectLights;
+    std::vector<Shader> shaders;
 
     Camera camera;
 };

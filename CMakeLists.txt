@@ -21,8 +21,6 @@ file(GLOB_RECURSE SRCS sources/*.cpp sources/*.h)
 
 add_executable(pathTracer ${SRCS})
 
-message(${SINGLE_THREADED})
-
 if (${SINGLE_THREADED} STREQUAL "ON")
         message("Building single threaded")
         add_compile_definitions(SINGLE_THREADED)

@@ -12,6 +12,7 @@ struct ShadingPoint{
     const Face face;
     const float u;
     const float v;
+    const Shader shader;
 };
 
 
@@ -29,11 +30,11 @@ public:
             const ShadingPoint& shadingPoint
     );
 
-    static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint);
+    static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint, const Scene& scene);
 
 private:
-    uint indirectSamples = 0;
-    uint indirectDepth = 2;
+    uint indirectSamples = 8;
+    uint indirectDepth = 0;
 
 };
 #endif

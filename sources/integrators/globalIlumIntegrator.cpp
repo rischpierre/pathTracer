@@ -5,7 +5,8 @@ ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
         float u,
         float v,
         const Face& face,
-        const Eigen::Vector3f& hitPoint
+        const Eigen::Vector3f& hitPoint,
+        const Scene& scene
         ){
 
     // Gouraud's smooth shading technique
@@ -16,7 +17,8 @@ ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
         smoothNormal,
         face,
         u,
-        v
+        v,
+        scene.getShaderFromFace(face)
     };
 
 }
@@ -60,7 +62,8 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
             }
         }
     }
-    return color;
+    // todo bug here continue
+    return color.cwiseProduct(shader.diffuse);
 }
 
 Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
@@ -118,12 +121,9 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
 
 
     Eigen::Vector3f hitPoint = ray.o + ray.d * minDistance;
-    ShadingPoint shdPoint = computeShadingPoint(nearestFaceU, nearestFaceV, *nearestFace, hitPoint);
-
-    Eigen::Vector3f albedo = scene.getShaderFromFace(*nearestFace).diffuse;
+    ShadingPoint shdPoint = computeShadingPoint(nearestFaceU, nearestFaceV, *nearestFace, hitPoint, scene);
 
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
-    directContribution = directContribution.cwiseProduct(albedo); 
 
     if (indirectDepth == 0){
         return directContribution;
@@ -162,6 +162,6 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     }
     indirectContribution /= (float)indirectSamples;
 
-    indirectContribution = indirectContribution.cwiseProduct(albedo);
+    indirectContribution = indirectContribution * shdPoint.shader.diffuse;
     return indirectContribution + directContribution;
 }

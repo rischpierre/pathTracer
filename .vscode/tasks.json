@@ -1,17 +1,28 @@
 {
 	"version": "2.0.0",
 	"tasks": [
-		{
-			"type": "cmake",
-			"label": "CMake: build pathTracer",
-			"command": "build",
-			"targets": [
-				"pathTracer"
-			],
-			""
-			"group": "build",
-			"problemMatcher": [],
-			"detail": "CMake template build task"
-		}
-	]
+        {
+            "label": "build and run simpleScene1",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/pathTracer",
+            "args": [
+                "${workspaceFolder}/examples/simpleScene1.usda"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "dependsOn": [
+                "CMake: build pathTracer"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "type": "cmake",
+            "label": "CMake: build pathTracer",
+            "command": "build",
+            "problemMatcher": [],
+            "detail": "CMake template build task"
+        }
+    ]
 }

@@ -125,6 +125,10 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
     directContribution = directContribution.cwiseProduct(albedo); 
 
+    if (indirectDepth == 0){
+        return directContribution;
+    }
+
     Eigen::Vector3f indirectContribution{0, 0, 0};
 
     Eigen::Vector3f Nb{0, 0, 0};

@@ -37,3 +37,4 @@ build
 
 *.blend1
 .vscode/*.log
+*-workspace

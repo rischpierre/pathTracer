@@ -63,7 +63,9 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
         }
     }
     // todo bug here continue
-    return color.cwiseProduct(shader.diffuse);
+    // exit(1);
+    // return color * shadingPoint.shader.diffuse;
+    return shadingPoint.shader.diffuse;
 }
 
 Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
@@ -162,6 +164,8 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     }
     indirectContribution /= (float)indirectSamples;
 
-    indirectContribution = indirectContribution * shdPoint.shader.diffuse;
+    // todo bug mult matrices
+    // indirectContribution = indirectContribution * shdPoint.shader.diffuse;
+
     return indirectContribution + directContribution;
 }

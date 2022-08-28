@@ -21,7 +21,10 @@
             "type": "cmake",
             "label": "CMake: build pathTracer",
             "command": "build",
-            "problemMatcher": [],
+              
+            "problemMatcher":[
+                "$gcc"
+            ],
             "detail": "CMake template build task"
         }
     ]

@@ -109,7 +109,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
     int faceId = 0;
     uint materialId = 1;  // default shader id is 0
-    bool materialFound = false;
+
     Shader defaultShader;
     shaders.push_back(defaultShader);
 
@@ -152,18 +152,25 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
         auto relationship = bindingApi.GetDirectBindingRel();
         auto direct = pxr::UsdShadeMaterialBindingAPI::DirectBinding {relationship};
         
+        // todo need refacto
+        bool materialFound = false;
         if (direct.GetMaterial()) {
             auto material = direct.GetMaterialPath();
             auto materialPrim = bindingApi.GetPrim().GetStage()->GetPrimAtPath(material);
             if (materialPrim.IsValid()) {
-                auto descendants = materialPrim.GetAllDescendants();
+                auto scope = materialPrim.GetChild(pxr::TfToken("preview"));
+                auto descendants = scope.GetChildren();
+
                 for(auto descendant: descendants){
-                    if (descendant.GetTypeName() == "Shader")
-                        std::cout << descendant.GetName() << std::endl;
+                    if (descendant.GetTypeName() == "Shader"){
+
                         pxr::GfVec3f diffuseColor;
                         pxr::UsdAttribute diffuseAttr = descendant.GetAttribute(pxr::TfToken("inputs:diffuseColor"));
-                        diffuseAttr.Get(&diffuseColor);
+
+                        diffuseAttr.Get(&diffuseColor, STATIC_FRAME);
+
                         Eigen::Vector3f diffuse(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
+
                         Shader shader{diffuse, materialPrim.GetName(), materialId};
 
                         shaders.push_back(shader);
@@ -171,6 +178,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
                         materialId++;
                         materialFound = true;
                         break;
+                    }
                 }
             }
         }
@@ -222,6 +230,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
         Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE);
         this->meshes.push_back(mesh);
     }
+
 }
 
 

@@ -17,7 +17,7 @@
 
 struct Shader {
     Eigen::Vector3f diffuse{0.18, 0.18, 0.18};
-    std::string name;
+    std::string name = "default";
     uint id;
 };
 

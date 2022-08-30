@@ -18,7 +18,7 @@
 struct Shader {
     Eigen::Vector3f diffuse{0.18, 0.18, 0.18};
     std::string name = "default";
-    uint id;
+    uint id = 0;
 };
 
 struct Face {
@@ -166,9 +166,13 @@ public:
 
     Shader getShaderFromFace(const Face& face) const;
 
+    Shader createShader(const pxr::UsdGeomMesh& mesh);
+
     std::vector<Mesh> meshes;
     std::vector<RectLight> rectLights;
-    std::vector<Shader> shaders;
+
+    Shader defaultShader; 
+    std::vector<Shader> shaders = {defaultShader};
 
     Camera camera;
 };

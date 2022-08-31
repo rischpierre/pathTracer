@@ -162,6 +162,7 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     indirectContribution /= (float)indirectSamples;
 
     indirectContribution = indirectContribution.cwiseProduct(shdPoint.shader.diffuse);
-
+    // todo problems with the indirect contribution, there should be a flaw in the algo, 
+    // because the indirect contribution seems not to have any effect
     return indirectContribution + directContribution;
 }

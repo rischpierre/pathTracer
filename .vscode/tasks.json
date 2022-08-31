@@ -11,6 +11,7 @@
             "options": {
                 "cwd": "${workspaceFolder}/build"
             },
+            "dependsOrder": "sequence",
             "dependsOn": [
                 "CMake: build pathTracer"
             ],
@@ -21,11 +22,17 @@
             "type": "cmake",
             "label": "CMake: build pathTracer",
             "command": "build",
-              
-            "problemMatcher":[
-                "$gcc"
-            ],
-            "detail": "CMake template build task"
+            "detail": "CMake template build task",
+            "problemMatcher": {
+                "fileLocation": "absolute",
+                "pattern": {
+                    "regexp": "^([#%$~A-Za-z0-9_:+-\\\\]+)[(]([0-9]+)[)] (:) (Warning|Error)(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         }
     ]
 }

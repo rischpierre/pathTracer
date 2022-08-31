@@ -33,8 +33,8 @@ public:
     static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint, const Scene& scene);
 
 private:
-    uint indirectSamples = 8;
-    uint indirectDepth = 0;
+    uint indirectSamples = 4;
+    uint indirectDepth = 3;
 
 };
 #endif

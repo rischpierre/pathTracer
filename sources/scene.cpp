@@ -45,7 +45,6 @@ Scene::Scene(const std::string &path) {
     std::vector<pxr::UsdPrim> usdRectLights;
     parsePrimsByType(root, *stage, usdRectLights, pxr::TfToken("RectLight"));
     parseLights(usdRectLights);
-
 }
 
 void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {

@@ -99,7 +99,7 @@ def "_materials"
                 uniform token info:id = "UsdPreviewSurface"
                 float inputs:clearcoat = 0
                 float inputs:clearcoatRoughness = 0.03
-                float3 inputs:diffuseColor = (0.021662576, 0.008679664, 0.8000001)
+                float3 inputs:diffuseColor = (0.102795586, 0.8000001, 0.10923779)
                 float inputs:ior = 1.45
                 float inputs:metallic = 0
                 float inputs:opacity = 1

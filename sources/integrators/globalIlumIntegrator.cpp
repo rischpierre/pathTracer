@@ -88,8 +88,6 @@ void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f&
 
 
 Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
-    if (depth > indirectDepth)
-        return {0, 0, 0};
 
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;
@@ -124,9 +122,8 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
 
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
 
-    if (indirectDepth == 0){
+    if (depth > indirectDepth)
         return directContribution;
-    }
 
     Eigen::Vector3f indirectContribution{0, 0, 0};
 
@@ -164,5 +161,8 @@ Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene
     indirectContribution = indirectContribution.cwiseProduct(shdPoint.shader.diffuse);
     // todo problems with the indirect contribution, there should be a flaw in the algo, 
     // because the indirect contribution seems not to have any effect
-    return indirectContribution + directContribution;
+
+    // TODO test 
+    // return indirectContribution *10 + directContribution;
+    return indirectContribution * 3 + directContribution;
 }

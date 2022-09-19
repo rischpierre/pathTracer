@@ -125,6 +125,7 @@ Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
         shaders.push_back(shader);
         return shader;
     }
+    return defaultShader;
 }
 
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){

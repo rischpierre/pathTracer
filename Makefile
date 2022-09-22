@@ -3,6 +3,12 @@
 CC = g++
 CFLAGS = -Wno-deprecated -std=c++17
 
+ifeq ($(BUILD),debug)
+	CFLAGS += -g
+else
+	CFLAGS += -O3
+endif
+
 LFLAGS = -L/opt/USD/lib
 
 LIBS = -ltbb -lpng -lsdf -lusd -lgf -ltf -lvt -lusdGeom -lusdShade 
@@ -14,6 +20,7 @@ OBJS = $(SRCS:.cpp=.o)
 MAIN = pathTracer
 
 # TODO I need to put the files in a build folder
+# TODO add singleThread option
 
 all: $(MAIN)
 	@echo compilation done
@@ -24,10 +31,14 @@ $(MAIN): $(OBJS)
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCL) -c $<  -o $@
 
+
+debug:
+	$(MAKE) BUILD=debug
+
 render:
-	./$(MAIN) ../examples/simpleScene.usda 
+	./$(MAIN) examples/simpleScene1.usda 
  
 clean:
-	rm -f $(MAIN) $(OBJS)
+	rm $(MAIN) $(OBJS)
  
  

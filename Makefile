@@ -14,16 +14,22 @@ LFLAGS = -L/opt/USD/lib
 LIBS = -ltbb -lpng -lsdf -lusd -lgf -ltf -lvt -lusdGeom -lusdShade 
 INCL = -I/opt/USD/include -I/opt/Eigen
 
-SRCS = $(wildcard sources/*.cpp) $(wildcard sources/integrators/*.cpp)
-OBJS = $(SRCS:.cpp=.o)
+SRCS = $(wildcard sources/*.cpp)
+OBJS := $(subst: /sources/, /build/, $(SRCS:.cpp=.o))
 
 MAIN = pathTracer
+BUID_DIR = build
 
 # TODO I need to put the files in a build folder
 # TODO add singleThread option
 
-all: $(MAIN)
+.PHONY: all debug clean
+
+all: $(BUILD_DIR) $(MAIN)
 	@echo compilation done
+
+$(BUILD_DIR):
+	@mkdir -p $(BUILD_DIR)
 
 $(MAIN): $(OBJS)
 	$(CC) $(CFLAGS) $(INCL) -o $(MAIN) $(OBJS) -Wl,-rpath=/opt/USD/lib $(LFLAGS) $(LIBS)
@@ -31,14 +37,11 @@ $(MAIN): $(OBJS)
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCL) -c $<  -o $@
 
-
 debug:
 	$(MAKE) BUILD=debug
-
-render:
-	./$(MAIN) examples/simpleScene1.usda 
  
 clean:
 	rm $(MAIN) $(OBJS)
+	rm -r $(BUILD_DIR)
  
  

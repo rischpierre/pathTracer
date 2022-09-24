@@ -34,7 +34,7 @@ public:
 
 private:
     uint indirectSamples = 4;
-    uint indirectDepth = 2;
+    uint indirectDepth = 0;
 
 };
 #endif

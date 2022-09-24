@@ -9,11 +9,7 @@
 #include "scene.h"
 #include "raytracer.h"
 #include "accelerator.h"
-#include "integrators/normalIntegrator.h"
-#include "integrators/facingRatioIntegrator.h"
-#include "integrators/directLightIntegrator.h"
-#include "integrators/globalIlumIntegrator.h"
-#include "integrators/debugAccIntegrator.h"
+#include "globalIlumIntegrator.h"
 
 
 #define MAIN_RESOLUTION_W 1280

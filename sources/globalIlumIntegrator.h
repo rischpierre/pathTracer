@@ -3,7 +3,7 @@
 
 #include <Eigen>
 
-#include "../raytracer.h"
+#include "raytracer.h"
 #include "baseIntegrator.h"
 
 struct ShadingPoint{

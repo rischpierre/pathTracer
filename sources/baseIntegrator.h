@@ -7,8 +7,8 @@
 #define BG_COLOR_G 0.1f
 #define BG_COLOR_B 0.1f
 
-#include "../scene.h"
-#include "../accelerator.h"
+#include "scene.h"
+#include "accelerator.h"
 
 class BaseIntegrator {
 public:

@@ -126,6 +126,7 @@ struct Mesh {
 
     std::vector<Face> faces;
     std::string name;
+    uint shaderId; 
     BBox bbox;
 
 };
@@ -167,6 +168,8 @@ public:
     Shader getShaderFromFace(const Face& face) const;
 
     Shader createShader(const pxr::UsdGeomMesh& mesh);
+    
+    void print() const;
 
     std::vector<Mesh> meshes;
     std::vector<RectLight> rectLights;

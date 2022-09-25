@@ -1,5 +1,21 @@
 #include "scene.h"
 
+void Scene::print() const{
+    std::cout << "Scene:" << std::endl;
+    std::cout << "  Meshes:" << std::endl;
+
+    for (const auto& mesh: meshes){
+        Shader *currentShader = nullptr;
+        for (Shader shader: shaders){
+            if (shader.id == mesh.shaderId){
+                currentShader = &shader;
+                break;
+            }
+        }
+        std::cout << "    " << mesh.name << "->" << currentShader->name << std::endl;
+    }
+};
+
 std::string BBox::getStrRepr() const {
     Eigen::Vector3f members[2] = {min, max};
 
@@ -97,7 +113,7 @@ Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
     auto bindingApi = pxr::UsdShadeMaterialBindingAPI(mesh);
     auto relationship = bindingApi.GetDirectBindingRel();
     auto direct = pxr::UsdShadeMaterialBindingAPI::DirectBinding {relationship};
-
+    
     if (!direct.GetMaterial())
         return defaultShader;
 
@@ -211,6 +227,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
         }
 
         Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE);
+        mesh.shaderId = shader.id;
         this->meshes.push_back(mesh);
     }
 

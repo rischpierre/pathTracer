@@ -56,6 +56,7 @@ int main(int argc, char *argv[]){
 
     clock_t t1 = clock();
     Scene scene = Scene(path);
+    scene.print();
     clock_t t2 = clock();
     std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
 

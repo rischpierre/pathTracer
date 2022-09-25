@@ -36,5 +36,6 @@ build-*
 build
 
 *.blend1
-.vscode/*.log
 *-workspace
+render.png
+.vimspector.json

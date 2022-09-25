@@ -45,7 +45,7 @@ $(OBJS): $(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp
 debug:
 	$(MAKE) BUILD=debug
  
-debugSt:
+debugst:
 	$(MAKE) BUILD=debug SINGLE_THREADED=1
 
 clean:

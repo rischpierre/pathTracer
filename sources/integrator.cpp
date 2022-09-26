@@ -32,8 +32,11 @@ Eigen::Vector3f Integrator::getDirectContribution(
     for (auto& light: scene.rectLights){
 
         for (auto &lightSample: light.computeSamples()) {
-
+            
             Eigen::Vector3f lightDir = (lightSample - shadingPoint.hitPoint).normalized();
+            
+            if (lightDir.dot(light.normal) < 0) // skip if light is not visible to the shading point
+                continue;
 
             // to avoid shadow acne
             Eigen::Vector3f shadowRayOrigin = shadingPoint.hitPoint + shadingPoint.n * 0.00001;

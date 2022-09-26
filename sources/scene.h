@@ -138,9 +138,9 @@ struct RectLight {
     Eigen::Vector3f color;
     Eigen::Vector3f position;
     float intensity;
-    pxr::GfMatrix4d toWorld;   // todo maybe replace with eigen type
-
-    int sampleSteps = 6;
+    pxr::GfMatrix4d toWorld;   // TODO maybe replace with eigen type
+    Eigen::Vector3f normal;
+    int sampleSteps = 6;  // TODO put that in a render settings file
     std::vector<Eigen::Vector3f> computeSamples() const;
 
 };
@@ -149,7 +149,7 @@ struct Camera {
     float focalLength;
     float hAperture;
     float vAperture;
-    pxr::GfMatrix4d toWorld;  // todo maybe replace with eigen type
+    pxr::GfMatrix4d toWorld;  // TODO maybe replace with eigen type
 };
 
 class Scene {

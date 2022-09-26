@@ -87,11 +87,14 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         pxr::GfVec3f position(0);
         position = newLight.toWorld.Transform(position);
         newLight.position = Eigen::Vector3f(position[0], position[1], position[2]);
-        newLight.computeSamples();
+        
+        pxr::GfVec3f normal(0, 0, 1);  // lights are pointing down the Z axis by default
+        normal = newLight.toWorld.Transform(normal);
+        newLight.normal = Eigen::Vector3f(normal[0], normal[1], normal[2]);
+
         this->rectLights.push_back(newLight);
 
     }
-
 }
 
 void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {

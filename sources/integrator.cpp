@@ -31,16 +31,17 @@ Eigen::Vector3f Integrator::getDirectContribution(
     Eigen::Vector3f color{0.f, 0.f, 0.f};
     for (auto& light: scene.rectLights){
 
+        Eigen::Vector3f lightDir = (light.position - shadingPoint.hitPoint).normalized();
+        if (lightDir.dot(light.normal) < 0) // skip if light is not visible to the shading point
+            continue;
+
         for (auto &lightSample: light.computeSamples()) {
             
-            Eigen::Vector3f lightDir = (lightSample - shadingPoint.hitPoint).normalized();
-            
-            if (lightDir.dot(light.normal) < 0) // skip if light is not visible to the shading point
-                continue;
+            Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
             // to avoid shadow acne
             Eigen::Vector3f shadowRayOrigin = shadingPoint.hitPoint + shadingPoint.n * 0.00001;
-            Ray shadowRay(shadowRayOrigin, lightDir);
+            Ray shadowRay(shadowRayOrigin, lightDirSample);
 
             bool intersected = false;
 
@@ -60,8 +61,8 @@ Eigen::Vector3f Integrator::getDirectContribution(
             if (!intersected) {
                 // light intensity is exposure so its squared
                 color += ((light.color * light.intensity * light.intensity *
-                           std::max(0.f, lightDir.dot(shadingPoint.n))) /
-                          (4 * M_1_PI * lightDir.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
+                           std::max(0.f, lightDirSample.dot(shadingPoint.n))) /
+                          (4 * M_1_PI * lightDirSample.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
             }
         }
     }

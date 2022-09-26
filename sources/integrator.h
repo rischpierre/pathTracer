@@ -1,10 +1,16 @@
 #ifndef PATHTRACER_GLOBALILUMINTEGRATOR_H
 #define PATHTRACER_GLOBALILUMINTEGRATOR_H
 
+#define WORLD_MAX_DISTANCE 9999999.f
+#define BG_COLOR_R 0.1f
+#define BG_COLOR_G 0.1f
+#define BG_COLOR_B 0.1f
+
 #include <Eigen>
 
+#include "scene.h"
+#include "accelerator.h"
 #include "raytracer.h"
-#include "baseIntegrator.h"
 
 struct ShadingPoint{
     const Eigen::Vector3f hitPoint;
@@ -16,9 +22,12 @@ struct ShadingPoint{
 };
 
 
-class GlobalIlumIntegrator: public BaseIntegrator {
+class Integrator{
 public:
-    explicit GlobalIlumIntegrator(const Scene &scene, const Accelerator& accelerator) : BaseIntegrator(scene, accelerator) {};
+    explicit Integrator(const Scene &scene, const Accelerator& accelerator) : scene(scene), accelerator(accelerator) {};
+
+    Scene scene;
+    Accelerator accelerator;
 
     Eigen::Vector3f castRay(const Ray &ray, const Scene &scene, uint depth=0);
 
@@ -38,3 +47,4 @@ private:
 
 };
 #endif
+

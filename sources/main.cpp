@@ -9,7 +9,7 @@
 #include "scene.h"
 #include "raytracer.h"
 #include "accelerator.h"
-#include "globalIlumIntegrator.h"
+#include "integrator.h"
 
 
 #define MAIN_RESOLUTION_W 1280
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
 
     std::cout << " (" << accelerator.getNodeNumber() << " nodes)" << std::endl;
 
-    GlobalIlumIntegrator integrator(scene, accelerator);
+    Integrator integrator(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
     int progress = 0;

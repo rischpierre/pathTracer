@@ -1,7 +1,7 @@
-#include "globalIlumIntegrator.h"
 
+#include "integrator.h"
 
-ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
+ShadingPoint Integrator::computeShadingPoint(
         float u,
         float v,
         const Face& face,
@@ -23,7 +23,7 @@ ShadingPoint GlobalIlumIntegrator::computeShadingPoint(
 
 }
 
-Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
+Eigen::Vector3f Integrator::getDirectContribution(
         const Ray &ray,
         const Scene &scene,
         const ShadingPoint& shadingPoint) {
@@ -65,7 +65,7 @@ Eigen::Vector3f GlobalIlumIntegrator::getDirectContribution(
     return color.cwiseProduct(shadingPoint.shader.diffuse);
 }
 
-Eigen::Vector3f GlobalIlumIntegrator::createHemisphereSample(const float& r1, const float& r2) {
+Eigen::Vector3f Integrator::createHemisphereSample(const float& r1, const float& r2) {
     float sinTheta = sqrtf(1 - r1 * r1);
     float phi = 2 * (float)M_PI * r2;
     float x = sinTheta * cos(phi);
@@ -87,7 +87,7 @@ void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f&
 }
 
 
-Eigen::Vector3f GlobalIlumIntegrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
+Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
 
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;

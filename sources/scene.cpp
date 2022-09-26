@@ -61,6 +61,7 @@ Scene::Scene(const std::string &path) {
     std::vector<pxr::UsdPrim> usdRectLights;
     parsePrimsByType(root, *stage, usdRectLights, pxr::TfToken("RectLight"));
     parseLights(usdRectLights);
+    
 }
 
 void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
@@ -136,7 +137,7 @@ Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
 
         Eigen::Vector3f diffuse(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
 
-        Shader shader{diffuse, materialPrim.GetName(), shaders[-1].id + 1};
+        Shader shader{diffuse, materialPrim.GetName(), shaders.back().id + 1};
 
         shaders.push_back(shader);
         return shader;

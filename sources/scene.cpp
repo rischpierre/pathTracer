@@ -231,7 +231,8 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, shader.id, meshId);
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, meshId, shader.id);
+
             faces.push_back(face);
             faceId++;
         }

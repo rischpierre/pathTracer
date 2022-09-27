@@ -53,7 +53,7 @@ Eigen::Vector3f Integrator::getDirectContribution(
 
                 float u, v, distance;
                 intersected = isRayIntersectsTriangle(&shadowRay, &face, &distance, u, v);
-                if (intersected) {
+                if (intersected && distance < (lightSample - shadingPoint.hitPoint).norm()) {
                     break;
                 }
             }

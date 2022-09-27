@@ -93,7 +93,7 @@ int main(int argc, char *argv[]){
                 int percentage = int((float)progress * 100 /(RESOLUTION_H * RESOLUTION_W));
                 std::cout << percentage << " %" << std::endl; 
             }
-
+            
             Eigen::Vector3f color = integrator.castRay(ray, scene);
 
             pixels[y * RESOLUTION_W + x] =  color;

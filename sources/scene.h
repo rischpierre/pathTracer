@@ -31,6 +31,7 @@ struct Face {
          Eigen::Vector3f n1 = Eigen::Vector3f(),
          Eigen::Vector3f n2 = Eigen::Vector3f(),
          int id = 0,
+         uint meshId = 0,
          uint shaderId = 0) :   v0(std::move(v0)),
                                 v1(std::move(v1)),
                                 v2(std::move(v2)),
@@ -39,6 +40,7 @@ struct Face {
                                 n1(std::move(n1)),
                                 n2(std::move(n2)),
                                 id(id),
+                                meshId(meshId),
                                 shaderId(shaderId) {}
     Face(const Face& f){
         v0 = f.v0;
@@ -50,11 +52,13 @@ struct Face {
         n2 = f.n2;
         id = f.id;
         shaderId = f.shaderId;
+        meshId = f.meshId;
     }
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
     int id;
     uint shaderId;
+    uint meshId;
 
     Eigen::Vector3f getCenter() const{
         return (v0 + v1 + v2) / 3.0f;
@@ -120,10 +124,10 @@ struct BBox {
 
 
 struct Mesh {
-    Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox) : faces(faces), name(name), bbox(bbox) {}
+    Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox, uint id) : faces(faces), name(name), bbox(bbox), id(id) {}
 
     std::vector<Face> getFaces() { return this->faces; }
-
+    uint id;
     std::vector<Face> faces;
     std::string name;
     uint shaderId; 

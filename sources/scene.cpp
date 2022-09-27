@@ -12,7 +12,8 @@ void Scene::print() const{
                 break;
             }
         }
-        std::cout << "    " << mesh.name << "->" << currentShader->name << std::endl;
+        std::cout << "    " << mesh.name << "(" << mesh.id << ")" << "->" << currentShader->name;
+        std::cout<< "(" << currentShader->id << ")" << std::endl;
     }
 };
 
@@ -126,6 +127,11 @@ Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
     if (! materialPrim.IsValid())
         return defaultShader;
 
+    for (const auto& shader: shaders){
+        if (materialPrim.GetName().GetString() == shader.name)
+            return shader;
+    }
+
     auto previewScope = materialPrim.GetChild(pxr::TfToken("preview"));
     auto descendants = previewScope.GetChildren();
 
@@ -151,7 +157,7 @@ Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
     int faceId = 0;
-
+    uint meshId = 0;
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
         pxr::UsdAttribute pointsAttr = usdMesh.GetPointsAttr();
@@ -225,12 +231,13 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, shader.id);
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, shader.id, meshId);
             faces.push_back(face);
             faceId++;
         }
-
-        Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE);
+        
+        Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE, meshId);
+        meshId++;
         mesh.shaderId = shader.id;
         this->meshes.push_back(mesh);
     }

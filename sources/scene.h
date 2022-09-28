@@ -1,8 +1,6 @@
 #ifndef PATHTRACER_SCENEPARSER_H
 #define PATHTRACER_SCENEPARSER_H
 
-#define STATIC_FRAME 0
-
 #include <iostream>
 
 #include <pxr/usd/usd/stage.h>
@@ -14,9 +12,10 @@
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <Eigen>
 
+#include "renderSettings.h"
 
 struct Shader {
-    Eigen::Vector3f diffuse{0.18, 0.18, 0.18};
+    Eigen::Vector3f diffuse{DEFAULT_ALBEDO, DEFAULT_ALBEDO, DEFAULT_ALBEDO};
     std::string name = "default";
     uint id = 0;
 };
@@ -144,7 +143,6 @@ struct RectLight {
     float intensity;
     pxr::GfMatrix4d toWorld;   // TODO maybe replace with eigen type
     Eigen::Vector3f normal;
-    int sampleSteps = 6;  // TODO put that in a render settings file
     std::vector<Eigen::Vector3f> computeSamples() const;
 
 };

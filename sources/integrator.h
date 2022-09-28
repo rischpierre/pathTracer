@@ -1,16 +1,12 @@
 #ifndef PATHTRACER_GLOBALILUMINTEGRATOR_H
 #define PATHTRACER_GLOBALILUMINTEGRATOR_H
 
-#define WORLD_MAX_DISTANCE 9999999.f
-#define BG_COLOR_R 0.1f
-#define BG_COLOR_G 0.1f
-#define BG_COLOR_B 0.1f
-
 #include <Eigen>
 
 #include "scene.h"
 #include "accelerator.h"
 #include "raytracer.h"
+#include "renderSettings.h"
 
 struct ShadingPoint{
     const Eigen::Vector3f hitPoint;
@@ -40,10 +36,6 @@ public:
     );
 
     static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint, const Scene& scene);
-
-private:
-    uint indirectSamples = 4;
-    uint indirectDepth = 0;
 
 };
 #endif

@@ -1,5 +1,6 @@
 
 #include "integrator.h"
+#include "renderSettings.h"
 
 ShadingPoint Integrator::computeShadingPoint(
         float u,
@@ -35,12 +36,12 @@ Eigen::Vector3f Integrator::getDirectContribution(
         if (lightDir.dot(light.normal) < 0) // skip if light is not visible to the shading point
             continue;
 
-        for (auto &lightSample: light.computeSamples()) {
+        for (auto &lightSample: light.computeSamples()){
             
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
             // to avoid shadow acne
-            Eigen::Vector3f shadowRayOrigin = shadingPoint.hitPoint + shadingPoint.n * 0.00001;
+            Eigen::Vector3f shadowRayOrigin = shadingPoint.hitPoint + shadingPoint.n * SHADOW_BIAS;
             Ray shadowRay(shadowRayOrigin, lightDirSample);
 
             bool intersected = false;
@@ -62,7 +63,7 @@ Eigen::Vector3f Integrator::getDirectContribution(
                 // light intensity is exposure so its squared
                 color += ((light.color * light.intensity * light.intensity *
                            std::max(0.f, lightDirSample.dot(shadingPoint.n))) /
-                          (4 * M_1_PI * lightDirSample.squaredNorm())) / (light.sampleSteps * light.sampleSteps);
+                          (4 * M_1_PI * lightDirSample.squaredNorm())) / (LIGHT_SAMPLES * LIGHT_SAMPLES);
             }
         }
     }
@@ -126,7 +127,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
 
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
 
-    if (depth > indirectDepth)
+    if (depth > INDIRECT_DEPTH)
         return directContribution;
 
     Eigen::Vector3f indirectContribution{0, 0, 0};
@@ -137,7 +138,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     createCoordinateSystemFromNormal(shdPoint.n, Nb, Nt);
     float pdf = 1 / (2 * M_1_PI);
 
-    for (uint i = 0; i < indirectSamples; i++){
+    for (uint i = 0; i < INDIRECT_SAMPLES; i++){
         float r1 = (float)rand()/RAND_MAX;
         float r2 = (float)rand()/RAND_MAX;
 
@@ -151,16 +152,14 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
         }; 
 
         // r1 is cos(theta)
-        float bias = 0.00001f; // todo maybe reuse the one in the shadow ray?
-
         // todo create a new contructor for the Ray to simplify this
-        Eigen::Vector3f newRayOrigin = hitPoint + shdPoint.n * bias;
+        Eigen::Vector3f newRayOrigin = hitPoint + shdPoint.n * INDIRECT_RAY_BIAS;
         Eigen::Vector3f newRayDirection = sampleWorld;
         Ray newRay(newRayOrigin, newRayDirection);
 
         indirectContribution += r1 * castRay(newRay, scene, depth + 1) / pdf;
     }
-    indirectContribution /= (float)indirectSamples;
+    indirectContribution /= (float)INDIRECT_SAMPLES;
 
     indirectContribution = indirectContribution.cwiseProduct(shdPoint.shader.diffuse);
     // todo problems with the indirect contribution, there should be a flaw in the algo, 
@@ -168,5 +167,5 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
 
     // TODO test 
     // return indirectContribution *10 + directContribution;
-    return indirectContribution * 3 + directContribution;
+    return indirectContribution * 5 + directContribution;
 }

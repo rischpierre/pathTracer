@@ -10,14 +10,7 @@
 #include "raytracer.h"
 #include "accelerator.h"
 #include "integrator.h"
-
-
-#define MAIN_RESOLUTION_W 1280
-#define MAIN_RESOLUTION_H 720
-#define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
-#define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
-#define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
-#define RAY_TRACING_THRESHOLD 0.000001
+#include "renderSettings.h"
 
 
 // todo move in camera class

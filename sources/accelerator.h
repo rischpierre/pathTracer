@@ -5,7 +5,7 @@
 #include "scene.h"
 #include "raytracer.h"
 #include <pxr/usd/usdGeom/sphere.h>
-
+#include "renderSettings.h"
 
 struct BVHNode{
     BVHNode* leftChild = nullptr;
@@ -64,8 +64,6 @@ private:
     const Scene& scene;
     BBox mainBbox{};
     BVHNode* root{};
-    uint8_t buildDepthLimit = 20;
-    uint8_t buildMinFaceCount = 5;
 
     void _parseAllFaces(){
         for (auto &mesh : scene.meshes){

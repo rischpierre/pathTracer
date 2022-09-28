@@ -258,7 +258,7 @@ void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std
 
 std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
 
-    int steps = this->sampleSteps;
+    int steps = LIGHT_SAMPLES;
 
     auto samples = std::vector<Eigen::Vector3f>(steps * steps);
 

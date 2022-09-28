@@ -3,9 +3,7 @@
 
 #include <Eigen>
 #include "scene.h"
-
-#define RAY_TRACING_THRESHOLD 0.000001
-
+#include "renderSettings.h"
 
 class Ray {
 public:

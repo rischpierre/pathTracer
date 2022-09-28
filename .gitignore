@@ -39,4 +39,4 @@ build
 *-workspace
 render.png
 .vimspector.json
-Session.vim
+*.vim

@@ -86,9 +86,15 @@ int main(int argc, char *argv[]){
                 int percentage = int((float)progress * 100 /(RESOLUTION_H * RESOLUTION_W));
                 std::cout << percentage << " %" << std::endl; 
             }
-            
+#if DEBUG_PIXEL == true
+            Eigen::Vector3f color(0, 0, 0);
+            if (x == DEBUG_PIXEL_X && y == DEBUG_PIXEL_Y) {
+                std::cout << "debug pixel" << std::endl;
+                Eigen::Vector3f color = integrator.castRay(ray, scene);
+            }
+#else
             Eigen::Vector3f color = integrator.castRay(ray, scene);
-
+#endif
             pixels[y * RESOLUTION_W + x] =  color;
             progress++;
         }

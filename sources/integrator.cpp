@@ -75,7 +75,7 @@ Eigen::Vector3f Integrator::createHemisphereSample(const float& r1, const float&
     float phi = 2 * (float)M_PI * r2;
     float x = sinTheta * cos(phi);
     float y = sinTheta * sin(phi);
-    return {x, y, r1};
+    return {x, r1, y};
 }
 
 void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f& r_Nt, Eigen::Vector3f& r_Nb){
@@ -127,7 +127,15 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
 
     Eigen::Vector3f directContribution = getDirectContribution(ray, scene, shdPoint);
 
-    if (depth > INDIRECT_DEPTH)
+#if DEBUG_PIXEL == true 
+    std::string depthTab(depth * 2, ' ');
+    std::cout << depthTab << "DC: " << directContribution[0] << " ";
+    std::cout << directContribution[1] << " " << directContribution[2] << " mesh: ";
+    std::cout << scene.meshes[shdPoint.face.meshId].name << " fId: ";
+    std::cout << shdPoint.face.id << std::endl;
+#endif
+
+    if (depth >= INDIRECT_DEPTH)
         return directContribution;
 
     Eigen::Vector3f indirectContribution{0, 0, 0};
@@ -135,7 +143,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     Eigen::Vector3f Nb{0, 0, 0};
     Eigen::Vector3f Nt{0, 0, 0};
     
-    createCoordinateSystemFromNormal(shdPoint.n, Nb, Nt);
+    createCoordinateSystemFromNormal(shdPoint.n, Nt, Nb);
     float pdf = 1 / (2 * M_1_PI);
 
     for (uint i = 0; i < INDIRECT_SAMPLES; i++){
@@ -162,10 +170,11 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     indirectContribution /= (float)INDIRECT_SAMPLES;
 
     indirectContribution = indirectContribution.cwiseProduct(shdPoint.shader.diffuse);
-    // todo problems with the indirect contribution, there should be a flaw in the algo, 
-    // because the indirect contribution seems not to have any effect
 
-    // TODO test 
-    // return indirectContribution *10 + directContribution;
-    return indirectContribution * 5 + directContribution;
+#if DEBUG_PIXEL == true
+    std::cout << depthTab << "IC: " << indirectContribution[0] << " ";
+    std::cout << indirectContribution[1] << " " << indirectContribution[2] << std::endl;
+#endif    
+
+    return indirectContribution + directContribution;
 }

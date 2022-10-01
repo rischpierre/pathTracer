@@ -32,14 +32,13 @@ Eigen::Vector3f Integrator::getDirectContribution(
     Eigen::Vector3f color{0.f, 0.f, 0.f};
     for (auto& light: scene.rectLights){
 
-        Eigen::Vector3f lightDir = (light.position - shadingPoint.hitPoint).normalized();
-        if (lightDir.dot(light.normal) < 0) // skip if light is not visible to the shading point
-            continue;
-
         for (auto &lightSample: light.computeSamples()){
             
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
+            if (lightDirSample.dot(light.normal) < 0) // skip if samples is not visible to the shading point
+                continue;
+            
             // to avoid shadow acne
             Eigen::Vector3f shadowRayOrigin = shadingPoint.hitPoint + shadingPoint.n * SHADOW_BIAS;
             Ray shadowRay(shadowRayOrigin, lightDirSample);
@@ -61,13 +60,12 @@ Eigen::Vector3f Integrator::getDirectContribution(
 
             if (!intersected) {
                 // light intensity is exposure so its squared
-                color += ((light.color * light.intensity * light.intensity *
-                           std::max(0.f, lightDirSample.dot(shadingPoint.n))) /
-                          (4 * M_1_PI * lightDirSample.squaredNorm())) / (LIGHT_SAMPLES * LIGHT_SAMPLES);
+                color += light.color * light.intensity * std::max(0.f, lightDirSample.dot(shadingPoint.n));
             }
         }
+        color /= LIGHT_SAMPLES;
     }
-    return color.cwiseProduct(shadingPoint.shader.diffuse);
+    return color;
 }
 
 Eigen::Vector3f Integrator::createHemisphereSample(const float& r1, const float& r2) {
@@ -93,6 +91,11 @@ void createCoordinateSystemFromNormal(const Eigen::Vector3f& N, Eigen::Vector3f&
 
 
 Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint depth) {
+
+    Eigen::Vector3f hitColor{0.f, 0.f, 0.f};
+
+    if (depth >= INDIRECT_DEPTH)
+        return hitColor;
 
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;
@@ -135,8 +138,6 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     std::cout << shdPoint.face.id << std::endl;
 #endif
 
-    if (depth >= INDIRECT_DEPTH)
-        return directContribution;
 
     Eigen::Vector3f indirectContribution{0, 0, 0};
 
@@ -144,7 +145,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     Eigen::Vector3f Nt{0, 0, 0};
     
     createCoordinateSystemFromNormal(shdPoint.n, Nt, Nb);
-    float pdf = 1 / (2 * M_1_PI);
+    float pdf = 1 / (2 * M_PI);
 
     for (uint i = 0; i < INDIRECT_SAMPLES; i++){
         float r1 = (float)rand()/RAND_MAX;
@@ -169,12 +170,12 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     }
     indirectContribution /= (float)INDIRECT_SAMPLES;
 
-    indirectContribution = indirectContribution.cwiseProduct(shdPoint.shader.diffuse);
+    hitColor = (directContribution/ M_PI + 2 * indirectContribution).cwiseProduct(shdPoint.shader.diffuse);
 
 #if DEBUG_PIXEL == true
     std::cout << depthTab << "IC: " << indirectContribution[0] << " ";
     std::cout << indirectContribution[1] << " " << indirectContribution[2] << std::endl;
 #endif    
 
-    return indirectContribution + directContribution;
+    return hitColor;
 }

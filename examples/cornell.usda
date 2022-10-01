@@ -7,7 +7,7 @@
 
 def Xform "Camera"
 {
-    matrix4d xformOp:transform = ( (0.9910786747932434, 0.13099989295005798, -0.02453775145113468, 0), (0.0034560475032776594, 0.15878695249557495, 0.9873068332672119, 0), (0.13323335349559784, -0.9785835146903992, 0.15691763162612915, 0), (1.4125804901123047, -11.773750305175781, 4.75237512588501, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, -4.371138828673793e-8, 1, 0), (0, -1, -4.371138828673793e-8, 0), (0, -11.773750305175781, 3.1259818077087402, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Camera "Camera"
@@ -24,22 +24,22 @@ def Xform "Camera"
 
 def Xform "Area"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-0.1570383906364441, 0.05454277992248535, 5.941807746887207, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0.05198146402835846, 0.05454277992248535, 6.059874534606934, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def RectLight "Area"
     {
         color3f inputs:color = (1, 1, 1)
-        float inputs:height = 3
-        float inputs:intensity = 2
+        float inputs:height = 1.92
+        float inputs:intensity = 0.5
         float inputs:specular = 1
-        float inputs:width = 3
+        float inputs:width = 1.92
     }
 }
 
 def Xform "Sphere"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-1.2993800640106201, -0.3140529990196228, 1.460828423500061, 1) )
+    matrix4d xformOp:transform = ( (0.7431742548942566, 0, 0, 0), (0, 0.7431742548942566, 0, 0), (0, 0, 0.7431742548942566, 0), (-1.2993800640106201, -0.3140529990196228, 1.3936529159545898, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Sphere"
@@ -240,7 +240,7 @@ def Xform "back"
 
 def Xform "Cube"
 {
-    matrix4d xformOp:transform = ( (0.9900633692741394, -0.1406218409538269, 0, 0), (0.1406218409538269, 0.9900633692741394, 0, 0), (0, 0, 1, 0), (1.2269024848937988, 0.026273339986801147, 1.5035269260406494, 1) )
+    matrix4d xformOp:transform = ( (0.7416250705718994, -0.2549388110637665, 0, 0), (0.2549388110637665, 0.7416250705718994, 0, 0), (0, 0, 0.7842203378677368, 0), (1.2269024848937988, 0.026273339986801147, 1.4639527797698975, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "Cube"

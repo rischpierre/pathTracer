@@ -13,9 +13,9 @@
 
 #define DEFAULT_ALBEDO 0.18f
 
-#define LIGHT_SAMPLES 8 
-#define INDIRECT_SAMPLES 128 // 128 for high quality 
-#define INDIRECT_DEPTH 2  // 1 for direct lighting only
+#define LIGHT_SAMPLES 16 // 16 for HQ 
+#define INDIRECT_SAMPLES 256 // 128 for high quality 
+#define INDIRECT_DEPTH 2  // 1 for direct lighting only, 2 for HQ
 
 #define RAY_TRACING_THRESHOLD 0.000001f
 #define INDIRECT_RAY_BIAS 0.00001f

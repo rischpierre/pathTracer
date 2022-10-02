@@ -52,8 +52,9 @@ int main(int argc, char *argv[]){
     scene.print();
     clock_t t2 = clock();
     std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
-
-    Eigen::Vector3f pixels[RESOLUTION_W * RESOLUTION_H];
+    
+    // allocating on the head to avoid the limit on creating arrays
+    Eigen::Vector3f* pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
     t1 = clock();
 

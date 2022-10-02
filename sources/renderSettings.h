@@ -2,9 +2,9 @@
 #ifndef PATHTRACER_RENDERSETTINGS_H
 #define PATHTRACER_RENDERSETTINGS_H
 
-#define MAIN_RESOLUTION_W 1280
-#define MAIN_RESOLUTION_H 720
-#define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
+#define MAIN_RESOLUTION_W 1920
+#define MAIN_RESOLUTION_H 1080
+#define RESOLUTION_DIVIDER 1 // should be a multiple of 2 or 1
 #define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
 
@@ -14,7 +14,7 @@
 #define DEFAULT_ALBEDO 0.18f
 
 #define LIGHT_SAMPLES 8 
-#define INDIRECT_SAMPLES 128  // 128 for high quality 
+#define INDIRECT_SAMPLES 128 // 128 for high quality 
 #define INDIRECT_DEPTH 2  // 1 for direct lighting only
 
 #define RAY_TRACING_THRESHOLD 0.000001f

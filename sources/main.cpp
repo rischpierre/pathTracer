@@ -110,5 +110,7 @@ int main(int argc, char *argv[]){
     write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
     std::cout << "Wrote file " << resultImageFile << std::endl;
 
+    delete pixels;
+
     return 0;
  }

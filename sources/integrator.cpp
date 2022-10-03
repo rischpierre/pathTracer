@@ -59,8 +59,9 @@ Eigen::Vector3f Integrator::getDirectContribution(
             }
 
             if (!intersected) {
-                // light intensity is exposure so its squared
-                color += light.color * light.intensity * std::max(0.f, lightDirSample.dot(shadingPoint.n));
+                // light decay 
+                color += (light.color * light.intensity) / (4 * M_PI * lightDirSample.norm());
+                color *= std::max(0.f, lightDirSample.dot(shadingPoint.n));
             }
         }
         color /= LIGHT_SAMPLES;

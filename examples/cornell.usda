@@ -31,7 +31,7 @@ def Xform "Area"
     {
         color3f inputs:color = (1, 1, 1)
         float inputs:height = 1.92
-        float inputs:intensity = 0.5
+        float inputs:intensity = 50
         float inputs:specular = 1
         float inputs:width = 1.92
     }

@@ -40,3 +40,4 @@ build
 render.png
 .vimspector.json
 *.vim
+.clangd

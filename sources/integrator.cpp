@@ -1,6 +1,7 @@
 
 #include "integrator.h"
 #include "renderSettings.h"
+#include "raytracer.h"
 
 ShadingPoint Integrator::computeShadingPoint(
         float u,
@@ -97,12 +98,19 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
 
     if (depth >= INDIRECT_DEPTH)
         return hitColor;
+    
+
+    // check if ray intersects a light
+    for (const auto& light: scene.rectLights){
+        if (isRayInstersectsLight(ray, light)){
+            return {1.f, 1.f, 1.f};
+        }
+    }
 
     float distance = WORLD_MAX_DISTANCE;
     float minDistance = WORLD_MAX_DISTANCE;
     Face *nearestFace = nullptr;
     float nearestFaceU = 0, nearestFaceV = 0;
-
 
     for(Face& face: accelerator.getIntersectedFaces(ray)) {
 

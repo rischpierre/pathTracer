@@ -105,3 +105,26 @@ bool isRayIntersectsBox(const Ray& ray, const BBox& bbox){
 
     return true;
 }
+
+bool isRayInstersectsLight(const Ray& ray, const RectLight& light){
+    
+    // compute bounds vertices in local
+    Eigen::Vector3f x0{-light.width/2, -light.height/2, 0};
+    Eigen::Vector3f x1{-light.width/2, light.height/2, 0};
+    Eigen::Vector3f x2{light.width/2, light.height/2, 0};
+    Eigen::Vector3f x3{light.width/2, -light.height/2, 0};
+    Eigen::Vector3f n{0, 0, -1};
+    //
+    // TODO transform with usd types 
+    x0 = light.toWorld.Transform(x0);
+    x1 = light.toWorld.Transform(x1);
+    x2 = light.toWorld.Transform(x2);
+    x3 = light.toWorld.Transform(x3);
+    n = light.toWorld.TransformDir(n);
+
+    Face f1 = Face(x0, x1, x2, n, n, n);
+    Face f2 = Face(x0, x2, x3, n, n, n);
+
+    float d, u, v;
+    return isRayIntersectsTriangle(&ray, &f1, &d, u, v) || isRayIntersectsTriangle(&ray, &f2, &d, u, v);
+}

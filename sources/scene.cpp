@@ -92,6 +92,7 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         pxr::GfVec3f normal(0, 0, 1);  // lights are pointing down the Z axis by default
         normal = newLight.toWorld.Transform(normal);
         newLight.normal = Eigen::Vector3f(normal[0], normal[1], normal[2]);
+        newLight.computeFaces();
 
         this->rectLights.push_back(newLight);
 
@@ -262,7 +263,7 @@ std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
 
     auto samples = std::vector<Eigen::Vector3f>(steps * steps);
 
-    // todo refacto, this is not precise enough
+    // TODO refacto, this is not precise enough
     int i = 0;
     for (int x = -steps/2; x < steps/2; x++){
         for (int y = -steps/2; y < steps/2; y++) {
@@ -277,6 +278,29 @@ std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
         }
     }
     return samples;
+}
+
+void RectLight::computeFaces(){
+    
+    // compute bounds vertices in local
+    float halfHeight = this->height / 2.f;
+    float halfWidth = this->width / 2.f;
+    
+    pxr::GfVec3f x0{-halfWidth, -halfHeight, 0};
+    pxr::GfVec3f x1{-halfWidth, halfHeight, 0};
+    pxr::GfVec3f x2{halfWidth, halfHeight, 0};
+    pxr::GfVec3f x3{halfWidth, -halfHeight, 0};
+    pxr::GfVec3f n{0, 0, -1};
+
+    Eigen::Vector3f xe0 = toEigen(this->toWorld.Transform(x0));
+    Eigen::Vector3f xe1 = toEigen(this->toWorld.Transform(x1));
+    Eigen::Vector3f xe2 = toEigen(this->toWorld.Transform(x2));
+    Eigen::Vector3f xe3 = toEigen(this->toWorld.Transform(x3));
+    Eigen::Vector3f ne = toEigen(this->toWorld.TransformDir(n));
+    
+    f1 = Face(xe0, xe1, xe2, ne, ne, ne);
+    f2 = Face(xe0, xe2, xe3, ne, ne, ne);
+
 }
 
 Shader Scene::getShaderFromFace(const Face& face) const {

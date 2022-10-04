@@ -76,7 +76,4 @@ private:
 
 };
 
-
-
-
 #endif //PATHTRACER_ACCELERATOR_H

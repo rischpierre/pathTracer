@@ -31,9 +31,9 @@ Eigen::Vector3f Integrator::getDirectContribution(
         const ShadingPoint& shadingPoint) {
 
     Eigen::Vector3f color{0.f, 0.f, 0.f};
-    for (auto& light: scene.rectLights){
+    for (const RectLight& light: scene.rectLights){
 
-        for (auto &lightSample: light.computeSamples()){
+        for (const Eigen::Vector3f &lightSample: light.samples){
             
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
@@ -63,6 +63,7 @@ Eigen::Vector3f Integrator::getDirectContribution(
                 // light decay 
                 color += (light.color * light.intensity) / (4 * M_PI * lightDirSample.norm());
                 color *= std::max(0.f, lightDirSample.dot(shadingPoint.n));
+                color *= std::max(0.f, lightDirSample.dot(light.normal));
             }
         }
         color /= LIGHT_SAMPLES;

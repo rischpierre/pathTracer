@@ -144,13 +144,13 @@ struct RectLight {
     float intensity;
     pxr::GfMatrix4d toWorld;   // TODO maybe replace with eigen type
     Eigen::Vector3f normal;
-
+    
     Face f1, f2;  // the 2 faces that compose a rectangle light
+    
+    std::vector<Eigen::Vector3f> samples;
 
     void computeFaces();
-
-    std::vector<Eigen::Vector3f> computeSamples() const;
-
+    void computeSamples();
 
 };
 

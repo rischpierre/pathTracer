@@ -92,7 +92,9 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         pxr::GfVec3f normal(0, 0, 1);  // lights are pointing down the Z axis by default
         normal = newLight.toWorld.Transform(normal);
         newLight.normal = Eigen::Vector3f(normal[0], normal[1], normal[2]);
+        newLight.normal.normalize();
         newLight.computeFaces();
+        newLight.computeSamples();
 
         this->rectLights.push_back(newLight);
 
@@ -257,27 +259,25 @@ void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std
     }
 }
 
-std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
+void RectLight::computeSamples(){
 
-    int steps = LIGHT_SAMPLES;
-
-    auto samples = std::vector<Eigen::Vector3f>(steps * steps);
-
-    // TODO refacto, this is not precise enough
+    float stepSizeHeight = this->height / LIGHT_SAMPLES;
+    float stepSizeWidth = this->width / LIGHT_SAMPLES;
+    
     int i = 0;
-    for (int x = -steps/2; x < steps/2; x++){
-        for (int y = -steps/2; y < steps/2; y++) {
-            auto sample = pxr::GfVec3f((float)x/this->width, (float)y/this->height, 0);
+    for (float x = -this->width/2 + stepSizeWidth/2; x < this->width/2 - stepSizeWidth/2; x+= stepSizeWidth){
+        for (float y = -this->height/2 + stepSizeHeight/2; y < this->height/2 - stepSizeHeight/2; y+= stepSizeHeight){
+
+            auto sample = pxr::GfVec3f(x, y, 0);
+            float jitter = (((float)rand() / (float)RAND_MAX) * 2) - 1;  // range: [-1, 1]
+
+            sample = pxr::GfVec3f(sample[0] + stepSizeWidth * jitter, sample[1] + stepSizeHeight * jitter, 0);
+
             sample = this->toWorld.Transform(sample);
-
-            float jitter = (((float)rand() / (float)RAND_MAX) - 0.5f) * 2;
-
-            Eigen::Vector3f sample_(sample[0] + jitter * this->width/(float)steps, sample[1] + jitter * this->height/(float)steps, sample[2]);
-            samples[i] = sample_;
+            this->samples.push_back(toEigen(sample));
             i++;
         }
     }
-    return samples;
 }
 
 void RectLight::computeFaces(){

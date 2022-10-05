@@ -8,19 +8,9 @@
 
 #include "scene.h"
 #include "raytracer.h"
-#include "integrators/normalIntegrator.h"
-#include "integrators/facingRatioIntegrator.h"
-#include "integrators/directLightIntegrator.h"
 #include "accelerator.h"
-#include "integrators/debugAccIntegrator.h"
-
-
-#define MAIN_RESOLUTION_W 1280
-#define MAIN_RESOLUTION_H 720
-#define RESOLUTION_DIVIDER 2 // should be a multiple of 2 or 1
-#define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
-#define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
-#define RAY_TRACING_THRESHOLD 0.000001
+#include "integrator.h"
+#include "renderSettings.h"
 
 
 // todo move in camera class
@@ -59,15 +49,16 @@ int main(int argc, char *argv[]){
 
     clock_t t1 = clock();
     Scene scene = Scene(path);
+    scene.print();
     clock_t t2 = clock();
     std::cout << "Parsed scene in " << (float)(t2 - t1) / CLOCKS_PER_SEC << " seconds" << std::endl;
-
-    Eigen::Vector3f pixels[RESOLUTION_W * RESOLUTION_H];
+    
+    // allocating on the head to avoid the limit on creating arrays
+    Eigen::Vector3f* pixels = new Eigen::Vector3f[RESOLUTION_W * RESOLUTION_H];
 
     t1 = clock();
 
     Accelerator accelerator(scene);
-
     accelerator.build();
 
     t2 = clock();
@@ -75,9 +66,11 @@ int main(int argc, char *argv[]){
 
     std::cout << " (" << accelerator.getNodeNumber() << " nodes)" << std::endl;
 
-    DirectLightIntegrator integratorDirect(scene, accelerator);
+    Integrator integrator(scene, accelerator);
 
     tbb::tick_count t3 = tbb::tick_count::now();
+    int progress = 0;
+
 #ifdef SINGLE_THREADED
     std::cout << "Single threaded" << std::endl;
 
@@ -90,9 +83,21 @@ int main(int argc, char *argv[]){
 
             Ray ray = createCameraRay(scene.camera, x, y);
 
-            Eigen::Vector3f colorDirect = integratorDirect.getColor(ray, scene);
-
-            pixels[y * RESOLUTION_W + x] =  colorDirect;
+            if (progress % ((RESOLUTION_H * RESOLUTION_W) / 10) == 0) { // every 10%
+                int percentage = int((float)progress * 100 /(RESOLUTION_H * RESOLUTION_W));
+                std::cout << percentage << " %" << std::endl; 
+            }
+#if DEBUG_PIXEL == true
+            Eigen::Vector3f color(0, 0, 0);
+            if (x == DEBUG_PIXEL_X && y == DEBUG_PIXEL_Y) {
+                std::cout << "debug pixel" << std::endl;
+                Eigen::Vector3f color = integrator.castRay(ray, scene);
+            }
+#else
+            Eigen::Vector3f color = integrator.castRay(ray, scene);
+#endif
+            pixels[y * RESOLUTION_W + x] =  color;
+            progress++;
         }
     }
 #ifndef SINGLE_THREADED
@@ -105,5 +110,7 @@ int main(int argc, char *argv[]){
     write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
     std::cout << "Wrote file " << resultImageFile << std::endl;
 
+    delete[] pixels;
+
     return 0;
-}
+ }

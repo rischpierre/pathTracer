@@ -1,5 +1,22 @@
 #include "scene.h"
 
+void Scene::print() const{
+    std::cout << "Scene:" << std::endl;
+    std::cout << "  Meshes:" << std::endl;
+
+    for (const auto& mesh: meshes){
+        Shader *currentShader = nullptr;
+        for (Shader shader: shaders){
+            if (shader.id == mesh.shaderId){
+                currentShader = &shader;
+                break;
+            }
+        }
+        std::cout << "    " << mesh.name << "(" << mesh.id << ")" << "->" << currentShader->name;
+        std::cout<< "(" << currentShader->id << ")" << std::endl;
+    }
+};
+
 std::string BBox::getStrRepr() const {
     Eigen::Vector3f members[2] = {min, max};
 
@@ -45,7 +62,7 @@ Scene::Scene(const std::string &path) {
     std::vector<pxr::UsdPrim> usdRectLights;
     parsePrimsByType(root, *stage, usdRectLights, pxr::TfToken("RectLight"));
     parseLights(usdRectLights);
-
+    
 }
 
 void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
@@ -71,11 +88,17 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         pxr::GfVec3f position(0);
         position = newLight.toWorld.Transform(position);
         newLight.position = Eigen::Vector3f(position[0], position[1], position[2]);
+        
+        pxr::GfVec3f normal(0, 0, 1);  // lights are pointing down the Z axis by default
+        normal = newLight.toWorld.Transform(normal);
+        newLight.normal = Eigen::Vector3f(normal[0], normal[1], normal[2]);
+        newLight.normal.normalize();
+        newLight.computeFaces();
         newLight.computeSamples();
+
         this->rectLights.push_back(newLight);
 
     }
-
 }
 
 void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
@@ -93,11 +116,51 @@ void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
     vApertureAttr.Get(&this->camera.vAperture, STATIC_FRAME);
 
 }
+Shader Scene::createShader(const pxr::UsdGeomMesh& mesh){
 
+    auto bindingApi = pxr::UsdShadeMaterialBindingAPI(mesh);
+    auto relationship = bindingApi.GetDirectBindingRel();
+    auto direct = pxr::UsdShadeMaterialBindingAPI::DirectBinding {relationship};
+    
+    if (!direct.GetMaterial())
+        return defaultShader;
+
+    auto material = direct.GetMaterialPath();
+    pxr::UsdPrim materialPrim = bindingApi.GetPrim().GetStage()->GetPrimAtPath(material);
+    if (! materialPrim.IsValid())
+        return defaultShader;
+
+    for (const auto& shader: shaders){
+        if (materialPrim.GetName().GetString() == shader.name)
+            return shader;
+    }
+
+    auto previewScope = materialPrim.GetChild(pxr::TfToken("preview"));
+    auto descendants = previewScope.GetChildren();
+
+    for(auto descendant: descendants){
+        if (descendant.GetTypeName() != "Shader")
+            continue;
+
+        pxr::GfVec3f diffuseColor;
+        pxr::UsdAttribute diffuseAttr = descendant.GetAttribute(pxr::TfToken("inputs:diffuseColor"));
+
+        diffuseAttr.Get(&diffuseColor, STATIC_FRAME);
+
+        Eigen::Vector3f diffuse(diffuseColor[0], diffuseColor[1], diffuseColor[2]);
+
+        Shader shader{diffuse, materialPrim.GetName(), shaders.back().id + 1};
+
+        shaders.push_back(shader);
+        return shader;
+    }
+    return defaultShader;
+}
 
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
     // populate meshes
     int faceId = 0;
+    uint meshId = 0;
     for (auto &primMesh: usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
         pxr::UsdAttribute pointsAttr = usdMesh.GetPointsAttr();
@@ -133,6 +196,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
                 exit(1);
             }
         }
+        Shader shader = createShader(usdMesh);
 
         std::vector<Eigen::Vector3f> vertices;
         std::vector<Face> faces;
@@ -170,19 +234,22 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes){
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();
 
-            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId);
+            Face face(v0e, v1e, v2e, nf, n0e, n1e, n2e, faceId, meshId, shader.id);
+
             faces.push_back(face);
             faceId++;
         }
-
-        Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE);
+        
+        Mesh mesh(faces, primMesh.GetName().GetString(), BBoxE, meshId);
+        meshId++;
+        mesh.shaderId = shader.id;
         this->meshes.push_back(mesh);
     }
+
 }
 
 
-void
-Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
+void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
                         const pxr::TfToken& type) {
     for (pxr::UsdPrim childPrim: prim.GetChildren()) {
         if (childPrim.GetTypeName() == type) {
@@ -192,25 +259,55 @@ Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vec
     }
 }
 
-std::vector<Eigen::Vector3f> RectLight::computeSamples() const {
+void RectLight::computeSamples(){
 
-    int steps = this->sampleSteps;
-
-    auto samples = std::vector<Eigen::Vector3f>(steps * steps);
-
-    // todo refacto, this is not precise enough
+    float stepSizeHeight = this->height / LIGHT_SAMPLES;
+    float stepSizeWidth = this->width / LIGHT_SAMPLES;
+    
     int i = 0;
-    for (int x = -steps/2; x < steps/2; x++){
-        for (int y = -steps/2; y < steps/2; y++) {
-            auto sample = pxr::GfVec3f((float)x/this->width, (float)y/this->height, 0);
+    for (float x = -this->width/2 + stepSizeWidth/2; x < this->width/2 - stepSizeWidth/2; x+= stepSizeWidth){
+        for (float y = -this->height/2 + stepSizeHeight/2; y < this->height/2 - stepSizeHeight/2; y+= stepSizeHeight){
+
+            auto sample = pxr::GfVec3f(x, y, 0);
+            float jitter = (((float)rand() / (float)RAND_MAX) * 2) - 1;  // range: [-1, 1]
+
+            sample = pxr::GfVec3f(sample[0] + stepSizeWidth * jitter, sample[1] + stepSizeHeight * jitter, 0);
+
             sample = this->toWorld.Transform(sample);
-
-            float jitter = (((float)rand() / (float)RAND_MAX) - 0.5f) * 2;
-
-            Eigen::Vector3f sample_(sample[0] + jitter * this->width/(float)steps, sample[1] + jitter * this->height/(float)steps, sample[2]);
-            samples[i] = sample_;
+            this->samples.push_back(toEigen(sample));
             i++;
         }
     }
-    return samples;
+}
+
+void RectLight::computeFaces(){
+    
+    // compute bounds vertices in local
+    float halfHeight = this->height / 2.f;
+    float halfWidth = this->width / 2.f;
+    
+    pxr::GfVec3f x0{-halfWidth, -halfHeight, 0};
+    pxr::GfVec3f x1{-halfWidth, halfHeight, 0};
+    pxr::GfVec3f x2{halfWidth, halfHeight, 0};
+    pxr::GfVec3f x3{halfWidth, -halfHeight, 0};
+    pxr::GfVec3f n{0, 0, -1};
+
+    Eigen::Vector3f xe0 = toEigen(this->toWorld.Transform(x0));
+    Eigen::Vector3f xe1 = toEigen(this->toWorld.Transform(x1));
+    Eigen::Vector3f xe2 = toEigen(this->toWorld.Transform(x2));
+    Eigen::Vector3f xe3 = toEigen(this->toWorld.Transform(x3));
+    Eigen::Vector3f ne = toEigen(this->toWorld.TransformDir(n));
+    
+    f1 = Face(xe0, xe1, xe2, ne, ne, ne);
+    f2 = Face(xe0, xe2, xe3, ne, ne, ne);
+
+}
+
+Shader Scene::getShaderFromFace(const Face& face) const {
+    for (auto shader: this->shaders) {
+        if (shader.id == face.shaderId)
+            return shader;
+    }
+    return Shader();
+
 }

@@ -31,7 +31,14 @@
 *.out
 *.app
 .idea
-.reference
-build
 
+# project specifics
+.reference
+build-*
+build
 *.blend1
+*-workspace
+render.png
+.vimspector.json
+*.vim
+.clangd

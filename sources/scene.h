@@ -1,8 +1,6 @@
 #ifndef PATHTRACER_SCENEPARSER_H
 #define PATHTRACER_SCENEPARSER_H
 
-#define STATIC_FRAME 0
-
 #include <iostream>
 
 #include <pxr/usd/usd/stage.h>
@@ -11,26 +9,39 @@
 #include <pxr/base/gf/bbox3d.h>
 #include <pxr/usd/usdGeom/camera.h>
 #include <pxr/usd/usd/attribute.h>
+#include <pxr/usd/usdShade/materialBindingAPI.h>
 #include <Eigen>
 
+#include "helpers.h"
+#include "renderSettings.h"
 
+struct Shader {
+    Eigen::Vector3f diffuse{DEFAULT_ALBEDO, DEFAULT_ALBEDO, DEFAULT_ALBEDO};
+    std::string name = "default";
+    uint id = 0;
+};
 
 struct Face {
-    explicit Face(Eigen::Vector3f v0 = Eigen::Vector3f(),
+    explicit Face(
+         Eigen::Vector3f v0 = Eigen::Vector3f(),
          Eigen::Vector3f v1 = Eigen::Vector3f(),
          Eigen::Vector3f v2 = Eigen::Vector3f(),
          Eigen::Vector3f nf = Eigen::Vector3f(),
          Eigen::Vector3f n0 = Eigen::Vector3f(),
          Eigen::Vector3f n1 = Eigen::Vector3f(),
          Eigen::Vector3f n2 = Eigen::Vector3f(),
-         int id = 0) :          v0(std::move(v0)),
+         int id = 0,
+         uint meshId = 0,
+         uint shaderId = 0) :   v0(std::move(v0)),
                                 v1(std::move(v1)),
                                 v2(std::move(v2)),
                                 nf(std::move(nf)),
                                 n0(std::move(n0)),
                                 n1(std::move(n1)),
                                 n2(std::move(n2)),
-                                id(id) {}
+                                id(id),
+                                meshId(meshId),
+                                shaderId(shaderId) {}
     Face(const Face& f){
         v0 = f.v0;
         v1 = f.v1;
@@ -40,10 +51,14 @@ struct Face {
         n1 = f.n1;
         n2 = f.n2;
         id = f.id;
+        shaderId = f.shaderId;
+        meshId = f.meshId;
     }
 
     Eigen::Vector3f v0, v1, v2, nf, n0, n1, n2;
     int id;
+    uint shaderId;
+    uint meshId;
 
     Eigen::Vector3f getCenter() const{
         return (v0 + v1 + v2) / 3.0f;
@@ -109,12 +124,13 @@ struct BBox {
 
 
 struct Mesh {
-    Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox) : faces(faces), name(name), bbox(bbox) {}
+    Mesh(std::vector<Face> &faces, const std::string& name, const BBox& bbox, uint id) : faces(faces), name(name), bbox(bbox), id(id) {}
 
     std::vector<Face> getFaces() { return this->faces; }
-
+    uint id;
     std::vector<Face> faces;
     std::string name;
+    uint shaderId; 
     BBox bbox;
 
 };
@@ -126,10 +142,15 @@ struct RectLight {
     Eigen::Vector3f color;
     Eigen::Vector3f position;
     float intensity;
-    pxr::GfMatrix4d toWorld;   // todo maybe replace with eigen type
+    pxr::GfMatrix4d toWorld;   // TODO maybe replace with eigen type
+    Eigen::Vector3f normal;
+    
+    Face f1, f2;  // the 2 faces that compose a rectangle light
+    
+    std::vector<Eigen::Vector3f> samples;
 
-    int sampleSteps = 6;
-    std::vector<Eigen::Vector3f> computeSamples() const;
+    void computeFaces();
+    void computeSamples();
 
 };
 
@@ -137,7 +158,7 @@ struct Camera {
     float focalLength;
     float hAperture;
     float vAperture;
-    pxr::GfMatrix4d toWorld;  // todo maybe replace with eigen type
+    pxr::GfMatrix4d toWorld;  // TODO maybe replace with eigen type
 };
 
 class Scene {
@@ -153,9 +174,17 @@ public:
 
     void parseLights(const std::vector<pxr::UsdPrim> &usdLights);
 
-    std::vector<Mesh> meshes;
+    Shader getShaderFromFace(const Face& face) const;
 
+    Shader createShader(const pxr::UsdGeomMesh& mesh);
+    
+    void print() const;
+
+    std::vector<Mesh> meshes;
     std::vector<RectLight> rectLights;
+
+    Shader defaultShader; 
+    std::vector<Shader> shaders = {defaultShader};
 
     Camera camera;
 };

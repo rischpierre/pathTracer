@@ -85,10 +85,10 @@ void Accelerator::exportBBoxesToUsd(const std::string& filePath) const {
 
 void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth){
 
-    if (depth > buildDepthLimit)
+    if (depth > ACCELERATOR_DEPTH_LIMIT)
         return;
 
-    if (startNode.facesID.size() <= buildMinFaceCount){
+    if (startNode.facesID.size() <= ACCELERATOR_MIN_FACES_COUNT){
         return;
     }
 

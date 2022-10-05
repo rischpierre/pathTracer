@@ -105,3 +105,9 @@ bool isRayIntersectsBox(const Ray& ray, const BBox& bbox){
 
     return true;
 }
+
+bool isRayInstersectsLight(const Ray& ray, const RectLight& light){
+
+    float d, u, v;
+    return isRayIntersectsTriangle(&ray, &light.f1, &d, u, v) || isRayIntersectsTriangle(&ray, &light.f2, &d, u, v);
+}

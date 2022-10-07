@@ -10,108 +10,100 @@
  * intersection between the ray and the face.
  * return: true if the ray intersect the face.
  */
-bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance,
-                             float &u, float &v) {
+bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, float &u, float &v) {
 
-  Eigen::Vector3f edge1, edge2, p, q, t;
-  float det, invertedDet;
+    Eigen::Vector3f edge1, edge2, p, q, t;
+    float det, invertedDet;
 
-  // find the two edges around V0
-  edge1 = face->v1 - face->v0;
-  edge2 = face->v2 - face->v0;
+    // find the two edges around V0
+    edge1 = face->v1 - face->v0;
+    edge2 = face->v2 - face->v0;
 
-  //  get p
-  p = ray->d.cross(edge2);
+    //  get p
+    p = ray->d.cross(edge2);
 
-  det = edge1.dot(p);
+    det = edge1.dot(p);
 
-  if (det > -RAY_TRACING_THRESHOLD && det < RAY_TRACING_THRESHOLD)
-    return false;
+    if (det > -RAY_TRACING_THRESHOLD && det < RAY_TRACING_THRESHOLD)
+        return false;
 
-  // precompute the inverse of the determinant
-  invertedDet = 1.f / det;
+    // precompute the inverse of the determinant
+    invertedDet = 1.f / det;
 
-  // distance from V to ray origin
-  t = ray->o - face->v0;
+    // distance from V to ray origin
+    t = ray->o - face->v0;
 
-  // calculate u param
-  u = t.dot(p) * invertedDet;
+    // calculate u param
+    u = t.dot(p) * invertedDet;
 
-  if (u < 0 || u > 1.f) // the hit point is outside the triangle
-    return false;
+    if (u < 0 || u > 1.f) // the hit point is outside the triangle
+        return false;
 
-  // calculate v param
-  q = t.cross(edge1);
+    // calculate v param
+    q = t.cross(edge1);
 
-  v = ray->d.dot(q) * invertedDet;
-  if (v < 0 || u + v > 1.f) // hit point outside triangle
-    return false;
+    v = ray->d.dot(q) * invertedDet;
+    if (v < 0 || u + v > 1.f) // hit point outside triangle
+        return false;
 
-  *distance = edge2.dot(q) * invertedDet;
+    *distance = edge2.dot(q) * invertedDet;
 
-  // if the distance is negative, the ray is on the other side
-  if (*distance > RAY_TRACING_THRESHOLD)
-    return true;
-  else
-    return false;
+    // if the distance is negative, the ray is on the other side
+    if (*distance > RAY_TRACING_THRESHOLD)
+        return true;
+    else
+        return false;
 }
 
 bool isRayIntersectsBox(const Ray &ray, const BBox &bbox) {
-  float tmin, tmax, tymin, tymax, tzmax, tzmin;
+    float tmin, tmax, tymin, tymax, tzmax, tzmin;
 
-  // in order to avoid div by 0
-  Eigen::Vector3f invDir =
-      Eigen::Vector3f(1.f / ray.d.x(), 1.f / ray.d.y(), 1.f / ray.d.z());
+    // in order to avoid div by 0
+    Eigen::Vector3f invDir = Eigen::Vector3f(1.f / ray.d.x(), 1.f / ray.d.y(), 1.f / ray.d.z());
 
-  if (invDir.x() >= 0) {
-    tmin = (bbox.min.x() - ray.o.x()) * invDir.x();
-    tmax = (bbox.max.x() - ray.o.x()) * invDir.x();
-  } else {
-    tmax = (bbox.min.x() - ray.o.x()) * invDir.x();
-    tmin = (bbox.max.x() - ray.o.x()) * invDir.x();
-  }
+    if (invDir.x() >= 0) {
+        tmin = (bbox.min.x() - ray.o.x()) * invDir.x();
+        tmax = (bbox.max.x() - ray.o.x()) * invDir.x();
+    } else {
+        tmax = (bbox.min.x() - ray.o.x()) * invDir.x();
+        tmin = (bbox.max.x() - ray.o.x()) * invDir.x();
+    }
 
-  if (invDir.y() >= 0) {
-    tymin = (bbox.min.y() - ray.o.y()) * invDir.y();
-    tymax = (bbox.max.y() - ray.o.y()) * invDir.y();
-  } else {
-    tymax = (bbox.min.y() - ray.o.y()) * invDir.y();
-    tymin = (bbox.max.y() - ray.o.y()) * invDir.y();
-  }
+    if (invDir.y() >= 0) {
+        tymin = (bbox.min.y() - ray.o.y()) * invDir.y();
+        tymax = (bbox.max.y() - ray.o.y()) * invDir.y();
+    } else {
+        tymax = (bbox.min.y() - ray.o.y()) * invDir.y();
+        tymin = (bbox.max.y() - ray.o.y()) * invDir.y();
+    }
 
-  // ray misses box in y
-  if ((tmin > tymax) || (tymin > tmax))
-    return false;
+    // ray misses box in y
+    if ((tmin > tymax) || (tymin > tmax))
+        return false;
 
-  if (tymin > tmin)
-    tmin = tymin;
+    if (tymin > tmin)
+        tmin = tymin;
 
-  if (tymax < tmax)
-    tmax = tymax;
+    if (tymax < tmax)
+        tmax = tymax;
 
-  if (invDir.z() >= 0) {
-    tzmin = (bbox.min.z() - ray.o.z()) * invDir.z();
-    tzmax = (bbox.max.z() - ray.o.z()) * invDir.z();
-  } else {
-    tzmax = (bbox.min.z() - ray.o.z()) * invDir.z();
-    tzmin = (bbox.max.z() - ray.o.z()) * invDir.z();
-  }
+    if (invDir.z() >= 0) {
+        tzmin = (bbox.min.z() - ray.o.z()) * invDir.z();
+        tzmax = (bbox.max.z() - ray.o.z()) * invDir.z();
+    } else {
+        tzmax = (bbox.min.z() - ray.o.z()) * invDir.z();
+        tzmin = (bbox.max.z() - ray.o.z()) * invDir.z();
+    }
 
-  if ((tmin > tzmax) || (tzmin > tmax))
-    return false;
+    if ((tmin > tzmax) || (tzmin > tmax))
+        return false;
 
-  if (tzmin > tmin)
-    tmin = tzmin;
+    if (tzmin > tmin)
+        tmin = tzmin;
 
-  if (tzmax < tmax)
-    tmax = tzmax;
+    if (tzmax < tmax)
+        tmax = tzmax;
 
-  return true;
+    return true;
 }
 
-bool isRayInstersectsLight(const Ray &ray, const RectLight &light) {
-
-  float d, u, v;
-  return isRayIntersectsTriangle(&ray, &light.f1, &d, u, v) ||
-         isRayIntersectsTriangle(&ray, &light.f2, &d, u, v);
-}

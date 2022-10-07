@@ -16,7 +16,6 @@ Eigen::Vector3f toEigen(const pxr::GfVec3f &input);
 pxr::GfVec3f toGfVec3f(const Eigen::Vector3f &input);
 
 // TODO cleanup camel case
-void write_png_file(const std::string &filename, int width, int height,
-                    const Eigen::Vector3f *pixels);
+void write_png_file(const std::string &filename, int width, int height, const Eigen::Vector3f *pixels);
 
 #endif // PATHTRACER_HELPERS_H

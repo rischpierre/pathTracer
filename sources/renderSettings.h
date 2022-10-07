@@ -7,14 +7,17 @@
 #define RESOLUTION_W (MAIN_RESOLUTION_W / RESOLUTION_DIVIDER)
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
 
+#define LIGHT_MESH_ID -2
+#define LIGHT_SHADER_ID -2
+
 #define WORLD_MAX_DISTANCE 9999999.f
 #define STATIC_FRAME 0
 
 #define DEFAULT_ALBEDO 0.18f
 
-#define LIGHT_SAMPLES 16     // 16 for HQ
+#define LIGHT_SAMPLES 8    // 16 for HQ
 #define INDIRECT_SAMPLES 128 // 128 for high quality
-#define INDIRECT_DEPTH 2     // 1 for direct lighting only, 2 for HQ
+#define INDIRECT_DEPTH 2    // 1 for direct lighting only, 2 for HQ
 
 #define RAY_TRACING_THRESHOLD 0.000001f
 #define INDIRECT_RAY_BIAS 0.00001f

@@ -9,31 +9,28 @@
 #include "scene.h"
 
 struct ShadingPoint {
-  const Eigen::Vector3f hitPoint;
-  const Eigen::Vector3f n;
-  const Face face;
-  const float u;
-  const float v;
-  const Shader shader;
+    const Eigen::Vector3f hitPoint;
+    const Eigen::Vector3f n;
+    const Face face;
+    const float u;
+    const float v;
+    const Shader shader;
 };
 
 class Integrator {
-public:
-  explicit Integrator(const Scene &scene, const Accelerator &accelerator)
-      : scene(scene), accelerator(accelerator){};
+  public:
+    explicit Integrator(const Scene &scene, const Accelerator &accelerator) : scene(scene), accelerator(accelerator){};
 
-  Scene scene;
-  Accelerator accelerator;
+    Scene scene;
+    Accelerator accelerator;
 
-  Eigen::Vector3f castRay(const Ray &ray, const Scene &scene, uint depth = 0);
+    Eigen::Vector3f castRay(const Ray &ray, const Scene &scene, uint depth = 0);
 
-  Eigen::Vector3f createHemisphereSample(const float &r1, const float &r2);
+    Eigen::Vector3f createHemisphereSample(const float &r1, const float &r2);
 
-  Eigen::Vector3f getDirectContribution(const Ray &ray, const Scene &scene,
-                                        const ShadingPoint &shadingPoint);
+    Eigen::Vector3f getDirectContribution(const Ray &ray, const Scene &scene, const ShadingPoint &shadingPoint);
 
-  static ShadingPoint computeShadingPoint(float u, float v, const Face &face,
-                                          const Eigen::Vector3f &hitPoint,
-                                          const Scene &scene);
+    static ShadingPoint computeShadingPoint(float u, float v, const Face &face, const Eigen::Vector3f &hitPoint,
+                                            const Scene &scene);
 };
 #endif

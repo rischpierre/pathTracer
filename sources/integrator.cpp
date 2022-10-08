@@ -16,8 +16,10 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
                                                   const ShadingPoint &shadingPoint) {
 
     Eigen::Vector3f color{0.f, 0.f, 0.f};
-    for (const RectLight &light : scene.rectLights) {
+    for (RectLight light : scene.rectLights) {
 
+        // compute samples every time in order to have new samples each time, if not It will create banding
+        light.computeSamples();
         for (const Eigen::Vector3f &lightSample : light.samples) {
 
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
@@ -48,7 +50,7 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
                 // light decay
                 color += (light.color * light.intensity) / (4 * M_PI * lightDirSample.norm());
                 color *= std::max(0.f, lightDirSample.dot(shadingPoint.n));
-                color *= std::max(0.f, lightDirSample.dot(light.normal));
+                color *= std::max(0.f, lightDirSample.dot(light.normal)) / 2;
             }
         }
         color /= LIGHT_SAMPLES;
@@ -109,6 +111,11 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
         return {0, 0, 0};
 
     if (nearestFace->meshId == LIGHT_MESH_ID) {
+        
+        // if light is backfacing the ray
+        if (nearestFace->nf.dot(ray.d) > 0) {
+            return {0, 0, 0};
+        }
         return {1.f, 1.f, 1.f};
     }
 
@@ -154,7 +161,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     }
     indirectContribution /= (float)INDIRECT_SAMPLES;
 
-    hitColor = (directContribution / M_PI + 2 * indirectContribution).cwiseProduct(shdPoint.shader.diffuse);
+    hitColor = (directContribution / M_PI + indirectContribution).cwiseProduct(shdPoint.shader.diffuse);
 
 #if DEBUG_PIXEL == true
     std::cout << depthTab << "IC: " << indirectContribution[0] << " ";

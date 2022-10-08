@@ -96,7 +96,6 @@ void Scene::parseLights(const std::vector<pxr::UsdPrim> &usdLights) {
         newLight.normal.normalize();
 
         newLight.computeFaces(faceIdCounter);
-        newLight.computeSamples();
 
         faces.insert(faces.end(), newLight.faces.begin(), newLight.faces.end());
 
@@ -262,7 +261,6 @@ void RectLight::computeSamples() {
     float stepSizeHeight = this->height / LIGHT_SAMPLES;
     float stepSizeWidth = this->width / LIGHT_SAMPLES;
 
-    int i = 0;
     for (float x = -this->width / 2 + stepSizeWidth / 2; x < this->width / 2 - stepSizeWidth / 2; x += stepSizeWidth) {
         for (float y = -this->height / 2 + stepSizeHeight / 2; y < this->height / 2 - stepSizeHeight / 2;
              y += stepSizeHeight) {
@@ -274,7 +272,6 @@ void RectLight::computeSamples() {
 
             sample = this->toWorld.Transform(sample);
             this->samples.push_back(toEigen(sample));
-            i++;
         }
     }
 }

@@ -24,14 +24,14 @@ def Xform "Camera"
 
 def Xform "Area"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 5.984611988067627, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 6.070693492889404, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def RectLight "Area"
     {
         color3f inputs:color = (1, 1, 1)
         float inputs:height = 1.5
-        float inputs:intensity = 30
+        float inputs:intensity = 600
         float inputs:specular = 1
         float inputs:width = 1.5
     }
@@ -218,7 +218,7 @@ def Xform "right"
 
 def Xform "back"
 {
-    matrix4d xformOp:transform = ( (-1, 1.5099581673894136e-7, -8.742277657347586e-8, 0), (1.553776485252456e-7, -7.768884557890487e-8, -1.7773131132125854, 0), (-1.5099581673894136e-7, -1, 4.371138828673793e-8, 0), (0, 6.063604831695557, 1.9251174926757812, 1) )
+    matrix4d xformOp:transform = ( (-1, 1.5099581673894136e-7, -8.742277657347586e-8, 0), (1.553776485252456e-7, -7.768884557890487e-8, -1.7773131132125854, 0), (-1.5099581673894136e-7, -1, 4.371138828673793e-8, 0), (0, 3.126101016998291, 1.9251174926757812, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def Mesh "back"

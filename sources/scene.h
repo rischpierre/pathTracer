@@ -72,9 +72,8 @@ struct BBox {
 
         return true;
     }
-
+    
     bool isFaceInside(const Face &face) const {
-        // todo at least one of the face's vertex should be in the box
         Eigen::Vector3f v0 = face.v0;
         Eigen::Vector3f v1 = face.v1;
         Eigen::Vector3f v2 = face.v2;
@@ -96,6 +95,7 @@ struct BBox {
     }
 };
 
+// Represents a mesh object in the scene. It contains faces, bbox and a shader
 struct Mesh {
     Mesh(std::vector<Face> &faces, const std::string &name, const BBox &bbox, uint id)
         : faces(faces), name(name), bbox(bbox), id(id) {}
@@ -108,14 +108,17 @@ struct Mesh {
     BBox bbox;
 };
 
+// Represents a rectangle light 
+// It contains information about its color, intensity, position and size
 struct RectLight {
     float height;
     float width;
 
     Eigen::Vector3f color;
-    Eigen::Vector3f position;
     float intensity;
-    pxr::GfMatrix4d toWorld; // TODO maybe replace with eigen type
+
+    Eigen::Vector3f position;
+    pxr::GfMatrix4d toWorld;
     Eigen::Vector3f normal;
 
     std::vector<Eigen::Vector3f> samples;
@@ -129,9 +132,12 @@ struct Camera {
     float focalLength;
     float hAperture;
     float vAperture;
-    pxr::GfMatrix4d toWorld; // TODO maybe replace with eigen type
+    pxr::GfMatrix4d toWorld;
 };
 
+// Container and manager of all objects in the scene 
+// It contains all meshes, lights, camera and shaders
+// It also converts USD data to internal data structures
 class Scene {
   public:
     Scene(const std::string &path);
@@ -154,12 +160,12 @@ class Scene {
     std::vector<Mesh> meshes;
     std::vector<Face> faces;
     std::vector<RectLight> rectLights;
+    Camera camera;
 
     Shader defaultShader;
     std::vector<Shader> shaders = {defaultShader};
     int faceIdCounter = 0;
 
-    Camera camera;
 };
 
 #endif // PATHTRACER_SCENEPARSER_H

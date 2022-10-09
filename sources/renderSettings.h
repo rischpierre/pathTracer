@@ -7,9 +7,9 @@
 #define MAIN_RESOLUTION_H 1080
 #define RESOLUTION_DIVIDER 2 
 
-#define LIGHT_SAMPLES 32    // 32 for HQ
-#define INDIRECT_SAMPLES 256  // 256 for high quality
-#define INDIRECT_DEPTH 2    // 1 for direct lighting only, 2 for HQ
+#define LIGHT_SAMPLES 4    // 32 for HQ
+#define INDIRECT_SAMPLES 8  // 256 for high quality
+#define INDIRECT_DEPTH 1    // 1 for direct lighting only, 2 for HQ
 
 #define RAY_TRACING_THRESHOLD 0.000001f
 #define INDIRECT_RAY_BIAS 0.00001f

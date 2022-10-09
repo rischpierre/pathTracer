@@ -117,6 +117,7 @@ void Scene::parseCamera(const std::vector<pxr::UsdPrim> &cameras) {
     hApertureAttr.Get(&this->camera.hAperture, STATIC_FRAME);
     vApertureAttr.Get(&this->camera.vAperture, STATIC_FRAME);
 }
+
 Shader Scene::createShader(const pxr::UsdGeomMesh &mesh) {
 
     auto bindingApi = pxr::UsdShadeMaterialBindingAPI(mesh);
@@ -159,7 +160,6 @@ Shader Scene::createShader(const pxr::UsdGeomMesh &mesh) {
 }
 
 void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes) {
-    // populate meshes
     uint meshId = 0;
     for (auto &primMesh : usdMeshes) {
         pxr::UsdGeomMesh usdMesh(primMesh);
@@ -222,14 +222,14 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes) {
             n0 = localToWorldMat.TransformDir(n0);
             n1 = localToWorldMat.TransformDir(n1);
             n2 = localToWorldMat.TransformDir(n2);
+            
+            Eigen::Vector3f n0e = toEigen(n0);
+            Eigen::Vector3f n1e = toEigen(n1);
+            Eigen::Vector3f n2e = toEigen(n2);
 
-            auto n0e = Eigen::Vector3f(n0[0], n0[1], n0[2]);
-            auto n1e = Eigen::Vector3f(n1[0], n1[1], n1[2]);
-            auto n2e = Eigen::Vector3f(n2[0], n2[1], n2[2]);
-
-            auto v0e = Eigen::Vector3f(v0[0], v0[1], v0[2]);
-            auto v1e = Eigen::Vector3f(v1[0], v1[1], v1[2]);
-            auto v2e = Eigen::Vector3f(v2[0], v2[1], v2[2]);
+            Eigen::Vector3f v0e = toEigen(v0);
+            Eigen::Vector3f v1e = toEigen(v1);
+            Eigen::Vector3f v2e = toEigen(v2);
 
             // compute Nf (face normal)
             auto nf = (v1e - v0e).cross(v2e - v0e).normalized();

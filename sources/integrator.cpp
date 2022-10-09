@@ -19,7 +19,7 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
     for (RectLight light : scene.rectLights) {
 
         // compute samples every time in order to have new samples each time, if not It will create banding
-        light.computeSamples();
+        /* light.computeSamples(); */
         for (const Eigen::Vector3f &lightSample : light.samples) {
 
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();

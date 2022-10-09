@@ -3,6 +3,12 @@
 CC = g++
 CFLAGS = -Wno-deprecated -std=c++17
 
+USD_ROOT = /opt/USD
+EIGEN_ROOT = /opt/Eigen
+MAIN = pathTracer
+BUILD_DIR = build
+SRCS_DIR = sources
+
 ifeq ($(BUILD),debug)
 	CFLAGS += -g
 else
@@ -13,20 +19,13 @@ ifeq ($(SINGLE_THREADED),1)
 	CFLAGS += -DSINGLE_THREADED
 endif
 
-LFLAGS = -L/opt/USD/lib
-USD_LIB = /opt/USD/lib
+LFLAGS = -L$(USD_ROOT)/lib
 LIBS = -ltbb -lpng -lsdf -lusd -lgf -ltf -lvt -lusdGeom -lusdShade 
-INCL = -I/opt/USD/include -I/opt/Eigen
-
-MAIN = pathTracer
-BUILD_DIR = build
-SRCS_DIR = sources
+INCL = -I$(USD_ROOT)/include -I$(EIGEN_ROOT)
 
 SRCS = $(wildcard $(SRCS_DIR)/*.cpp)
 HEADERS = $(wildcard $(SRCS_DIR)/*.h)
 OBJS = $(patsubst $(SRCS_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-
-# TODO bug when a file is changed, the make command does not recompiles
 
 .PHONY: all debug clean
 
@@ -37,7 +36,7 @@ $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 
 $(BUILD_DIR)/$(MAIN): $(OBJS) $(HEADERS)
-	$(CC) $(CFLAGS) $(INCL) -o $(BUILD_DIR)/$(MAIN) $(OBJS) -Wl,-rpath=$(USD_LIB) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(INCL) -o $(BUILD_DIR)/$(MAIN) $(OBJS) -Wl,-rpath=$(USD_ROOT)/lib $(LFLAGS) $(LIBS)
 
 $(OBJS): $(BUILD_DIR)/%.o: $(SRCS_DIR)/%.cpp
 	$(CC) $(CFLAGS) $(INCL) -c $<  -o $@

@@ -55,16 +55,13 @@ struct BBox {
 
     BBox(Eigen::Vector3f &min, Eigen::Vector3f &max) : min(min), max(max) {}
 
-    Eigen::Vector3f min;
-    Eigen::Vector3f max;
+    Eigen::Vector3f min, max;
 
     std::string getStrRepr() const;
-
     void print() const { std::cout << getStrRepr() << std::endl; }
-
+    
+    // Check if the given face is inside this bounding box
     bool isFaceCenterInside(const Face &face) const;
-
-    bool isFaceInside(const Face &face) const;
 };
 
 // Represents a mesh object in the scene. It contains faces, bbox and a shader
@@ -84,16 +81,15 @@ struct RectLight {
     float width, height, intensity;
 
     Eigen::Vector3f color, position, normal;
-
+    
     pxr::GfMatrix4d toWorld;
-
-    std::vector<Face> faces;
-    Eigen::Vector3f samples[LIGHT_SAMPLES * LIGHT_SAMPLES];
     
     // Generates faces from the light in order to add the resulting faces in the BVH
+    std::vector<Face> faces;
     void computeFaces(int startFaceId);
 
     // Generates a set of random points on the light
+    Eigen::Vector3f samples[LIGHT_SAMPLES * LIGHT_SAMPLES];
     void computeSamples();
 };
 

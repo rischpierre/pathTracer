@@ -11,27 +11,6 @@ bool BBox::isFaceCenterInside(const Face &face) const {
     return true;
 }
 
-bool BBox::isFaceInside(const Face &face) const {
-    Eigen::Vector3f v0 = face.v0;
-    Eigen::Vector3f v1 = face.v1;
-    Eigen::Vector3f v2 = face.v2;
-
-    if (v0.x() >= min.x() && v0.x() <= max.x() && v0.y() >= min.y() && v0.y() <= max.y() && v0.z() >= min.z() &&
-        v0.z() <= max.z()) {
-        return true;
-    }
-    if (v1.x() >= min.x() && v1.x() <= max.x() && v1.y() >= min.y() && v1.y() <= max.y() && v1.z() >= min.z() &&
-        v1.z() <= max.z()) {
-        return true;
-    }
-
-    if (v2.x() >= min.x() && v2.x() <= max.x() && v2.y() >= min.y() && v2.y() <= max.y() && v2.z() >= min.z() &&
-        v2.z() <= max.z()) {
-        return true;
-    }
-    return false;
-}
-
 void Scene::print() const {
     std::cout << "Scene:" << std::endl;
     std::cout << "  Meshes:" << std::endl;

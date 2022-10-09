@@ -21,40 +21,34 @@ struct BVHNode {
 // Represents a BVH tree structure accelerator.
 class Accelerator {
   public:
-    explicit Accelerator(const Scene &scene) : scene(scene) {
-        allFaces = scene.faces;
-
-        // init all bvh nodes
-        int maxNodeNumber = allFaces.size() * 2 - 1;
-        for (int i = 0; i < maxNodeNumber; i++) {
-            BVHNode node;
-            allNodes.push_back(node);
-        }
-
-        // init root node
-        root = &allNodes[0];
-    };
+    explicit Accelerator(const Scene &scene);
 
     int getNodeNumber() const { return nodeIdCounter; };
-
     std::vector<Face> getFaces() const { return allFaces; };
-
+    
+    // Builds the BVH tree structure recursively.
     BVHNode build();
-
+    void buildRecursive(BVHNode &startNode, uint8_t depth = 0);
+    
+    // Split a given bbox in two.
+    // It splits them along the longest axis.
     void splitBBoxIn2(const BBox &bbox, BBox &left, BBox &right);
 
     void print(int depth = 0);
     void print(const BVHNode &node, int depth = 0);
-
-    void buildRecursive(BVHNode &startNode, uint8_t depth = 0);
+    
+    // Generate a bounding box from a given set of faces
     BBox createBBoxFromFaces(const std::vector<Face> &faces);
 
+    // Get the faces intersected by a given ray using the BVH tree structure.
     std::vector<Face> getIntersectedFaces(const Ray &ray) const;
     void getIntersectedFacesRecursive(const BVHNode &node, const Ray &ray, std::vector<int> *intersectedFaces) const;
-
+    
+    // Get the nodes intersected by a given ray using the BVH tree structure.
     std::vector<BVHNode> getIntersectedNodes(const Ray &ray) const;
     void getIntersectedNodesRecursive(const BVHNode &node, const Ray &ray, std::vector<BVHNode> *nodes) const;
-
+    
+    // Export the bounding boxes to a USD file in order to visualize them in a 3D software
     void exportBBoxesToUsd(const std::string &filePath) const;
 
   private:

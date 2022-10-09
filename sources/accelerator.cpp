@@ -1,5 +1,19 @@
 #include "accelerator.h"
 
+Accelerator::Accelerator(const Scene &scene) : scene(scene) {
+        allFaces = scene.faces;
+
+        // init all bvh nodes
+        int maxNodeNumber = allFaces.size() * 2 - 1;
+        for (int i = 0; i < maxNodeNumber; i++) {
+            BVHNode node;
+            allNodes.push_back(node);
+        }
+
+        // init root node
+        root = &allNodes[0];
+    };
+
 void Accelerator::print(int depth) { print(*root, depth); }
 
 void Accelerator::print(const BVHNode &node, int depth) {

@@ -288,12 +288,11 @@ void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std
     }
 }
 
-std::vector<Eigen::Vector3f> RectLight::computeSamples() {
+void RectLight::computeSamples() {
 
     float stepSizeHeight = this->height / LIGHT_SAMPLES;
     float stepSizeWidth = this->width / LIGHT_SAMPLES;
-    std::vector<Eigen::Vector3f> samples;
-
+    int i =0;
     for (int sampleX = 0; sampleX < LIGHT_SAMPLES; sampleX++) {
         for (int sampleY = 0; sampleY < LIGHT_SAMPLES; sampleY++) {
             float initialPositionX = (stepSizeWidth / 2 + sampleX * stepSizeWidth) - this->width / 2;
@@ -308,11 +307,10 @@ std::vector<Eigen::Vector3f> RectLight::computeSamples() {
             auto sample = pxr::GfVec3f(jitteredX, jitteredY, 0);
             sample = this->toWorld.Transform(sample);
             Eigen::Vector3f sampleE = toEigen(sample);
-
-            samples.push_back(sampleE);
+            samples[i] = sampleE;
+            i++;
         }
     }
-    return samples;
 }
 
 void RectLight::computeFaces(int startFaceId) {

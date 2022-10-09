@@ -88,19 +88,19 @@ struct RectLight {
     pxr::GfMatrix4d toWorld;
 
     std::vector<Face> faces;
+    Eigen::Vector3f samples[LIGHT_SAMPLES * LIGHT_SAMPLES];
     
     // Generates faces from the light in order to add the resulting faces in the BVH
     void computeFaces(int startFaceId);
 
     // Generates a set of random points on the light
-    // todo maybe use a array instead of a vector to be faster?
-    std::vector<Eigen::Vector3f> computeSamples();
+    void computeSamples();
 };
 
+
+// Representation of a camera object in the scene
 struct Camera {
-    float focalLength;
-    float hAperture;
-    float vAperture;
+    float focalLength, hAperture, vAperture;
     pxr::GfMatrix4d toWorld;
 };
 
@@ -110,22 +110,30 @@ struct Camera {
 class Scene {
   public:
     Scene(const std::string &path);
-
+    
+    // Get all USD primitives by type
     void parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std::vector<pxr::UsdPrim> &rPrims,
                           const pxr::TfToken &type);
-
+    
+    // convert USD data to internal data structures
     void convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes);
-
+    
+    // Convert USD cameras to internal data structures
     void parseCamera(const std::vector<pxr::UsdPrim> &cameras);
 
+    // Convert USD lights to internal data structures
     void parseLights(const std::vector<pxr::UsdPrim> &usdLights);
-
+    
+    // Get the shader that is assigned to the given face
     Shader getShaderFromFace(const Face &face) const;
-
+    
+    // Create a shader from the given USD mesh.
+    // If the mesh does not have a material assigned, the default shader will be returned.
     Shader createShader(const pxr::UsdGeomMesh &mesh);
 
     void print() const;
-
+    
+    // Scene objects containers
     std::vector<Mesh> meshes;
     std::vector<Face> faces;
     std::vector<RectLight> rectLights;

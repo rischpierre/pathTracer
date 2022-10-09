@@ -18,12 +18,12 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
     Eigen::Vector3f color{0.f, 0.f, 0.f};
     for (RectLight light : scene.rectLights) {
 
-        // compute samples every time in order to have new samples each time, if not It will create banding
-        std::vector<Eigen::Vector3f> samples = light.computeSamples();
 
         Eigen::Vector3f lightDir = (light.position - shadingPoint.hitPoint).normalized();
 
-        for (const Eigen::Vector3f &lightSample : samples) {
+        // compute samples every time in order to have new samples each time, if not It will create banding
+        light.computeSamples();
+        for (const Eigen::Vector3f &lightSample : light.samples) {
 
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
@@ -57,7 +57,7 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
                 /* color *= std::max(0.f, lightDirSample.dot(light.normal)) / 2; */
             }
         }
-        color /= samples.size();
+        color /= (sizeof(light.samples) /sizeof(light.samples[0]));
 
         // decay for shading orientation
         color *= std::max(0.f, lightDir.dot(shadingPoint.n));

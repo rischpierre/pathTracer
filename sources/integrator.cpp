@@ -19,8 +19,11 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
     for (RectLight light : scene.rectLights) {
 
         // compute samples every time in order to have new samples each time, if not It will create banding
-        /* light.computeSamples(); */
-        for (const Eigen::Vector3f &lightSample : light.samples) {
+        std::vector<Eigen::Vector3f> samples = light.computeSamples();
+
+        Eigen::Vector3f lightDir = (light.position - shadingPoint.hitPoint).normalized();
+
+        for (const Eigen::Vector3f &lightSample : samples) {
 
             Eigen::Vector3f lightDirSample = (lightSample - shadingPoint.hitPoint).normalized();
 
@@ -35,12 +38,13 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
 
             for (const Face &face : accelerator.getIntersectedFaces(shadowRay)) {
 
-                if (face.id == shadingPoint.face.id) {
+                if (face.id == shadingPoint.face.id || face.meshId == LIGHT_MESH_ID){
                     continue;
                 }
 
                 float u, v, distance;
                 intersected = isRayIntersectsTriangle(&shadowRay, &face, &distance, u, v);
+                
                 if (intersected && distance < (lightSample - shadingPoint.hitPoint).norm()) {
                     break;
                 }
@@ -49,11 +53,17 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
             if (!intersected) {
                 // light decay
                 color += (light.color * light.intensity) / (4 * M_PI * lightDirSample.norm());
-                color *= std::max(0.f, lightDirSample.dot(shadingPoint.n));
-                color *= std::max(0.f, lightDirSample.dot(light.normal)) / 2;
+                /* color *= std::max(0.f, lightDirSample.dot(shadingPoint.n)); */
+                /* color *= std::max(0.f, lightDirSample.dot(light.normal)) / 2; */
             }
         }
-        color /= LIGHT_SAMPLES;
+        color /= samples.size();
+        
+        // decay for shading orientation
+        color *= std::max(0.f, lightDir.dot(shadingPoint.n));
+        
+        // decay for light orientation 
+        color *= std::max(0.f, lightDir.dot(light.normal)) / 2;
     }
     return color;
 }

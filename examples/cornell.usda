@@ -24,16 +24,16 @@ def Xform "Camera"
 
 def Xform "Area"
 {
-    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 6.070693492889404, 1) )
+    matrix4d xformOp:transform = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 6.070690155029297, 1) )
     uniform token[] xformOpOrder = ["xformOp:transform"]
 
     def RectLight "Area"
     {
         color3f inputs:color = (1, 1, 1)
-        float inputs:height = 1.5
-        float inputs:intensity = 600
+        float inputs:height = 2
+        float inputs:intensity = 60
         float inputs:specular = 1
-        float inputs:width = 1.5
+        float inputs:width = 2
     }
 }
 

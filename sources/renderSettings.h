@@ -5,11 +5,11 @@
 // RENDER SETTINGS
 #define MAIN_RESOLUTION_W 1920
 #define MAIN_RESOLUTION_H 1080
-#define RESOLUTION_DIVIDER 2 
+#define RESOLUTION_DIVIDER 4 
 
-#define LIGHT_SAMPLES 4    // 32 for HQ
-#define INDIRECT_SAMPLES 8  // 256 for high quality
-#define INDIRECT_DEPTH 1    // 1 for direct lighting only, 2 for HQ
+#define LIGHT_SAMPLES 8    // 16 for HQ
+#define INDIRECT_SAMPLES 32  // 256 for high quality
+#define INDIRECT_DEPTH 2    // 1 for direct lighting only, 2 for HQ
 
 #define RAY_TRACING_THRESHOLD 0.000001f
 #define INDIRECT_RAY_BIAS 0.00001f
@@ -31,7 +31,7 @@
 #define RESOLUTION_H (MAIN_RESOLUTION_H / RESOLUTION_DIVIDER)
 
 #define DEBUG_PIXEL false 
-#define DEBUG_PIXEL_X 467 
-#define DEBUG_PIXEL_Y 537 
+#define DEBUG_PIXEL_X 291 
+#define DEBUG_PIXEL_Y 470 
 
 #endif // PATHTRACER_RENDERSETTINGS_H

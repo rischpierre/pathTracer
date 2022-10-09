@@ -121,11 +121,10 @@ struct RectLight {
     pxr::GfMatrix4d toWorld;
     Eigen::Vector3f normal;
 
-    std::vector<Eigen::Vector3f> samples;
     std::vector<Face> faces;
 
     void computeFaces(int startFaceId);
-    void computeSamples();
+    std::vector<Eigen::Vector3f> computeSamples();
 };
 
 struct Camera {

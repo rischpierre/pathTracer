@@ -11,6 +11,8 @@ void printGfMat4f(const pxr::GfMatrix4d &input);
 
 void printGfVec3f(const pxr::GfVec3f &input);
 
+void printVec3(const Eigen::Vector3f &v);
+
 Eigen::Vector3f toEigen(const pxr::GfVec3f &input);
 
 pxr::GfVec3f toGfVec3f(const Eigen::Vector3f &input);

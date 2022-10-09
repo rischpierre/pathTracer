@@ -256,24 +256,31 @@ void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std
     }
 }
 
-void RectLight::computeSamples() {
+ std::vector<Eigen::Vector3f> RectLight::computeSamples() {
 
     float stepSizeHeight = this->height / LIGHT_SAMPLES;
     float stepSizeWidth = this->width / LIGHT_SAMPLES;
+    std::vector<Eigen::Vector3f> samples;
 
-    for (float x = -this->width / 2 + stepSizeWidth / 2; x < this->width / 2 - stepSizeWidth / 2; x += stepSizeWidth) {
-        for (float y = -this->height / 2 + stepSizeHeight / 2; y < this->height / 2 - stepSizeHeight / 2;
-             y += stepSizeHeight) {
+    for (int sampleX = 0; sampleX < LIGHT_SAMPLES; sampleX++) {
+        for (int sampleY = 0; sampleY < LIGHT_SAMPLES; sampleY++){
+            float initialPositionX = (stepSizeWidth / 2 + sampleX * stepSizeWidth) - this->width / 2;
+            float initialPositionY = (stepSizeHeight / 2 + sampleY * stepSizeHeight) - this->height / 2;
 
-            auto sample = pxr::GfVec3f(x, y, 0);
-            float jitter = (((float)rand() / (float)RAND_MAX) * 2) - 1; // range: [-1, 1]
+            float jitterX = (((float)rand() / (float)RAND_MAX) * 2) - 1; // range: [-1, 1]
+            float jitterY = (((float)rand() / (float)RAND_MAX) * 2) - 1; // range: [-1, 1]
 
-            sample = pxr::GfVec3f(sample[0] + stepSizeWidth * jitter, sample[1] + stepSizeHeight * jitter, 0);
+            float jitteredX = initialPositionX + (stepSizeWidth/2) * jitterX;
+            float jitteredY = initialPositionY + (stepSizeHeight/2) * jitterY;
 
+            auto sample = pxr::GfVec3f(jitteredX, jitteredY, 0);
             sample = this->toWorld.Transform(sample);
-            this->samples.push_back(toEigen(sample));
-        }
+            Eigen::Vector3f sampleE = toEigen(sample);
+
+            samples.push_back(sampleE);
+         }
     }
+    return samples;
 }
 
 void RectLight::computeFaces(int startFaceId) {

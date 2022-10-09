@@ -171,7 +171,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     }
     indirectContribution /= (float)INDIRECT_SAMPLES;
 
-    hitColor = (directContribution / M_PI + indirectContribution).cwiseProduct(shdPoint.shader.diffuse);
+    hitColor = (directContribution / M_PI + indirectContribution/2).cwiseProduct(shdPoint.shader.diffuse);
 
 #if DEBUG_PIXEL == true
     std::cout << depthTab << "IC: " << indirectContribution[0] << " ";

@@ -5,10 +5,10 @@
 // RENDER SETTINGS
 #define MAIN_RESOLUTION_W 1920
 #define MAIN_RESOLUTION_H 1080
-#define RESOLUTION_DIVIDER 4 
+#define RESOLUTION_DIVIDER 2 
 
 #define LIGHT_SAMPLES 8    // 16 for HQ
-#define INDIRECT_SAMPLES 32  // 256 for high quality
+#define INDIRECT_SAMPLES 256 // 256 for high quality
 #define INDIRECT_DEPTH 2    // 1 for direct lighting only, 2 for HQ
 
 #define RAY_TRACING_THRESHOLD 0.000001f

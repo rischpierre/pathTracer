@@ -162,10 +162,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
                                        sample.x() * Nb.z() + sample.y() * shdPoint.n.z() + sample.z() * Nt.z()};
 
         // r1 is cos(theta)
-        // todo create a new contructor for the Ray to simplify this
-        Eigen::Vector3f newRayOrigin = hitPoint + shdPoint.n * INDIRECT_RAY_BIAS;
-        Eigen::Vector3f newRayDirection = sampleWorld;
-        Ray newRay(newRayOrigin, newRayDirection);
+        Ray newRay(hitPoint + shdPoint.n * INDIRECT_RAY_BIAS, sampleWorld);
 
         indirectContribution += r1 * castRay(newRay, scene, depth + 1) / pdf;
     }

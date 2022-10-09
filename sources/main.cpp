@@ -12,23 +12,6 @@
 #include "renderSettings.h"
 #include "scene.h"
 
-// todo move in camera class
-Ray createCameraRay(const Camera &cam, int x, int y) {
-
-    float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
-    // todo why - for the y sample ?
-    float sampleY = -((cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2);
-    float sampleZ = -cam.focalLength; // camera is pointing towards - z
-
-    pxr::GfVec3f rayOrig = cam.toWorld.Transform(pxr::GfVec3f(0));
-    pxr::GfVec3f rayDir = cam.toWorld.TransformDir(pxr::GfVec3f(sampleX, sampleY, sampleZ)).GetNormalized();
-
-    Eigen::Vector3f rayD(rayDir[0], rayDir[1], rayDir[2]);
-    Eigen::Vector3f rayO(rayOrig[0], rayOrig[1], rayOrig[2]);
-
-    Ray ray(rayO, rayD);
-    return ray;
-}
 
 int main(int argc, char *argv[]) {
 
@@ -106,7 +89,7 @@ int main(int argc, char *argv[]) {
     tbb::tick_count t4 = tbb::tick_count::now();
     std::cout << "Rendered in " << (t4 - t3).seconds() << " seconds" << std::endl;
 
-    write_png_file(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
+    writePngFile(resultImageFile, RESOLUTION_W, RESOLUTION_H, pixels);
     std::cout << "Wrote file " << resultImageFile << std::endl;
 
     delete[] pixels;

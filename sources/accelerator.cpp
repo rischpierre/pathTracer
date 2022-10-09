@@ -99,7 +99,6 @@ void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth) {
         }
     }
 
-    // todo bug with the bbox having the same fCount and continuing to split
     // 0: left, 1: right
     for (uint8_t i = 0; i < 2; i++) {
         

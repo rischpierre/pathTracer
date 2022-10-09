@@ -107,3 +107,18 @@ bool isRayIntersectsBox(const Ray &ray, const BBox &bbox) {
     return true;
 }
 
+Ray createCameraRay(const Camera& cam, int x, int y) {
+
+    float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
+    float sampleY = -((cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2);
+    float sampleZ = -cam.focalLength; // camera is pointing towards - z
+
+    pxr::GfVec3f rayOrig = cam.toWorld.Transform(pxr::GfVec3f(0));
+    pxr::GfVec3f rayDir = cam.toWorld.TransformDir(pxr::GfVec3f(sampleX, sampleY, sampleZ)).GetNormalized();
+
+    Eigen::Vector3f rayD(rayDir[0], rayDir[1], rayDir[2]);
+    Eigen::Vector3f rayO(rayOrig[0], rayOrig[1], rayOrig[2]);
+
+    Ray ray(rayO, rayD);
+    return ray;
+}

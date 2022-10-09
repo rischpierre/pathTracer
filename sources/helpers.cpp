@@ -29,8 +29,7 @@ Eigen::Vector3f toEigen(const pxr::GfVec3f &input) { return Eigen::Vector3f(inpu
 
 pxr::GfVec3f toGfVec3f(const Eigen::Vector3f &input) { return pxr::GfVec3f(input[0], input[1], input[2]); }
 
-// todo cleanup camel case
-void write_png_file(const std::string &filename, int width, int height, const Eigen::Vector3f *pixels) {
+void writePngFile(const std::string &filename, int width, int height, const Eigen::Vector3f *pixels) {
 
     FILE *fp = fopen(filename.c_str(), "wb");
     if (!fp)

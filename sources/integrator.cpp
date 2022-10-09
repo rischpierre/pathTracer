@@ -51,10 +51,7 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
             }
 
             if (!intersected) {
-                // light decay
                 color += (light.color * light.intensity) / (4 * M_PI * lightDirSample.norm());
-                /* color *= std::max(0.f, lightDirSample.dot(shadingPoint.n)); */
-                /* color *= std::max(0.f, lightDirSample.dot(light.normal)) / 2; */
             }
         }
         color /= (sizeof(light.samples) /sizeof(light.samples[0]));

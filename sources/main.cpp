@@ -1,11 +1,11 @@
 
-#include "helpers.h"
 #include <Eigen>
 #include <ctime>
 #include <fstream>
 #include <iostream>
 #include <tbb/tbb.h>
 
+#include "helpers.h"
 #include "accelerator.h"
 #include "integrator.h"
 #include "raytracer.h"

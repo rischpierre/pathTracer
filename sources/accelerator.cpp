@@ -108,8 +108,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth) {
         else if (i == 1 && rightFacesIds.empty())
             continue;
 
-        // all nodes are initialized in advance to avoid initializing them on the
-        // heap
+        // all nodes are initialized in advance to avoid initializing them on the heap
         nodeIdCounter++;
         BVHNode *childNode = &allNodes[nodeIdCounter];
         childNode->id = nodeIdCounter;

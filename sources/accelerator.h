@@ -1,11 +1,14 @@
 #ifndef PATHTRACER_ACCELERATOR_H
 #define PATHTRACER_ACCELERATOR_H
 
+#include <pxr/usd/usdGeom/sphere.h>
 #include "raytracer.h"
 #include "renderSettings.h"
 #include "scene.h"
-#include <pxr/usd/usdGeom/sphere.h>
 
+
+// Represents a node in the BVH tree structure.
+// It contains the bounding box of the node and the faces contained in it.
 struct BVHNode {
     BVHNode *leftChild = nullptr;
     BVHNode *rightChild = nullptr;
@@ -14,6 +17,8 @@ struct BVHNode {
     int id = -1;
 };
 
+
+// Represents a BVH tree structure accelerator.
 class Accelerator {
   public:
     explicit Accelerator(const Scene &scene) : scene(scene) {

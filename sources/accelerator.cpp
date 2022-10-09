@@ -101,7 +101,7 @@ void Accelerator::buildRecursive(BVHNode &startNode, uint8_t depth) {
 
     // 0: left, 1: right
     for (uint8_t i = 0; i < 2; i++) {
-        
+
         // skip if no faces
         if (i == 0 && leftFacesIds.empty())
             continue;

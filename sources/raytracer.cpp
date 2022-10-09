@@ -1,15 +1,5 @@
 #include "raytracer.h"
 
-/*
- * Check if a ray hits a given triangle. This is the implementation of the
- * Möller-Trumbore algorithm
- *
- * ray: The ray that intersects or not the face.
- * face: The face that is intersected or not by the ray.
- * distance: The distance between the origin of the ray and the point of
- * intersection between the ray and the face.
- * return: true if the ray intersect the face.
- */
 bool isRayIntersectsTriangle(const Ray *ray, const Face *face, float *distance, float &u, float &v) {
 
     Eigen::Vector3f edge1, edge2, p, q, t;
@@ -107,7 +97,7 @@ bool isRayIntersectsBox(const Ray &ray, const BBox &bbox) {
     return true;
 }
 
-Ray createCameraRay(const Camera& cam, int x, int y) {
+Ray createCameraRay(const Camera &cam, int x, int y) {
 
     float sampleX = (cam.hAperture / (float)RESOLUTION_W) * (float)x - cam.hAperture / 2;
     float sampleY = -((cam.vAperture / (float)RESOLUTION_H) * (float)y - cam.vAperture / 2);

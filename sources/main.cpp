@@ -12,7 +12,6 @@
 #include "renderSettings.h"
 #include "scene.h"
 
-
 int main(int argc, char *argv[]) {
 
     if (argc != 2) {
@@ -54,7 +53,7 @@ int main(int argc, char *argv[]) {
     int progress = 0;
 
 #ifdef SINGLE_THREADED
-    std::cout << "Single threaded" << std::endl; 
+    std::cout << "Single threaded" << std::endl;
 
     for (int y = 0; y < RESOLUTION_H; y++) {
 #else

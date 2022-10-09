@@ -18,7 +18,7 @@ class Accelerator {
   public:
     explicit Accelerator(const Scene &scene) : scene(scene) {
         allFaces = scene.faces;
-        
+
         // init all bvh nodes
         int maxNodeNumber = allFaces.size() * 2 - 1;
         for (int i = 0; i < maxNodeNumber; i++) {

@@ -1,5 +1,37 @@
 #include "scene.h"
 
+Eigen::Vector3f Face::getCenter() const { return (v0 + v1 + v2) / 3.0f; }
+
+bool BBox::isFaceCenterInside(const Face &face) const {
+    Eigen::Vector3f center = face.getCenter();
+    for (int i = 0; i < 3; i++) {
+        if (center[i] < min[i] || center[i] > max[i])
+            return false;
+    }
+    return true;
+}
+
+bool BBox::isFaceInside(const Face &face) const {
+    Eigen::Vector3f v0 = face.v0;
+    Eigen::Vector3f v1 = face.v1;
+    Eigen::Vector3f v2 = face.v2;
+
+    if (v0.x() >= min.x() && v0.x() <= max.x() && v0.y() >= min.y() && v0.y() <= max.y() && v0.z() >= min.z() &&
+        v0.z() <= max.z()) {
+        return true;
+    }
+    if (v1.x() >= min.x() && v1.x() <= max.x() && v1.y() >= min.y() && v1.y() <= max.y() && v1.z() >= min.z() &&
+        v1.z() <= max.z()) {
+        return true;
+    }
+
+    if (v2.x() >= min.x() && v2.x() <= max.x() && v2.y() >= min.y() && v2.y() <= max.y() && v2.z() >= min.z() &&
+        v2.z() <= max.z()) {
+        return true;
+    }
+    return false;
+}
+
 void Scene::print() const {
     std::cout << "Scene:" << std::endl;
     std::cout << "  Meshes:" << std::endl;
@@ -222,7 +254,7 @@ void Scene::convertUSDMeshes(const std::vector<pxr::UsdPrim> &usdMeshes) {
             n0 = localToWorldMat.TransformDir(n0);
             n1 = localToWorldMat.TransformDir(n1);
             n2 = localToWorldMat.TransformDir(n2);
-            
+
             Eigen::Vector3f n0e = toEigen(n0);
             Eigen::Vector3f n1e = toEigen(n1);
             Eigen::Vector3f n2e = toEigen(n2);
@@ -256,49 +288,49 @@ void Scene::parsePrimsByType(pxr::UsdPrim &prim, const pxr::UsdStage &stage, std
     }
 }
 
- std::vector<Eigen::Vector3f> RectLight::computeSamples() {
+std::vector<Eigen::Vector3f> RectLight::computeSamples() {
 
     float stepSizeHeight = this->height / LIGHT_SAMPLES;
     float stepSizeWidth = this->width / LIGHT_SAMPLES;
     std::vector<Eigen::Vector3f> samples;
 
     for (int sampleX = 0; sampleX < LIGHT_SAMPLES; sampleX++) {
-        for (int sampleY = 0; sampleY < LIGHT_SAMPLES; sampleY++){
+        for (int sampleY = 0; sampleY < LIGHT_SAMPLES; sampleY++) {
             float initialPositionX = (stepSizeWidth / 2 + sampleX * stepSizeWidth) - this->width / 2;
             float initialPositionY = (stepSizeHeight / 2 + sampleY * stepSizeHeight) - this->height / 2;
 
             float jitterX = (((float)rand() / (float)RAND_MAX) * 2) - 1; // range: [-1, 1]
             float jitterY = (((float)rand() / (float)RAND_MAX) * 2) - 1; // range: [-1, 1]
 
-            float jitteredX = initialPositionX + (stepSizeWidth/2) * jitterX;
-            float jitteredY = initialPositionY + (stepSizeHeight/2) * jitterY;
+            float jitteredX = initialPositionX + (stepSizeWidth / 2) * jitterX;
+            float jitteredY = initialPositionY + (stepSizeHeight / 2) * jitterY;
 
             auto sample = pxr::GfVec3f(jitteredX, jitteredY, 0);
             sample = this->toWorld.Transform(sample);
             Eigen::Vector3f sampleE = toEigen(sample);
 
             samples.push_back(sampleE);
-         }
+        }
     }
     return samples;
 }
 
 void RectLight::computeFaces(int startFaceId) {
-     
-    int samples = 2; 
+
+    int samples = 2;
     float stepSizeHeight = this->height / samples;
     float stepSizeWidth = this->width / samples;
 
     pxr::GfVec3f n{0, 0, -1};
     Eigen::Vector3f ne = toEigen(this->toWorld.TransformDir(n));
 
-    for (float x=-this->width/2; x< this->width/2; x+=stepSizeWidth) {
-        for (float y=-this->height/2; y< this->height/2; y+=stepSizeHeight) {
+    for (float x = -this->width / 2; x < this->width / 2; x += stepSizeWidth) {
+        for (float y = -this->height / 2; y < this->height / 2; y += stepSizeHeight) {
 
             pxr::GfVec3f x0{x, y, 0};
-            pxr::GfVec3f x1{x+stepSizeWidth, y, 0};
-            pxr::GfVec3f x2{x+stepSizeHeight, y+stepSizeHeight, 0};
-            pxr::GfVec3f x3{x, y+stepSizeHeight, 0};
+            pxr::GfVec3f x1{x + stepSizeWidth, y, 0};
+            pxr::GfVec3f x2{x + stepSizeHeight, y + stepSizeHeight, 0};
+            pxr::GfVec3f x3{x, y + stepSizeHeight, 0};
 
             Eigen::Vector3f xe0 = toEigen(this->toWorld.Transform(x0));
             Eigen::Vector3f xe1 = toEigen(this->toWorld.Transform(x1));

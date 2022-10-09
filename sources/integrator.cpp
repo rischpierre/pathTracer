@@ -38,13 +38,13 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
 
             for (const Face &face : accelerator.getIntersectedFaces(shadowRay)) {
 
-                if (face.id == shadingPoint.face.id || face.meshId == LIGHT_MESH_ID){
+                if (face.id == shadingPoint.face.id || face.meshId == LIGHT_MESH_ID) {
                     continue;
                 }
 
                 float u, v, distance;
                 intersected = isRayIntersectsTriangle(&shadowRay, &face, &distance, u, v);
-                
+
                 if (intersected && distance < (lightSample - shadingPoint.hitPoint).norm()) {
                     break;
                 }
@@ -58,11 +58,11 @@ Eigen::Vector3f Integrator::getDirectContribution(const Ray &ray, const Scene &s
             }
         }
         color /= samples.size();
-        
+
         // decay for shading orientation
         color *= std::max(0.f, lightDir.dot(shadingPoint.n));
-        
-        // decay for light orientation 
+
+        // decay for light orientation
         color *= std::max(0.f, lightDir.dot(light.normal)) / 2;
     }
     return color;
@@ -121,7 +121,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
         return {0, 0, 0};
 
     if (nearestFace->meshId == LIGHT_MESH_ID) {
-        
+
         // if light is backfacing the ray
         if (nearestFace->nf.dot(ray.d) > 0) {
             return {0, 0, 0};
@@ -168,7 +168,7 @@ Eigen::Vector3f Integrator::castRay(const Ray &ray, const Scene &scene, uint dep
     }
     indirectContribution /= (float)INDIRECT_SAMPLES;
 
-    hitColor = (directContribution / M_PI + indirectContribution/2).cwiseProduct(shdPoint.shader.diffuse);
+    hitColor = (directContribution / M_PI + indirectContribution / 2).cwiseProduct(shdPoint.shader.diffuse);
 
 #if DEBUG_PIXEL == true
     std::cout << depthTab << "IC: " << indirectContribution[0] << " ";

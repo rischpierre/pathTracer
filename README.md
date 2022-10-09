@@ -1,13 +1,19 @@
 # pathTracer
 
-This is an experimental uni-directionnal path tracer based on USD.
-Currently it is for diffuse materials only.
-There are examples of usd scene in the examples folder.
+This is an experimental uni-directionnal path tracer based on USD.  
+It is supporting only diffuse materials currently.  
+There are examples of usd scene in the examples folder.  
 
 ![Example render](examples/cornell.png)
 
 ## Usage
-pathTracer <usd scene>
+```shell
+pathTracer <scene.usda>
+```
+
+```shell
+pathTracer examples/cornell.usda
+```
 
 ## Dependencies
 - USD

@@ -1,10 +1,19 @@
 # pathTracer
 
 This is an experimental uni-directionnal path tracer based on USD.  
-It is supporting only diffuse materials currently.  
-There are examples of usd scene in the examples folder.  
 
 ![Example render](examples/cornell.png)
+
+
+## Features
+- Diffuse shading
+- Rect lights
+- Smooth shading
+- BVH acceleration
+- Multi-threaded
+- CPU based
+- USD as scene data source 
+
 
 ## Usage
 ```shell

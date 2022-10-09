@@ -4,7 +4,7 @@ This is an experimental uni-directionnal path tracer based on USD.
 Currently it is for diffuse materials only.
 There are examples of usd scene in the examples folder.
 
-![Example render](examples/cornell.png)
+![Example render](.examples/cornell.png)
 
 ## Usage
 pathTracer <usd scene>
